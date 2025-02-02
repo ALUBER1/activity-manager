@@ -1,7 +1,1 @@
-# Tauri + Yew
-
-This template should help get you started developing with Tauri and Yew.
-
-## Recommended IDE Setup
-
-[VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+This app is an activity manager (as name suggests) that lets store and remove activities, it only requires a name, a date and a time. It can just stay on background in the tray and notify you by default 30 minuts earlier (you can change it in the settings).
