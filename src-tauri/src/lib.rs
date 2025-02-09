@@ -57,9 +57,9 @@ impl Database{
         Ok(ret)
     }
 
-    fn delete_record(&mut self, record: Record) -> Result<(), Error>{
-        match self.conn.execute("DELETE FROM events WHERE name = ?1 AND date = ?2 AND time = ?3", [record.name, record.date, record.time]){
-            Ok(_) => Ok(()),
+    fn delete_record(&mut self, record: Record) -> Result<Record, Error>{
+        match self.conn.execute("DELETE FROM events WHERE name = ?1 AND date = ?2 AND time = ?3", [record.name.clone(), record.date.clone(), record.time.clone()]){
+            Ok(_) => Ok(record),
             Err(e) => Err(e)
         }
     }
@@ -152,6 +152,23 @@ fn get_record(record: Record, state: State<'_, Mutex<Option<Database>>>) -> Reco
 }
 
 #[tauri::command]
+fn delete_record(record: Record, state: State<'_, Mutex<Option<Database>>>) {
+    let mut db: std::sync::MutexGuard<'_, Option<Database>> = state.lock().expect("error unpacking mutex");
+    if db.is_none(){
+        println!("database doesn't exist yet");
+    } else {
+        if let Some(ref mut database) = *db{
+            match database.delete_record(record){
+                Ok(rec) => println!("deleted record: {:?}", rec),
+                Err(e) =>{println!("{:?}", e)}
+            }
+        } else {
+            println!("database error");
+        }
+    }
+}
+
+#[tauri::command]
 fn get_all_records(state: State<'_, Mutex<Option<Database>>>) -> Vec<Record>{
     let mut db = state.lock().expect("error unpacking mutex");
     if db.is_none(){
@@ -175,7 +192,7 @@ pub fn run() {
     tauri::Builder::default()
         .manage(Mutex::new(None::<Database>))
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![create_database, initialize_database, get_record, add_record, get_all_records])
+        .invoke_handler(tauri::generate_handler![create_database, initialize_database, get_record, add_record, get_all_records, delete_record])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

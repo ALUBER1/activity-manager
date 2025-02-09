@@ -1,6 +1,5 @@
 use std::rc::Rc;
 
-use gloo::console::log;
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
@@ -60,7 +59,6 @@ pub fn invoke_function_vec<'a>(function: &'a str, result: Option<UseStateHandle<
     if args.is_none(){
         spawn_local(async {
             let buffer = invoke(function, JsValue::null()).await;
-            log!(buffer.clone());
             
             if !result.is_none() {result.unwrap().set(from_value(buffer).expect("wasn't able to extract value"));}
         });
