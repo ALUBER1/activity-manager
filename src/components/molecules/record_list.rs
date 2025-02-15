@@ -24,8 +24,8 @@ pub fn record_list(records: &Props) -> Html{
     });
     html!{
         {records.list.clone().into_iter().map(|element|{
-            html!{<div style = "display: flex; align: center;">
-                <h1 style = "margin: 15px 20px 15px 20px; align-self: center;">{"name: "}{element.name.clone()}{", data: "}{element.date.clone()}{", orario: "}{element.time.clone()}</h1>
+            html!{<div id="record-list">
+                <h1>{"name: "}{element.name.clone()}{", date: "}{element.date.clone()}{", time: "}{element.time.clone()}</h1>
                 <RecordButton id = {element}  onclick = {handler.clone()}/>
             </div>}
         }).collect::<Html>()}

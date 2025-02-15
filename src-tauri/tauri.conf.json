@@ -13,7 +13,9 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "activity-manager",
+        "title": "Activity Manager",
+        "decorations": false,
+        "transparent": true,
         "width": 800,
         "height": 600
       }

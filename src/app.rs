@@ -30,11 +30,19 @@ pub fn app() -> Html {
 
     html! {
         <div>
-            <div style = "margin-bottom: 20px;">
-                <Form on_submit = {on_submit}/>
+            <div id="head">
+                <h1 id="title">{"Activity manager"}</h1>
+                <button id="minimize">{"-"}</button>
+                <button id="maximize">{"[]"}</button>
+                <button id="close">{"X"}</button>
             </div>
             <div>
-                <RecordList list = {(*record_list).clone()} callback = {remove_handler} />
+                <div style = "margin-bottom: 20px;">
+                    <Form on_submit = {on_submit}/>
+                </div>
+                <div>
+                    <RecordList list = {(*record_list).clone()} callback = {remove_handler} />
+                </div>
             </div>
         </div>
     }
