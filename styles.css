@@ -6,7 +6,8 @@
 
 input[type= "text"],
 button {
-  background-color: transparent !important;
+  transition-duration: 0.4s;
+  background-color: transparent;
   color: var(--text-color) !important;
   border: 2px solid var(--text-color);
   border-radius: 20px;
@@ -40,6 +41,7 @@ body {
   background-color: var(--head-background-color);
   display: flex;
   justify-content: flex-end;
+  cursor: default;
 }
 
 #title {
@@ -54,4 +56,20 @@ body {
 
 #head button:last-child {
   margin-right: 10px;
+}
+
+#head h1:hover {
+  cursor: default;
+}
+
+#close:hover {
+  background-color: red;
+}
+
+#maximize:hover {
+  background-color: grey;
+}
+
+#minimize:hover {
+  background-color: grey;
 }

@@ -1,6 +1,6 @@
 use gloo::console::log;
 use yew::prelude::*;
-use crate::{components::molecules::{form::{Event, Form}, record_list::{Record, RecordList}}, helper::{self, invoke_function, invoke_function_vec}};
+use crate::{components::molecules::{form::{Event, Form}, record_list::{Record, RecordList}, title_bar::TitleBar}, functions::Functions, helper::{self, invoke_function, invoke_function_vec}};
 
 #[function_component(App)]
 pub fn app() -> Html {
@@ -24,18 +24,21 @@ pub fn app() -> Html {
     let remove_handler = Callback::from(move |record: Record|{
         invoke_function("delete_record", None, Some(helper::Record::from(record)));
     });
+
+    let title_handler = Callback::from(move |function: Functions| {
+        match function {
+            Functions::close => invoke_function("close_app", None, None),
+            Functions::minimize => invoke_function("minimize_app", None, None),
+            Functions::maximize => invoke_function("maximize_app", None, None)
+        }
+    });
     
     
     invoke_function_vec("get_all_records", Some(clone_list), None);
 
     html! {
         <div>
-            <div id="head">
-                <h1 id="title">{"Activity manager"}</h1>
-                <button id="minimize">{"-"}</button>
-                <button id="maximize">{"[]"}</button>
-                <button id="close">{"X"}</button>
-            </div>
+            <TitleBar on_click={title_handler}></TitleBar>
             <div>
                 <div style = "margin-bottom: 20px;">
                     <Form on_submit = {on_submit}/>
