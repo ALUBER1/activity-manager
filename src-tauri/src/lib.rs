@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 use serde::{Deserialize, Serialize};
-use tauri::State;
+use tauri::{Manager, State};
 use rusqlite::{params, Connection, Error};
 
 #[derive(Debug)]
@@ -187,12 +187,37 @@ fn get_all_records(state: State<'_, Mutex<Option<Database>>>) -> Vec<Record>{
     }
 }
 
+#[tauri::command]
+fn close_app(app_handle: tauri::AppHandle) {
+    if let Some(window) = app_handle.get_webview_window("main") {
+        let _ = window.close();
+    }
+}
+
+#[tauri::command]
+fn minimize_app(app_handle: tauri::AppHandle) {
+    if let Some(window) = app_handle.get_webview_window("main") {
+        let _ = window.minimize();
+    }
+}
+
+#[tauri::command]
+fn maximize_app(app_handle: tauri::AppHandle) {
+    if let Some(window) = app_handle.get_webview_window("main") {
+        if window.is_maximized().expect("error"){
+            let _ = window.unmaximize();
+        } else {
+            let _ = window.maximize();
+        }
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .manage(Mutex::new(None::<Database>))
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![create_database, initialize_database, get_record, add_record, get_all_records, delete_record])
+        .invoke_handler(tauri::generate_handler![maximize_app, minimize_app, close_app, create_database, initialize_database, get_record, add_record, get_all_records, delete_record])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
