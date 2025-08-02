@@ -6,7 +6,6 @@
 
 input[type= "text"],
 button {
-  transition-duration: 0.4s;
   background-color: transparent;
   color: var(--text-color) !important;
   border: 2px solid var(--text-color);
@@ -14,6 +13,10 @@ button {
   padding-left: 10px !important;
   margin-top: 20px;
   margin-left: 10px !important;
+}
+
+input[type= "text"] {
+  transition: all 1.5s;
 }
 
 button {

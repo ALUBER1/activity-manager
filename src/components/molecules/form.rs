@@ -1,6 +1,8 @@
 use std::ops::Deref;
+use gloo::{console::log, timers::callback::Timeout};
 use yew::prelude::*;
 use crate::components::atoms::{text_input::TextInput, button::Button};
+use chrono::{Local, NaiveDate, NaiveTime};
 
 #[derive(Default, Clone)]
 pub struct Event {
@@ -16,7 +18,12 @@ pub struct Props {
 
 #[function_component(Form)]
 pub fn form(props: &Props) -> Html{
+    let timer = 3000;
+
     let value_state = use_state(||Event::default());
+    let name_color = use_state(||String::new());
+    let date_color = use_state(||String::new());
+    let time_color = use_state(||String::new());
 
     let cloned_value = value_state.clone();
     let on_changename = Callback::from(move |name|{
@@ -35,18 +42,74 @@ pub fn form(props: &Props) -> Html{
 
     let cloned_value = value_state.clone();
     let clone_submit = props.on_submit.clone();
+    let name_clone = name_color.clone();
+    let date_clone = date_color.clone();
+    let time_clone = time_color.clone();
     let on_submit = Callback::from(move |event: SubmitEvent|{
         event.prevent_default();
         let data = cloned_value.deref().clone();
-        clone_submit.emit(data);
+        let mut correct = true;
+        
+        if NaiveDate::parse_from_str(&data.date, "%d/%m/%Y").is_err() || is_future_date(&data.date) == 0 {
+            date_clone.set("red".to_string());
+            correct = false;
+            let date_clone = date_clone.clone();
+            Timeout::new(timer, move || {
+                date_clone.set("".to_string());
+            }).forget();
+        }
+        if data.name.is_empty() {
+            name_clone.set("red".to_string());
+            correct = false;
+            let name_clone = name_clone.clone();
+            Timeout::new(timer, move || {
+                name_clone.set("".to_string());
+            }).forget();
+        }
+        if NaiveTime::parse_from_str(&data.time, "%H:%M").is_err() || !is_future_time(&data.time, is_future_date(&data.date)) {
+            time_clone.set("red".to_string());
+            correct = false;
+            let time_clone = time_clone.clone();
+            Timeout::new(timer, move || {
+                time_clone.set("".to_string());
+            }).forget();
+        }
+        if correct {
+            clone_submit.emit(data);
+        }
     });
 
     html!{
         <form onsubmit={on_submit}>
-            <TextInput name="name" on_change={on_changename}/>
-            <TextInput name="date" on_change={on_changedate}/>
-            <TextInput name="time" on_change={on_changetime}/>
+            <TextInput name="name" on_change={on_changename} color={(*name_color).clone()}/>
+            <TextInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()}/>
+            <TextInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()}/>
             <Button label = "submit"/>
         </form>
     }
+}
+
+fn is_future_date(date: &str) -> i8 {
+    if let Ok(parsed) = NaiveDate::parse_from_str(date, "%d/%m/%Y") {
+        let local = Local::now().date_naive();
+        if parsed > local {
+            return 1;
+        } else if parsed == local {
+            return 2;
+        }
+    } 
+
+    0
+}
+
+fn is_future_time(time: &str, future : i8) -> bool {
+    if future == 1 {
+        return true;
+    } else if future == 2 {
+        if let Ok(parsed) = NaiveTime::parse_from_str(time, "%H:%M") {  
+            let local = Local::now().time();
+            return parsed > local;
+        }
+    }
+    false
 }

@@ -27,9 +27,9 @@ pub fn app() -> Html {
 
     let title_handler = Callback::from(move |function: Functions| {
         match function {
-            Functions::close => invoke_function("close_app", None, None),
-            Functions::minimize => invoke_function("minimize_app", None, None),
-            Functions::maximize => invoke_function("maximize_app", None, None)
+            Functions::Close => invoke_function("close_app", None, None),
+            Functions::Minimize => invoke_function("minimize_app", None, None),
+            Functions::Maximize => invoke_function("maximize_app", None, None)
         }
     });
     

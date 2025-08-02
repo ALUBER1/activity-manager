@@ -16,9 +16,9 @@ pub fn button(label: &Props) -> Html {
     html!{
         <div data-tauri-drag-region="true" id="head">
                 <h1 data-tauri-drag-region="true" id="title">{"Activity manager"}</h1>
-                <TitleButton label={"-"} id={Functions::minimize} on_click={handler.clone()}></TitleButton>
-                <TitleButton label={"[]"} id={Functions::maximize} on_click={handler.clone()}></TitleButton>
-                <TitleButton label={"X"} id={Functions::close} on_click={handler.clone()}></TitleButton>
+                <TitleButton label={"-"} id={Functions::Minimize} on_click={handler.clone()}></TitleButton>
+                <TitleButton label={"[]"} id={Functions::Maximize} on_click={handler.clone()}></TitleButton>
+                <TitleButton label={"X"} id={Functions::Close} on_click={handler.clone()}></TitleButton>
         </div>
     }
 }

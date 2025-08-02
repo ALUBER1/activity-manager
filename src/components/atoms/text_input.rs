@@ -5,7 +5,8 @@ use yew::prelude::*;
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub name: String,
-    pub on_change: Callback<String>
+    pub on_change: Callback<String>,
+    pub color: String
 }
 
 #[function_component(TextInput)]
@@ -16,6 +17,6 @@ pub fn text_input(props: &Props) -> Html{
         on_changecall.emit(input);
     });
     html!{
-        <input type="text" name = {props.name.clone()} placeholder = {props.name.clone()} onchange = {onchange}/>
+        <input type="text" autocomplete = "off" name = {props.name.clone()} placeholder = {props.name.clone()} onchange = {onchange} style = {format!("background-color: {}", props.color.clone())}/>
     }
 }
