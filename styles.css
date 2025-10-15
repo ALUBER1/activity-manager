@@ -1,18 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=close,delete,fullscreen,fullscreen_exit,remove,send");
+
 :root {
   --text-color: #a9a9a9;
+  --tet: #cc0b0b;
   --background-color: #3c3c3c;
   --head-background-color: #272727;
 }
 
-input[type= "text"],
-button {
+input[type= "text"] {
   background-color: transparent;
-  color: var(--text-color) !important;
+  color: var(--text-color);
   border: 2px solid var(--text-color);
   border-radius: 20px;
-  padding-left: 10px !important;
+  padding-left: 10px;
   margin-top: 20px;
-  margin-left: 10px !important;
+  margin-left: 10px;
 }
 
 input[type= "text"] {
@@ -20,14 +22,13 @@ input[type= "text"] {
 }
 
 button {
-  padding-right: 10px !important;
-}
-
-h1 {
-  color: var(--text-color);
-  margin: 15px 20px !important;
-  align-self: center;
-  font-size: 25px !important;
+  padding-right: 10px;
+  user-select: none;
+  background-color: transparent;
+  color: var(--text-color) !important;
+  padding-left: 10px;
+  margin-top: 20px;
+  margin-left: 10px !important;
 }
 
 body {
@@ -47,9 +48,26 @@ body {
   cursor: default;
 }
 
+#input[type= "text"]::placeholder {
+  user-select: none;
+}
+
 #title {
   flex-grow: 1;
   font-size: 15px !important;
+  color: var(--text-color);
+  margin: 15px 20px !important;
+  align-self: center;
+  user-select: none;
+
+  &:hover {
+    cursor: default;
+  }
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: #33cfc7;
 }
 
 #head button {
@@ -61,18 +79,26 @@ body {
   margin-right: 10px;
 }
 
-#head h1:hover {
-  cursor: default;
-}
-
-#close:hover {
+#Close:hover {
+  transition: background-color 0.5s;
   background-color: red;
 }
 
-#maximize:hover {
+#Maximize:hover,
+#Minimize:hover {
+  transition: background-color 0.5s;
   background-color: grey;
 }
 
-#minimize:hover {
-  background-color: grey;
+p {
+  padding: none;
+  padding-left: 2%;
+  color: var(--text-color);
+  margin: none;
+  font-size: 20px;
+}
+
+span {
+  font-size:25px;
+  vertical-align:middle;
 }

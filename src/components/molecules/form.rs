@@ -16,6 +16,8 @@ pub struct Props {
     pub on_submit: Callback<Event>
 }
 
+const INVALID_COLOR: &str = "#cc0b0b";
+
 #[function_component(Form)]
 pub fn form(props: &Props) -> Html{
     let timer = 3000;
@@ -51,7 +53,7 @@ pub fn form(props: &Props) -> Html{
         let mut correct = true;
         
         if NaiveDate::parse_from_str(&data.date, "%d/%m/%Y").is_err() || is_future_date(&data.date) == 0 {
-            date_clone.set("red".to_string());
+            date_clone.set(INVALID_COLOR.to_string());
             correct = false;
             let date_clone = date_clone.clone();
             Timeout::new(timer, move || {
@@ -59,7 +61,7 @@ pub fn form(props: &Props) -> Html{
             }).forget();
         }
         if data.name.is_empty() {
-            name_clone.set("red".to_string());
+            name_clone.set(INVALID_COLOR.to_string());
             correct = false;
             let name_clone = name_clone.clone();
             Timeout::new(timer, move || {
@@ -67,7 +69,7 @@ pub fn form(props: &Props) -> Html{
             }).forget();
         }
         if NaiveTime::parse_from_str(&data.time, "%H:%M").is_err() || !is_future_time(&data.time, is_future_date(&data.date)) {
-            time_clone.set("red".to_string());
+            time_clone.set(INVALID_COLOR.to_string());
             correct = false;
             let time_clone = time_clone.clone();
             Timeout::new(timer, move || {
@@ -84,7 +86,7 @@ pub fn form(props: &Props) -> Html{
             <TextInput name="name" on_change={on_changename} color={(*name_color).clone()}/>
             <TextInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()}/>
             <TextInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()}/>
-            <Button label = "submit"/>
+            <Button><span class="material-symbols-outlined">{"send"}</span></Button>
         </form>
     }
 }

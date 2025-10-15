@@ -16,6 +16,6 @@ pub fn button(label: &Props) -> Html {
         onclick.emit(id.clone());
     });
     html!{
-        <button style = "margin: 0; align-self: center; flex-shrink: 0; width: auto;" onclick = {handler}> {"delete"} </button>
+        <button style = "margin: 0; align-self: center; flex-shrink: 0; width: auto;" onclick = {handler}><span class="material-symbols-outlined">{"delete"}</span> </button>
     }
 }
