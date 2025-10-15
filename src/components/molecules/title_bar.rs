@@ -10,15 +10,22 @@ pub struct Props {
 #[function_component(TitleBar)]
 pub fn button(label: &Props) -> Html {
     let onclick = label.on_click.clone();
+
+    let maximize_class = use_state(||{false});
+    let maximize_class_clone = maximize_class.clone();
+
     let handler = Callback::from(move |a: Functions|{
+        if a == Functions::Maximize {
+            maximize_class_clone.set(!(*maximize_class_clone));
+        }
         onclick.emit(a.clone());
     });
     html!{
         <div data-tauri-drag-region="true" id="head">
                 <h1 data-tauri-drag-region="true" id="title">{"Activity manager"}</h1>
-                <TitleButton label={"-"} id={Functions::minimize} on_click={handler.clone()}></TitleButton>
-                <TitleButton label={"[]"} id={Functions::maximize} on_click={handler.clone()}></TitleButton>
-                <TitleButton label={"X"} id={Functions::close} on_click={handler.clone()}></TitleButton>
+                <TitleButton id={Functions::Minimize} on_click={handler.clone()}><span class="material-symbols-outlined">{"remove"}</span></TitleButton>
+                <TitleButton id={Functions::Maximize} on_click={handler.clone()}><span class="material-symbols-outlined">{if !(*maximize_class) {"fullscreen"} else {"fullscreen_exit"}}</span></TitleButton>
+                <TitleButton id={Functions::Close} on_click={handler.clone()}><span class="material-symbols-outlined">{"close"}</span></TitleButton>
         </div>
     }
 }

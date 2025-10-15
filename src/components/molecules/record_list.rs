@@ -25,7 +25,7 @@ pub fn record_list(records: &Props) -> Html{
     html!{
         {records.list.clone().into_iter().map(|element|{
             html!{<div id="record-list">
-                <h1>{"name: "}{element.name.clone()}{", date: "}{element.date.clone()}{", time: "}{element.time.clone()}</h1>
+                <p>{"name: "}{element.name.clone()}{", date: "}{element.date.clone()}{", time: "}{element.time.clone()}</p>
                 <RecordButton id = {element}  onclick = {handler.clone()}/>
             </div>}
         }).collect::<Html>()}

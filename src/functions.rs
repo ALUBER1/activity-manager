@@ -2,9 +2,9 @@ use core::fmt;
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum Functions {
-    close,
-    minimize,
-    maximize
+    Close,
+    Minimize,
+    Maximize
 } 
 
 impl fmt::Display for Functions {

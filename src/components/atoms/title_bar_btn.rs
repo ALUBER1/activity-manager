@@ -4,7 +4,8 @@ use crate::functions::Functions;
 
 #[derive(PartialEq, Properties)]
 pub struct Props {
-    pub label: String,
+    #[prop_or_default]
+    pub children: Children,
     pub id: Functions,
     pub on_click: Callback<Functions>
 }
@@ -17,6 +18,6 @@ pub fn button(label: &Props) -> Html {
         onclick.emit(id.clone());
     });
     html!{
-        <button id={label.id.to_string()} onclick={handler}>{label.label.clone()}</button>
+        <button id={label.id.to_string()} onclick={handler}>{for label.children.iter()}</button>
     }
 }
