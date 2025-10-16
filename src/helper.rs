@@ -4,10 +4,8 @@ use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 use wasm_bindgen_futures::spawn_local;
-use yew::{Properties, UseStateHandle};
-use components::molecules::record_list::Record as RecordOut;
-
-use crate::components;
+use yew::UseStateHandle;
+use shared::models::record::Record;
 
 #[wasm_bindgen]
 extern "C" {
@@ -15,30 +13,9 @@ extern "C" {
     async fn invoke(cmd: &str, args: JsValue) -> JsValue;
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Properties, PartialEq)]
-pub struct Record{
-    pub name: String,
-    pub date: String,
-    pub time: String
-}
-
 #[derive(Serialize, Deserialize)]
 pub struct Args{
     pub record: Record
-}
-
-impl Record {
-    pub fn default() -> Record {
-        Record { name: "".to_string(), date: "".to_string(), time: "".to_string() }
-    }
-
-    pub fn record_by_name(name: String) -> Record {
-        Record{name, date: "".to_string(), time: "".to_string() }
-    }
-
-    pub fn from(other: RecordOut) -> Record{
-        Record{name: other.name, date: other.date, time: other.time}
-    }
 }
 
 pub fn invoke_function<'a>(function: &'a str, result: Option<Rc<UseStateHandle<Record>>>, args: Option<Record>) where 'a:'static{
@@ -55,7 +32,7 @@ pub fn invoke_function<'a>(function: &'a str, result: Option<Rc<UseStateHandle<R
     }
 }
 
-pub fn invoke_function_vec<'a>(function: &'a str, result: Option<UseStateHandle<Vec<RecordOut>>>, args: Option<RecordOut>) where 'a:'static{
+pub fn invoke_function_vec<'a>(function: &'a str, result: Option<UseStateHandle<Vec<Record>>>, args: Option<Record>) where 'a:'static{
     if args.is_none(){
         spawn_local(async {
             let buffer = invoke(function, JsValue::null()).await;

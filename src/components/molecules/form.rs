@@ -1,15 +1,9 @@
 use std::ops::Deref;
-use gloo::{console::log, timers::callback::Timeout};
+use gloo::timers::callback::Timeout;
 use yew::prelude::*;
 use crate::components::atoms::{text_input::TextInput, button::Button};
+use shared::models::record::Record as Event;
 use chrono::{Local, NaiveDate, NaiveTime};
-
-#[derive(Default, Clone)]
-pub struct Event {
-    pub name: String,
-    pub date: String,
-    pub time: String
-}
 
 #[derive(Properties, PartialEq)]
 pub struct Props {

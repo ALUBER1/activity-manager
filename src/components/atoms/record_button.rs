@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-use crate::components::molecules::record_list::Record;
+use shared::models::record::Record;
 
 #[derive(PartialEq, Properties)]
 pub struct Props {

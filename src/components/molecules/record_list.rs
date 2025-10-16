@@ -1,14 +1,7 @@
-use serde::Deserialize;
 use yew::{function_component, html, Callback, Html, Properties};
 
 use crate::components::atoms::record_button::RecordButton;
-
-#[derive(Properties, PartialEq, Clone, Deserialize, Default)]
-pub struct Record{
-    pub name: String,
-    pub date: String,
-    pub time: String
-}
+use shared::models::record::Record;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct Props{
