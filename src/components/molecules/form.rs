@@ -80,7 +80,7 @@ pub fn form(props: &Props) -> Html{
             <TextInput name="name" on_change={on_changename} color={(*name_color).clone()}/>
             <TextInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()}/>
             <TextInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()}/>
-            <Button><span class="material-symbols-outlined">{"send"}</span></Button>
+            <Button id="submit"><span class="material-symbols-outlined">{"send"}</span></Button>
         </form>
     }
 }

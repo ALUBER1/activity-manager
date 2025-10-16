@@ -10,15 +10,16 @@
 input[type= "text"] {
   background-color: transparent;
   color: var(--text-color);
-  border: 2px solid var(--text-color);
-  border-radius: 20px;
-  padding-left: 10px;
+  padding-left: 5px;
   margin-top: 20px;
   margin-left: 10px;
-}
+  transition: all 1s;
+  border-bottom: 1px solid white;
 
-input[type= "text"] {
-  transition: all 1.5s;
+  &:focus {
+    outline: none;
+    border-color: #33cfc7;
+  }
 }
 
 button {
@@ -48,10 +49,6 @@ body {
   cursor: default;
 }
 
-#input[type= "text"]::placeholder {
-  user-select: none;
-}
-
 #title {
   flex-grow: 1;
   font-size: 15px !important;
@@ -65,18 +62,12 @@ body {
   }
 }
 
-input[type="text"]:focus {
-  outline: none;
-  border-color: #33cfc7;
-}
-
 #head button {
   display: flex;
   align-self: center;
-}
-
-#head button:last-child {
-  margin-right: 10px;
+  &:last-child {
+    margin-right: 10px;
+  }
 }
 
 #Close:hover {
@@ -85,9 +76,16 @@ input[type="text"]:focus {
 }
 
 #Maximize:hover,
-#Minimize:hover {
+#Minimize:hover,
+#submit:hover {
   transition: background-color 0.5s;
   background-color: grey;
+}
+
+#submit {
+  align-items: center;
+  width: 30px;
+  border-radius: 5px;
 }
 
 p {
@@ -99,6 +97,6 @@ p {
 }
 
 span {
-  font-size:25px;
-  vertical-align:middle;
+  font-size: 25px;
+  vertical-align: middle;
 }
