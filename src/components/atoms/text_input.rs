@@ -1,5 +1,5 @@
 use wasm_bindgen::JsCast;
-use web_sys::{HtmlInputElement, Node};
+use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]

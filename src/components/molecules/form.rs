@@ -1,15 +1,9 @@
 use std::ops::Deref;
-use gloo::{console::log, timers::callback::Timeout};
+use gloo::timers::callback::Timeout;
 use yew::prelude::*;
 use crate::components::atoms::{text_input::TextInput, button::Button};
+use shared::models::record::Record as Event;
 use chrono::{Local, NaiveDate, NaiveTime};
-
-#[derive(Default, Clone)]
-pub struct Event {
-    pub name: String,
-    pub date: String,
-    pub time: String
-}
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
@@ -86,7 +80,7 @@ pub fn form(props: &Props) -> Html{
             <TextInput name="name" on_change={on_changename} color={(*name_color).clone()}/>
             <TextInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()}/>
             <TextInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()}/>
-            <Button><span class="material-symbols-outlined">{"send"}</span></Button>
+            <Button id="submit"><span class="material-symbols-outlined">{"send"}</span></Button>
         </form>
     }
 }

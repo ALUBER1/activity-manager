@@ -1,6 +1,6 @@
-use gloo::console::log;
 use yew::prelude::*;
-use crate::{components::molecules::{form::{Event, Form}, record_list::{Record, RecordList}, title_bar::TitleBar}, functions::Functions, helper::{self, invoke_function, invoke_function_vec}};
+use crate::{components::molecules::{form::Form, record_list::RecordList, title_bar::TitleBar}, functions::Functions, helper::{invoke_function, invoke_function_vec}};
+use shared::models::record::Record;
 
 #[function_component(App)]
 pub fn app() -> Html {
@@ -13,16 +13,12 @@ pub fn app() -> Html {
     });
     let clone_list = record_list.clone();
     let on_submit = 
-        Callback::from(move |data: Event| {
-            invoke_function("add_record", None, Some(helper::Record {
-                name: data.name.clone(),
-                date: data.date.clone(),
-                time: data.time.clone(),
-            }));
+        Callback::from(move |data: Record| {
+            invoke_function("add_record", None, Some(Record { uuid: "".to_string(), name: data.name, date: data.date, time: data.time}));
         });
 
     let remove_handler = Callback::from(move |record: Record|{
-        invoke_function("delete_record", None, Some(helper::Record::from(record)));
+        invoke_function("delete_record", None, Some(Record::from(record)));
     });
 
     let title_handler = Callback::from(move |function: Functions| {
@@ -32,7 +28,6 @@ pub fn app() -> Html {
             Functions::Maximize => invoke_function("maximize_app", None, None)
         }
     });
-    
     
     invoke_function_vec("get_all_records", Some(clone_list), None);
 

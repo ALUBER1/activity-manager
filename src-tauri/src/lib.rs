@@ -2,27 +2,12 @@ use std::sync::Mutex;
 use serde::{Deserialize, Serialize};
 use tauri::{Manager, State};
 use rusqlite::{params, Connection, Error};
+use shared::models::record::Record;
+use uuid::Uuid;
 
 #[derive(Debug)]
 struct Database{
     conn: Connection
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Record{
-    name: String,
-    date: String,
-    time: String
-}
-
-impl Record {
-    fn default() -> Record {
-        Record { name: "".to_string(), date: "".to_string(), time: "".to_string() }
-    }
-
-    fn new(name: String, date: String, time: String) -> Record {
-        Record { name ,date, time }
-    }
 }
 
 impl Database{
@@ -33,6 +18,7 @@ impl Database{
 
     fn initialize(&mut self) -> Result<(), Error>{
         match self.conn.execute("CREATE TABLE IF NOT EXISTS events(
+            uuid TEXT,
             name TEXT,
             date TEXT,
             time TEXT
@@ -43,22 +29,22 @@ impl Database{
     }
 
     fn add_record(&mut self, record: Record) -> Result<(), Error>{
-        match self.conn.execute("INSERT INTO events(name, date, time) VALUES (?1, ?2, ?3)", params![record.name, record.date, record.time]){
+        match self.conn.execute("INSERT INTO events(uuid, name, date, time) VALUES (?1, ?2, ?3, ?4)", params![Uuid::new_v4().to_string(), record.name, record.date, record.time]){
             Ok(_) => Ok(()),
             Err(e) => Err(e)
         }
     }
 
     fn get_record(&mut self, record: String) -> Result<Record, Error>{
-        let mut comm = self.conn.prepare("SELECT name, date, time FROM events WHERE name = ?1")?;
+        let mut comm = self.conn.prepare("SELECT name, date, time FROM events WHERE id = ?1")?;
         let ret = comm.query_row([record], |row|{
-            Ok(Record{name: row.get(0)?, date: row.get(1)?, time: row.get(2)?})
+            Ok(Record::new(row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?,))
         })?;
         Ok(ret)
     }
 
     fn delete_record(&mut self, record: Record) -> Result<Record, Error>{
-        match self.conn.execute("DELETE FROM events WHERE name = ?1 AND date = ?2 AND time = ?3", [record.name.clone(), record.date.clone(), record.time.clone()]){
+        match self.conn.execute("DELETE FROM events WHERE uuid = ?1", [record.uuid.clone()]){
             Ok(_) => Ok(record),
             Err(e) => Err(e)
         }
@@ -76,7 +62,7 @@ impl Database{
         let mut cols = comm.query([])?;
         let mut vec = Vec::new();
         while let Some(row) = cols.next()? {
-            vec.push(Record::new(row.get(0)?, row.get(1)?, row.get(2)?));
+            vec.push(Record::new(row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?));
         }
         Ok(vec)
     }
@@ -90,6 +76,7 @@ fn create_database(state: State<'_, Mutex<Option<Database>>>) {
             Ok(database) => {*db = Some(database); println!("db opened correctly")},
             Err(e) => println!("{:?}", e)
         }
+
         
     } else {
         println!("db already exists");
