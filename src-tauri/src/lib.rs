@@ -1,5 +1,4 @@
 use std::sync::Mutex;
-use serde::{Deserialize, Serialize};
 use tauri::{Manager, State};
 use rusqlite::{params, Connection, Error};
 use shared::models::record::Record;
