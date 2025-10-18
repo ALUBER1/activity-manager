@@ -1,5 +1,5 @@
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, record_list::RecordList, title_bar::TitleBar}, functions::Functions, helper::{invoke_function, invoke_function_vec}};
+use crate::{components::molecules::{form::Form, record_list::RecordList, title_bar::TitleBar, settings::Settings}, functions::Functions, helper::{invoke_function, invoke_function_vec}};
 use shared::models::record::Record;
 
 #[function_component(App)]
@@ -32,13 +32,16 @@ pub fn app() -> Html {
     invoke_function_vec("get_all_records", Some(clone_list), None);
 
     html! {
-        <div>
-            <TitleBar on_click={title_handler}></TitleBar>
-            <div>
-                <div style = "margin-bottom: 20px;">
+        <div id="main">
+            <div id="fixed">
+                <TitleBar on_click={title_handler}></TitleBar>
+                <div id="form">
                     <Form on_submit = {on_submit}/>
                 </div>
-                <div>
+                <Settings />
+            </div>
+            <div id="non-fixed">
+                <div id="record-list">
                     <RecordList list = {(*record_list).clone()} callback = {remove_handler} />
                 </div>
             </div>

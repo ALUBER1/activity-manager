@@ -1,7 +1,8 @@
 use yew::{function_component, html, Callback, Html, Properties};
 
-use crate::components::atoms::record_button::RecordButton;
 use shared::models::record::Record;
+
+use crate::components::atoms::record_button::RecordButton;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct Props{
@@ -17,9 +18,9 @@ pub fn record_list(records: &Props) -> Html{
     });
     html!{
         {records.list.clone().into_iter().map(|element|{
-            html!{<div id="record-list">
+            html!{<div class="record-list-style">
                 <p>{"name: "}{element.name.clone()}{", date: "}{element.date.clone()}{", time: "}{element.time.clone()}</p>
-                <RecordButton id = {element}  onclick = {handler.clone()}/>
+                <RecordButton id = {element}  onclick = {handler.clone()} ty={"delete"}/>
             </div>}
         }).collect::<Html>()}
     }
