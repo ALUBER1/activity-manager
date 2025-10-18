@@ -1,0 +1,62 @@
+name: Build application for mac
+
+on:
+  workflow_call:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with: 
+          fetch-depth: 0
+            
+      - name: setup rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Cache cargo registry and build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: install wasm
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: install tauri
+        run: |
+          if ! command -v tauri &> /dev/null || ! cargo tauri --version &> /dev/null; then
+            cargo install tauri-cli --force
+          fi
+
+
+      - name: install trunk
+        run: |
+          if ! command -v trunk &> /dev/null; then
+            cargo install --locked trunk
+          fi
+            
+      - name: building application
+        run: cargo tauri build
+            
+      - name: rename installer
+        run: mv ./target/release/bundle/dmg/activity-manager_0.1.0_aarch64.dmg ./target/release/bundle/dmg/activity-manager-${{github.ref_name}}.dmg
+            
+      - name: Create GitHub Release  
+        uses: softprops/action-gh-release@v2  
+        with:  
+          files: ./target/release/bundle/dmg/activity-manager-${{github.ref_name}}.dmg
+          tag_name: ${{ github.ref_name }}
+        env:  
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

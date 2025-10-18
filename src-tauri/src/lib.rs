@@ -49,13 +49,6 @@ impl Database{
         }
     }
 
-    fn custom_command(&mut self, command: &str) -> Result<(), Error>{
-        match self.conn.execute(command, []){
-            Ok(_) => Ok(()),
-            Err(e) => Err(e)
-        }
-    }
-
     fn get_all_records(&mut self) -> Result<Vec<Record>, Error>{
         let mut comm = self.conn.prepare("SELECT * FROM events")?;
         let mut cols = comm.query([])?;
