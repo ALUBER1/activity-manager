@@ -43,9 +43,7 @@ html, body {
 }
 
 #non-fixed {
-  position: relative;
-  top: 50px;
-  height: calc(100% - 50px);
+  margin-top: 130px
 }
 
 #main {
