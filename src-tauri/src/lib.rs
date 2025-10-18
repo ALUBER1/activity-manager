@@ -1,5 +1,4 @@
 use std::sync::Mutex;
-use serde::{Deserialize, Serialize};
 use tauri::{Manager, State};
 use rusqlite::{params, Connection, Error};
 use shared::models::record::Record;
@@ -46,13 +45,6 @@ impl Database{
     fn delete_record(&mut self, record: Record) -> Result<Record, Error>{
         match self.conn.execute("DELETE FROM events WHERE uuid = ?1", [record.uuid.clone()]){
             Ok(_) => Ok(record),
-            Err(e) => Err(e)
-        }
-    }
-
-    fn custom_command(&mut self, command: &str) -> Result<(), Error>{
-        match self.conn.execute(command, []){
-            Ok(_) => Ok(()),
             Err(e) => Err(e)
         }
     }
