@@ -46,9 +46,25 @@ html, body {
 #record-list {
   height: 100%;
   width: 100%;
+  padding-right: 120px;
   overflow-x: hidden;
   overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    width: 20px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--text-color);
+    border-radius: 10px;
+    border: 6px solid var(--background-color);
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
 }
+
 
 #non-fixed {
   margin-top: 130px;
@@ -65,7 +81,7 @@ html, body {
   display: flex;
   align-self: center;
   height: fit-content;
-  width: 100%;
+  width: 90%;
 
   & > button {
     margin-left: 15px;

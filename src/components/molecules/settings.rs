@@ -1,4 +1,4 @@
-use gloo::{console::log, timers::callback::Timeout};
+use gloo::{timers::callback::Timeout};
 use yew::{function_component, html, use_state, Callback, Html};
 
 use crate::components::{atoms::button::Button};

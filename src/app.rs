@@ -6,19 +6,25 @@ use shared::models::record::Record;
 pub fn app() -> Html {
     
     let record_list: UseStateHandle<Vec<Record>> = use_state(||Vec::new());
-    use_effect_with((), |_|{
+    
+    let clone_list = record_list.clone();
+    use_effect_with((), move |_|{
         invoke_function("create_database", None, None);
-        invoke_function("initialize_database", None, None);
+        invoke_function("initialize_database", None, None);  
+        invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
         ||{}
     });
     let clone_list = record_list.clone();
-    let on_submit = 
-        Callback::from(move |data: Record| {
-            invoke_function("add_record", None, Some(Record { uuid: "".to_string(), name: data.name, date: data.date, time: data.time}));
-        });
+    let on_submit = Callback::from(move |data: Record| {
+        invoke_function("add_record", None, Some(Record { uuid: "".to_string(), name: data.name, date: data.date, time: data.time}));
+        invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
+    });
 
+        
+    let clone_list = record_list.clone();
     let remove_handler = Callback::from(move |record: Record|{
         invoke_function("delete_record", None, Some(Record::from(record)));
+        invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
     });
 
     let title_handler = Callback::from(move |function: Functions| {
@@ -29,8 +35,6 @@ pub fn app() -> Html {
         }
     });
     
-    invoke_function_vec("get_all_records", Some(clone_list), None);
-
     html! {
         <div id="main">
             <div id="fixed">
