@@ -69,6 +69,8 @@ html, body {
 #non-fixed {
   margin-top: 130px;
   height: calc(100vh - 130px);
+  margin-left: 60px;
+  z-index: 1;
 }
 
 #main {
@@ -111,7 +113,6 @@ html, body {
   display: flex;
   justify-content: flex-end;
   cursor: default;
-  z-index: 100;
 }
 
 #title {
@@ -172,15 +173,18 @@ p {
 
 #form {
   background-color: var(--background-color);
+  padding-left: 60px;
 }
 
 span {
   font-size: 25px;
   vertical-align: middle;
+  transition: transform 700ms ease;
+  transform: rotate(0deg);
 }
 
 #settings {
-  background-color: var(--input-background-color);
+  background-color: var(--head-background-color);
   position: fixed;
   width: 40px;
   height: 40px;
@@ -192,10 +196,43 @@ span {
 }
 
 .spin {
-  animation: SettingsSpin 700ms 1 linear;
+  transform: rotate(360deg);
 }
 
-@keyframes SettingsSpin {
-  from{transform: rotate(0deg);}
-  to{transform: rotate(360deg);}
+#settings-panel {
+  top: 0px;
+  position: absolute;
+  animation-fill-mode: both;
+  height: 100%;
+  background-color: var(--head-background-color);
+  transition: width 700ms ease;
+
+  & > div {
+    display: flex;
+  }
+}
+
+.show-panel {
+  width: 300px;
+}
+
+.hide-panel {
+  width: 60px;
+  content-visibility: hidden;
+}
+
+#settings-container {
+  z-index: 1000;
+  width: fit-content;
+  position: absolute;
+  top: 52.5px;
+  height: calc(100% - 52.5px);
+}
+
+.setting-label {
+  margin-left: 15px;
+
+  & + input {
+    margin-left: 10px;
+  }
 }
