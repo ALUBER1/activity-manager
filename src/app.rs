@@ -22,7 +22,7 @@ pub fn app() -> Html {
 
         
     let clone_list = record_list.clone();
-    let remove_handler = Callback::from(move |record: Record|{
+    let delete_handler = Callback::from(move |record: Record|{
         invoke_function("delete_record", None, Some(Record::from(record)));
         invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
     });
@@ -33,6 +33,12 @@ pub fn app() -> Html {
             Functions::Minimize => invoke_function("minimize_app", None, None),
             Functions::Maximize => invoke_function("maximize_app", None, None)
         }
+    });
+
+    let clone_list = record_list.clone();
+    let edit_handler = Callback::from(move |record: Record|{
+        invoke_function("delete_record", None, Some(Record::from(record)));
+        invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
     });
     
     html! {
@@ -45,7 +51,7 @@ pub fn app() -> Html {
             </div>
             <div id="non-fixed">
                 <div id="record-list">
-                    <RecordList list = {(*record_list).clone()} callback = {remove_handler} />
+                    <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler}/>
                 </div>
             </div>
             <Settings />

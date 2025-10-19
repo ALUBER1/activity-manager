@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=close,delete,fullscreen,fullscreen_exit,remove,send,settings");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=close,delete,edit,fullscreen,fullscreen_exit,remove,send,settings");
 
 :root {
   --text-color: #a9a9a9;
@@ -84,7 +84,15 @@ html, body {
   width: 90%;
 
   & > button {
-    margin-left: 15px;
+    margin-left: 10px;
+    &:nth-child(2) {
+      margin-left: 20px;
+    }
+
+    &:not(:last-child) {
+      padding-right: 10px;
+      border-right: var(--text-color) solid;
+    }
   }
 
   &:last-child {
