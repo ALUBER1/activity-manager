@@ -35,6 +35,7 @@ button {
 body {
   position: absolute;
   background-color: var(--background-color);
+  overflow: hidden;
 }
 
 html, body {
@@ -42,8 +43,16 @@ html, body {
   height: 100%;
 }
 
+#record-list {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 #non-fixed {
-  margin-top: 130px
+  margin-top: 130px;
+  height: calc(100vh - 130px);
 }
 
 #main {
@@ -56,16 +65,21 @@ html, body {
   display: flex;
   align-self: center;
   height: fit-content;
-  margin-top: 20px;
+  width: 100%;
 
   & > button {
-    margin-left: 10px;
+    margin-left: 15px;
   }
 
   &:last-child {
-    padding-bottom: 15px;
+    margin-bottom: 15px;
+  }
+
+  &:not(:first-child) {
+    margin-top: 20px;
   }
 }
+
 
 #head {
   width: 100%;
@@ -127,7 +141,7 @@ p {
 
 #fixed {
   width: 100%;
-  height: 100%;
+  height: fit-content;
   position: fixed;
   z-index: 100;
 }
@@ -143,7 +157,7 @@ span {
 
 #settings {
   background-color: var(--input-background-color);
-  position: absolute;
+  position: fixed;
   width: 40px;
   height: 40px;
   border-radius: 20px;

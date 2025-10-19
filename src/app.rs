@@ -38,13 +38,13 @@ pub fn app() -> Html {
                 <div id="form">
                     <Form on_submit = {on_submit}/>
                 </div>
-                <Settings />
             </div>
             <div id="non-fixed">
                 <div id="record-list">
                     <RecordList list = {(*record_list).clone()} callback = {remove_handler} />
                 </div>
             </div>
+            <Settings />
         </div>
     }
 }
