@@ -113,6 +113,7 @@ html, body {
   display: flex;
   justify-content: flex-end;
   cursor: default;
+  z-index: 10000;
 }
 
 #title {
@@ -206,14 +207,12 @@ span {
   height: 100%;
   background-color: var(--head-background-color);
   transition: width 700ms ease;
-
-  & > div {
-    display: flex;
-  }
 }
 
 .show-panel {
   width: 300px;
+  border-right: 1px solid var(--background-color);
+  content-visibility: show;
 }
 
 .hide-panel {
@@ -231,8 +230,58 @@ span {
 
 .setting-label {
   margin-left: 15px;
+  width: 20em;
+  font-size: 15px;
+  text-align: left;
+  text-wrap: unset;
+  overflow-wrap: normal;
 
   & + input {
     margin-left: 10px;
   }
+}
+
+div:has( > .color-picker-container) {
+  width: 100%;
+}
+
+.color-picker-container {
+  width: fit-content;
+  height: fit-content;
+  position: relative;
+  margin-left: auto;
+  margin-right: 10px;
+  outline: none !important;
+  width: 23px !important;
+  height: 23px !important;
+  cursor: pointer;
+  border-radius: 10px !important;
+}
+
+.pickr {
+  height: 23px;
+  width: 23px;
+  background-color: var(--background-color);
+  border: 3px solid black;
+  border-radius: 23px;
+}
+
+.setting {
+  display: flex;
+  height: fit-content;
+  width: 100%;
+  align-items: center;
+  position: relative;
+}
+
+.settings-divisor {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid var(--background-color);
+  padding: 0;
+}
+
+#default {
+  margin-right: 7px;
 }

@@ -1,6 +1,20 @@
+use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
 use crate::{components::molecules::{form::Form, record_list::RecordList, title_bar::TitleBar, settings::Settings}, functions::Functions, helper::{invoke_function, invoke_function_vec}};
 use shared::models::record::Record;
+
+#[wasm_bindgen(module="/src/js/variable_modify.js")]
+extern "C" {
+    fn variable_modify(input: String);
+}
+
+#[wasm_bindgen(module="/src/js/pickr.mjs")]
+extern "C" {
+    fn init_pickr();
+}
+
+
+const DEFAULT_BACKGROUND: &str = "#3c3c3c";
 
 #[function_component(App)]
 pub fn app() -> Html {
@@ -40,6 +54,16 @@ pub fn app() -> Html {
         invoke_function("delete_record", None, Some(Record::from(record)));
         invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
     });
+
+    let settings_handler = Callback::from(move |input: String|{
+        if !input.eq(&String::from("default")){variable_modify(input);}
+        else{variable_modify(DEFAULT_BACKGROUND.to_string());}
+    });
+
+    use_effect_with((), move |_|{
+        init_pickr();
+        ||{}
+    });
     
     html! {
         <div id="main">
@@ -54,7 +78,7 @@ pub fn app() -> Html {
                     <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler}/>
                 </div>
             </div>
-            <Settings />
+            <Settings callback={settings_handler}/>
         </div>
     }
 }
