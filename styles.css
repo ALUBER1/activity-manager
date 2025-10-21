@@ -2,7 +2,6 @@
 
 :root {
   --text-color: #a9a9a9;
-  --tet: #cc0b0b;
   --background-color: #3c3c3c;
   --head-background-color: #272727;
   --input-background-color: #313131;
@@ -212,7 +211,7 @@ span {
 .show-panel {
   width: 300px;
   border-right: 1px solid var(--background-color);
-  content-visibility: show;
+  content-visibility: visible;
 }
 
 .hide-panel {
@@ -230,7 +229,7 @@ span {
 
 .setting-label {
   margin-left: 15px;
-  width: 20em;
+  width: 13em;
   font-size: 15px;
   text-align: left;
   text-wrap: unset;
@@ -246,16 +245,15 @@ div:has( > .color-picker-container) {
 }
 
 .color-picker-container {
-  width: fit-content;
+  display: inline-block;
+  width: 100px;
   height: fit-content;
   position: relative;
   margin-left: auto;
   margin-right: 10px;
-  outline: none !important;
-  width: 23px !important;
-  height: 23px !important;
+  outline: none;
   cursor: pointer;
-  border-radius: 10px !important;
+  border-radius: 10px;
 }
 
 .pickr {
@@ -282,6 +280,19 @@ div:has( > .color-picker-container) {
   padding: 0;
 }
 
+.pcr-app {
+  background-color: #3c3c3c !important;
+}
+
+.pcr-result,
+.pcr-type {
+  color: var(--text-color) !important;
+  background-color: var(--input-background-color) !important;
+  &:focus {
+    -webkit-box-shadow: none !important;
+  }
+}
+
 #default {
-  margin-right: 7px;
+  padding-left: 7px;
 }
