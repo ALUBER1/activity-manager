@@ -4,12 +4,13 @@ use wasm_bindgen::{prelude::{wasm_bindgen, Closure}, JsCast};
 use web_sys::{HtmlInputElement};
 use yew::prelude::*;
 
-use crate::components::atoms::button::Button;
+use crate::{app::init_pickr, components::atoms::button::Button};
 
 #[derive(Properties,PartialEq)]
 pub struct Props {
     pub call_back: Callback<String>,
-    pub item: String
+    pub item: String,
+    pub index: u32
 }
 
 
@@ -19,24 +20,30 @@ pub fn color_picker(prop: &Props) -> Html {
 
     let callback = prop.call_back.clone();
     let name = use_state(||{prop.item.clone()});
+    let index = prop.index.clone();
     let onclick = Callback::from(move |_|{
         let input = document().get_elements_by_class_name("pcr-result");
-        let temp = input.get_with_index(0).unwrap().unchecked_into::<HtmlInputElement>();
-        log!((*name).clone() + &temp.value());
-        callback.emit((*name).clone() + &temp.value());
+        let temp = input.get_with_index(index).unwrap().unchecked_into::<HtmlInputElement>();
+        callback.emit((*name).clone() + &temp.value() + "#" + &index.to_string());
     });
-
     
     let callback = prop.call_back.clone();
     let name = use_state(||{prop.item.clone()});
+    let index = prop.index.clone();
     let default_onclick = Callback::from(move |_|{
-        callback.emit((*name).clone() + &DefaultColors::get(&name));
+        callback.emit((*name).clone() + &DefaultColors::get(&name) + "#" + &index.to_string());
+    });
+    
+    let name = prop.item.clone();
+    use_effect_with((), move |_|{    
+        log!("#".to_string()+&name + ", " + &DefaultColors::get(&name));
+        init_pickr("#".to_string()+&name, DefaultColors::get(&name));
     });
 
     html!{
         <div class="color-picker-container">
-            <button id="btn" class="pickr" onfocusout={onclick} />
-            <Button onclick={default_onclick.clone()} id="default">{"DEFAULT"}</Button>
+            <button id={prop.item.clone()} class="pickr" onfocusout={onclick} style={"background-color: ".to_string() + &DefaultColors::get(&prop.item)} />
+            <Button onclick={default_onclick.clone()} id="default" >{"DEFAULT"}</Button>
         </div>
     }
 }

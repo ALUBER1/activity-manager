@@ -1,7 +1,8 @@
+use gloo::utils::{document, window};
 use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
 use crate::{components::molecules::{form::Form, record_list::RecordList, title_bar::TitleBar, settings::Settings}, functions::Functions, helper::{invoke_function, invoke_function_vec}};
-use shared::{models::record::Record, style::default_colors::DefaultColors};
+use shared::{models::record::Record, style::default_colors::{self, DefaultColors}};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
 extern "C" {
@@ -10,7 +11,7 @@ extern "C" {
 
 #[wasm_bindgen(module="/src/js/pickr.mjs")]
 extern "C" {
-    fn init_pickr();
+    pub fn init_pickr(id: String, def: String);
 }
 
 #[function_component(App)]
@@ -53,11 +54,6 @@ pub fn app() -> Html {
 
     let settings_handler = Callback::from(move |input: String|{
         change_background(&input);
-    });
-
-    use_effect_with((), move |_|{
-        init_pickr();
-        ||{}
     });
     
     html! {

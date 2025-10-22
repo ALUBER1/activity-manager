@@ -210,7 +210,7 @@ span {
 
 .show-panel {
   width: 300px;
-  border-right: 1px solid var(--background-color);
+  border-top: 1px solid var(--background-color);
   content-visibility: visible;
 }
 
@@ -229,7 +229,7 @@ span {
 
 .setting-label {
   margin-left: 15px;
-  width: 13em;
+  width: 10em;
   font-size: 15px;
   text-align: left;
   text-wrap: unset;
@@ -259,7 +259,6 @@ div:has( > .color-picker-container) {
 .pickr {
   height: 23px;
   width: 23px;
-  background-color: var(--background-color);
   border: 3px solid black;
   border-radius: 23px;
 }
@@ -270,10 +269,13 @@ div:has( > .color-picker-container) {
   width: 100%;
   align-items: center;
   position: relative;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .settings-divisor {
-  display: block;
+  display: inline;
+  width: 100%;
   height: 1px;
   border: 0;
   border-top: 1px solid var(--background-color);

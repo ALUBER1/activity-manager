@@ -1,4 +1,4 @@
-use gloo::timers::callback::Timeout;
+use gloo::{console::log, timers::callback::Timeout};
 use web_sys::Element;
 use yew::{function_component, html, use_state, Callback, Html, NodeRef, Properties};
 
@@ -38,9 +38,8 @@ pub fn create_setting(prop: &Props) -> Html {
     html!{
         <div id="settings-container">
             <div id="settings-panel" class="hide-panel" ref={test.clone()}>
-                <hr class="settings-divisor"/>
-                <Setting label={"background color"}><ColorPicker item="background-color" call_back={get_input_values.clone()}/></Setting>
-                <hr class="settings-divisor"/>
+                <Setting label={"background color"}><ColorPicker item="background-color" call_back={get_input_values.clone()} index=0 /></Setting>
+                <Setting label={"header color"}><ColorPicker item="head-background-color" call_back={get_input_values.clone()} index=1 /></Setting>
             </div>
             <Button onclick={listener.clone()} id="settings"><span class={format!("material-symbols-outlined {}", *class)}>{"settings"}</span></Button>
         </div>

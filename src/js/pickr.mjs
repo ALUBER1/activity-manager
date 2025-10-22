@@ -1,10 +1,11 @@
 let clicked = false;
 
-export function init_pickr(){
-    var pickr = Pickr.create({
-        el: '#btn',
+export function init_pickr(id, def){
+    console.log(`pickr: ${id}, ${def}`)
+    let pickr = Pickr.create({
+        el: id,
         theme: 'monolith',
-        default: "#3c3c3c",
+        default: def,
         useAsButton: true,
         components: {
             opacity: true,
@@ -17,26 +18,31 @@ export function init_pickr(){
         }
     });
 
-    pickr.on("change", (color, source, istance) => {
-        let elements = document.querySelector("#btn");
-        elements.style.setProperty("background-color", "rgba(" + color.toRGBA()[0] + "," + color.toRGBA()[1] + "," + color.toRGBA()[2] + "," + color.toRGBA()[3] + ")")
+    pickr.on("change", (color, source, instance) => {
+        const el = instance.options.el;
+        const rgba = color.toRGBA();
+        el.style.setProperty(
+            "background-color",
+            `rgba(${rgba[0]},${rgba[1]},${rgba[2]},${rgba[3]})`
+        );
     });
 
-    
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.querySelectorAll(".pickr");
+        if (!btn) {return;}
+
+        for (el of btn) {
+            el.addEventListener('click', () => {
+                if (clicked) {
+                    clicked = false;
+                    pickr.hide();
+                } else {
+                    clicked = true;
+                    pickr.show();
+                }
+            });
+        }
+    });
 }
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.querySelector('#btn');
-    if (!btn) {return;}
-
-    btn.addEventListener('click', () => {
-        if (clicked) {
-            clicked = false;
-            pickr.hide();
-        } else {
-            clicked = true;
-            pickr.show();
-        }
-    });
-});

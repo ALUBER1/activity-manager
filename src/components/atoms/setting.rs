@@ -12,6 +12,7 @@ pub fn setting(prop: &Props) -> Html {
         <div class="setting">
             <p class="setting-label">{prop.label.clone()}</p>
             {prop.children.clone()}
+            <hr class="settings-divisor"/>
         </div>
     }
 }
