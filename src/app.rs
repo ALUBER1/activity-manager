@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
 use crate::{components::molecules::{form::Form, record_list::RecordList, title_bar::TitleBar, settings::Settings}, functions::Functions, helper::{invoke_function, invoke_function_vec}};
-use shared::{models::record::Record};
+use shared::models::record::{self, Record};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
 extern "C" {
@@ -27,7 +27,7 @@ pub fn app() -> Html {
     });
     let clone_list = record_list.clone();
     let on_submit = Callback::from(move |data: Record| {
-        invoke_function("add_record", None, Some(Record { uuid: "".to_string(), name: data.name, date: data.date, time: data.time}));
+        invoke_function("add_record", None, Some(Record { uuid: "".to_string(), ..data}));
         invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
     });
 

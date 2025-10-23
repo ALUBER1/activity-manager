@@ -34,7 +34,6 @@ pub fn color_picker(prop: &Props) -> Html {
     
     let name = prop.item.clone();
     use_effect_with((), move |_|{    
-        log!("#".to_string()+&name + ", " + &DefaultColors::get(&name));
         init_pickr("#".to_string()+&name, DefaultColors::get(&name));
     });
 

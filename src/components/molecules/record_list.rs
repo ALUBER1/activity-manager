@@ -18,9 +18,9 @@ pub fn record_list(records: &Props) -> Html{
         onclick.emit(a);
     });
 
-    let onclick = records.delete_callback.clone();
+    let onclick = records.edit_callback.clone();
     let edit_handler = Callback::from(move |a: Record|{
-        onclick.emit(a)
+        onclick.emit(a);
     });
     html!{
         {records.list.clone().into_iter().map(|element|{

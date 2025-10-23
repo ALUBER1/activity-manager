@@ -1,7 +1,6 @@
 let clicked = false;
 
 export function init_pickr(id, def){
-    console.log(`pickr: ${id}, ${def}`)
     let pickr = Pickr.create({
         el: id,
         theme: 'monolith',

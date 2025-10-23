@@ -49,6 +49,13 @@ impl Database{
         }
     }
 
+    fn update_record(&mut self, record: Record) -> Result<(), Error> {
+        match self.conn.execute("UPDATE events SET name=?1, date=?2, time=?3 WHERE uuid = ?4", [record.name, record.date, record.time, record.uuid]) {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e)
+        }
+    }
+
     fn get_all_records(&mut self) -> Result<Vec<Record>, Error>{
         let mut comm = self.conn.prepare("SELECT * FROM events")?;
         let mut cols = comm.query([])?;
@@ -167,6 +174,23 @@ fn get_all_records(state: State<'_, Mutex<Option<Database>>>) -> Vec<Record>{
 }
 
 #[tauri::command]
+fn update_record(record: Record, state: State<'_, Mutex<Option<Database>>>) {
+    let mut db = state.lock().expect("error unpacking mutex");
+    if db.is_none(){
+        println!("database doesn't exist yet");
+    } else {
+        if let Some(ref mut db) = *db {
+            match db.update_record(record) {
+                Ok(_) => (),
+                Err(e) =>{println!("{:?}", e)}
+            }
+        } else {
+            println!("database error");
+        }
+    }
+}
+
+#[tauri::command]
 fn close_app(app_handle: tauri::AppHandle) {
     if let Some(window) = app_handle.get_webview_window("main") {
         let _ = window.close();
@@ -196,7 +220,7 @@ pub fn run() {
     tauri::Builder::default()
         .manage(Mutex::new(None::<Database>))
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![maximize_app, minimize_app, close_app, create_database, initialize_database, get_record, add_record, get_all_records, delete_record])
+        .invoke_handler(tauri::generate_handler![update_record, maximize_app, minimize_app, close_app, create_database, initialize_database, get_record, add_record, get_all_records, delete_record])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

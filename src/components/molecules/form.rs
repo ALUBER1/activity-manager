@@ -1,7 +1,7 @@
 use std::ops::Deref;
 use gloo::timers::callback::Timeout;
 use yew::prelude::*;
-use crate::components::atoms::{submit_button::SubmitButton, text_input::TextInput};
+use crate::components::{atoms::{submit_button::SubmitButton, text_input::TextInput}};
 use shared::models::record::Record as Event;
 use chrono::{Local, NaiveDate, NaiveTime};
 
