@@ -1,24 +1,40 @@
+use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, record_list::RecordList, title_bar::TitleBar}, functions::Functions, helper::{invoke_function, invoke_function_vec}};
-use shared::models::record::Record;
+use crate::{components::molecules::{form::Form, record_list::RecordList, title_bar::TitleBar, settings::Settings}, functions::Functions, helper::{invoke_function, invoke_function_vec}};
+use shared::models::record::{self, Record};
+
+#[wasm_bindgen(module="/src/js/variable_modify.js")]
+extern "C" {
+    fn change_background(input: &str);
+}
+
+#[wasm_bindgen(module="/src/js/pickr.mjs")]
+extern "C" {
+    pub fn init_pickr(id: String, def: String);
+}
 
 #[function_component(App)]
 pub fn app() -> Html {
     
     let record_list: UseStateHandle<Vec<Record>> = use_state(||Vec::new());
-    use_effect_with((), |_|{
+    
+    let clone_list = record_list.clone();
+    use_effect_with((), move |_|{
         invoke_function("create_database", None, None);
-        invoke_function("initialize_database", None, None);
+        invoke_function("initialize_database", None, None);  
+        invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
         ||{}
     });
     let clone_list = record_list.clone();
-    let on_submit = 
-        Callback::from(move |data: Record| {
-            invoke_function("add_record", None, Some(Record { uuid: "".to_string(), name: data.name, date: data.date, time: data.time}));
-        });
+    let on_submit = Callback::from(move |data: Record| {
+        invoke_function("add_record", None, Some(Record { uuid: "".to_string(), ..data}));
+        invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
+    });
 
-    let remove_handler = Callback::from(move |record: Record|{
+    let clone_list = record_list.clone();
+    let delete_handler = Callback::from(move |record: Record|{
         invoke_function("delete_record", None, Some(Record::from(record)));
+        invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
     });
 
     let title_handler = Callback::from(move |function: Functions| {
@@ -28,20 +44,31 @@ pub fn app() -> Html {
             Functions::Maximize => invoke_function("maximize_app", None, None)
         }
     });
-    
-    invoke_function_vec("get_all_records", Some(clone_list), None);
 
+    let clone_list = record_list.clone();
+    let edit_handler = Callback::from(move |record: Record|{
+        invoke_function("delete_record", None, Some(Record::from(record)));
+        invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
+    });
+
+    let settings_handler = Callback::from(move |input: String|{
+        change_background(&input);
+    });
+    
     html! {
-        <div>
-            <TitleBar on_click={title_handler}></TitleBar>
-            <div>
-                <div style = "margin-bottom: 20px;">
+        <div id="main">
+            <div id="fixed">
+                <TitleBar on_click={title_handler}></TitleBar>
+                <div id="form">
                     <Form on_submit = {on_submit}/>
                 </div>
-                <div>
-                    <RecordList list = {(*record_list).clone()} callback = {remove_handler} />
+            </div>
+            <div id="non-fixed">
+                <div id="record-list">
+                    <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler}/>
                 </div>
             </div>
+            <Settings callback={settings_handler}/>
         </div>
     }
 }

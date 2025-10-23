@@ -1,7 +1,7 @@
 use std::ops::Deref;
 use gloo::timers::callback::Timeout;
 use yew::prelude::*;
-use crate::components::atoms::{text_input::TextInput, button::Button};
+use crate::components::{atoms::{submit_button::SubmitButton, text_input::TextInput}};
 use shared::models::record::Record as Event;
 use chrono::{Local, NaiveDate, NaiveTime};
 
@@ -80,7 +80,7 @@ pub fn form(props: &Props) -> Html{
             <TextInput name="name" on_change={on_changename} color={(*name_color).clone()}/>
             <TextInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()}/>
             <TextInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()}/>
-            <Button id="submit"><span class="material-symbols-outlined">{"send"}</span></Button>
+            <SubmitButton id="submit"><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
         </form>
     }
 }
