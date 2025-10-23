@@ -1,6 +1,6 @@
 use gloo::{console::log, utils::document};
 use shared::style::default_colors::DefaultColors;
-use wasm_bindgen::{prelude::{wasm_bindgen, Closure}, JsCast};
+use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement};
 use yew::prelude::*;
 
@@ -12,8 +12,6 @@ pub struct Props {
     pub item: String,
     pub index: u32
 }
-
-
 
 #[function_component(ColorPicker)]
 pub fn color_picker(prop: &Props) -> Html {

@@ -1,8 +1,7 @@
-use gloo::utils::{document, window};
 use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
 use crate::{components::molecules::{form::Form, record_list::RecordList, title_bar::TitleBar, settings::Settings}, functions::Functions, helper::{invoke_function, invoke_function_vec}};
-use shared::{models::record::Record, style::default_colors::{self, DefaultColors}};
+use shared::{models::record::Record};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
 extern "C" {
