@@ -1,9 +1,11 @@
 use std::thread;
 
+use chrono::{Datelike, NaiveDate, Utc};
+use gloo::{console::log, timers::callback::Timeout};
 use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, utils::{concurrent_state::ConcurrentState, functions::Functions, helper::{invoke_function, invoke_function_vec}}};
-use shared::models::record::Record;
+use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, utils::{concurrent_state::ConcurrentState, functions::Functions, helper::{invoke_function, invoke_function_not, invoke_function_vec}}};
+use shared::models::{notification::Notification, record::Record};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
 extern "C" {
@@ -26,11 +28,16 @@ pub fn app() -> Html {
         invoke_function("initialize_database", None, None);  
         invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
         let clone_list = ConcurrentState::new((*clone_list).clone());
-        thread::spawn(move ||{
-            for _record in &*(*clone_list.state).lock().unwrap() {
-                
-            }
-        });
+        // Timeout::new(1000, move||{
+        //     for record in &*(*clone_list.state).lock().unwrap() {
+        //         log!(record.clone().to_string());
+        //         let date = NaiveDate::parse_from_str(&record.date, "%d/%m/%Y").unwrap();
+        //         if date.day() - 1 == Utc::now().day() {
+        //             invoke_function_not("send_notification", None, Some(Notification::event_due(record.clone())));
+        //         }
+        //     }
+        // }).forget();
+        
         ||{}
     });
     let clone_list = record_list.clone();

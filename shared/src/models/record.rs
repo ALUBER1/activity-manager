@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use yew::Properties;
@@ -14,5 +16,11 @@ pub struct Record{
 impl Record {
     pub fn record_by_name(name: String) -> Record {
         Record{uuid: Uuid::nil().to_string(), name, date: "".to_string(), time: "".to_string() }
+    }
+}
+
+impl Display for Record {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
