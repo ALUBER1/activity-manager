@@ -26,3 +26,4 @@ rusqlite = {version = "0.33", features = ["bundled"] }
 shared = { path = "../shared"}
 uuid = { version = "1.18.1", features = ["v4"] }
 tauri-plugin-notifications = "0.2.5"
+chrono = "0.4.41"
