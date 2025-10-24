@@ -1,4 +1,4 @@
-use gloo::{console::log, utils::document};
+use gloo::utils::document;
 use shared::style::default_colors::DefaultColors;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement};
