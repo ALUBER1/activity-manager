@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-use crate::{components::atoms::title_bar_btn::TitleButton, functions::Functions};
+use crate::{components::atoms::title_bar_btn::TitleButton, utils::functions::Functions};
 
 #[derive(PartialEq, Properties)]
 pub struct Props {

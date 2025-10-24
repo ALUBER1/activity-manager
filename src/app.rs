@@ -1,6 +1,8 @@
+use std::thread;
+
 use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, record_list::RecordList, title_bar::TitleBar, settings::Settings}, functions::Functions, helper::{invoke_function, invoke_function_vec}};
+use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, utils::{concurrent_state::ConcurrentState, functions::Functions, helper::{invoke_function, invoke_function_vec}}};
 use shared::models::record::Record;
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
@@ -23,6 +25,12 @@ pub fn app() -> Html {
         invoke_function("create_database", None, None);
         invoke_function("initialize_database", None, None);  
         invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
+        let clone_list = ConcurrentState::new((*clone_list).clone());
+        thread::spawn(move ||{
+            for _record in &*(*clone_list.state).lock().unwrap() {
+                
+            }
+        });
         ||{}
     });
     let clone_list = record_list.clone();

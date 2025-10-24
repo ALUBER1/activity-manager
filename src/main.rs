@@ -1,7 +1,6 @@
 pub mod app;
-pub mod helper;
 pub mod components;
-pub mod functions;
+pub mod utils;
 
 use app::App;
 
