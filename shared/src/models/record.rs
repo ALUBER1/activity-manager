@@ -11,12 +11,12 @@ pub struct Record{
     pub name: String,
     pub date: String,
     pub time: String,
-    pub notified: bool
+    pub notified_at: String
 }
 
 impl Record {
     pub fn record_by_name(name: String) -> Record {
-        Record{uuid: Uuid::nil().to_string(), name, date: "".to_string(), time: "".to_string(), notified: false }
+        Record{uuid: Uuid::nil().to_string(), name, date: "".to_string(), time: "".to_string(), notified_at: "".to_string() }
     }
 }
 

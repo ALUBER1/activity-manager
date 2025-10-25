@@ -20,7 +20,7 @@ impl Database {
             name TEXT,
             date TEXT,
             time TEXT,
-            notified bit
+            notified_at TEXT
         );",
             [],
         ) {
@@ -31,13 +31,13 @@ impl Database {
 
     pub fn add_record(&mut self, record: Record) -> Result<(), Error> {
         match self.conn.execute(
-            "INSERT INTO events(uuid, name, date, time, notified) VALUES (?1, ?2, ?3, ?4, ?5)",
+            "INSERT INTO events(uuid, name, date, time, notified_at) VALUES (?1, ?2, ?3, ?4, ?5)",
             params![
                 Uuid::new_v4().to_string(),
                 record.name,
                 record.date,
                 record.time,
-                false
+                record.notified_at
             ],
         ) {
             Ok(_) => Ok(()),
@@ -48,7 +48,7 @@ impl Database {
     pub fn get_record(&mut self, record: String) -> Result<Record, Error> {
         let mut comm = self
             .conn
-            .prepare("SELECT name, date, time FROM events WHERE id = ?1")?;
+            .prepare("SELECT name, date, time, notified_at FROM events WHERE uuid = ?1")?;
         let ret = comm.query_row([record], |row| {
             Ok(Record::new(
                 row.get(0)?,
@@ -73,8 +73,8 @@ impl Database {
 
     pub fn update_record(&mut self, record: Record) -> Result<(), Error> {
         match self.conn.execute(
-            "UPDATE events SET name=?1, date=?2, time=?3, notified=?5 WHERE uuid = ?4",
-            [record.name, record.date, record.time, record.uuid, if record.notified {1.to_string()} else {0.to_string()}],
+            "UPDATE events SET name=?1, date=?2, time=?3, notified_at=?5 WHERE uuid = ?4",
+            [record.name, record.date, record.time, record.uuid, record.notified_at],
         ) {
             Ok(_) => Ok(()),
             Err(e) => Err(e),

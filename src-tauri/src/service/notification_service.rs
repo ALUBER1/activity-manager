@@ -31,9 +31,9 @@ pub fn notification_loop(app: AppHandle) {
             };
 
             for mut record in records {
-                if !record.notified && NaiveDate::parse_from_str(&record.date, "%d/%m/%Y").unwrap() - Utc::now().date_naive() == Duration::days(1) {
-                    let _ = send_notification(app.clone(), Notification { title: "test".to_string(), body: format_notification_body(&record) });
-                    record.notified = true;
+                if record.notified_at.is_empty() && NaiveDate::parse_from_str(&record.date, "%d/%m/%Y").unwrap() - Utc::now().date_naive() == Duration::days(1) {
+                    let _ = send_notification(app.clone(), Notification { title: record.name.clone(), body: format_notification_body(&record) });
+                    record.notified_at = Utc::now().format("%d/%m/%Y").to_string();
                     let _ = {
                         let mut guard = state.lock().unwrap();
                         if let Some(ref mut db) = *guard {

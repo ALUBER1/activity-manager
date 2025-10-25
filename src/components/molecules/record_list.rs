@@ -25,9 +25,11 @@ pub fn record_list(records: &Props) -> Html{
     html!{
         {records.list.clone().into_iter().map(|element|{
             html!{<div class="record-list-style">
-                <p>{"name: "}{element.name.clone()}{", date: "}{element.date.clone()}{", time: "}{element.time.clone()}</p>
-                <RecordButton id = {element.clone()}  onclick = {delete_handler.clone()} ty={"delete"}/>
-                <RecordButton id = {element}  onclick = {edit_handler.clone()} ty={"edit"}/>
+                <p class="record-label">{"name: "}{element.name.clone()}{", date: "}{element.date.clone()}{", time: "}{element.time.clone()}</p>
+                <div class="record-button">
+                    <RecordButton id = {element.clone()}  onclick = {delete_handler.clone()} ty={"delete"}/>
+                    <RecordButton id = {element}  onclick = {edit_handler.clone()} ty={"edit"}/>
+                </div>
             </div>}
         }).collect::<Html>()}
     }
