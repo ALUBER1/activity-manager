@@ -1,9 +1,9 @@
 use std::{sync::Mutex, thread, time};
 
 use chrono::{Duration, NaiveDate, Utc};
-use shared::{errors::notification_error::NotificationError, models::notification::Notification};
+use shared::{errors::notification_error::NotificationError, models::{notification::Notification, record::Record}};
 use tauri::{AppHandle, Manager, State};
-use crate::{gateway::notifications_gateway::NotificationGateway, repository::database_repository::Database, service::database_service::get_all_records};
+use crate::{gateway::notifications_gateway::NotificationGateway, repository::database_repository::Database};
 
 #[tauri::command]
 pub fn send_notification(app: AppHandle, notification: Notification) -> Result<(), NotificationError> {
@@ -32,7 +32,7 @@ pub fn notification_loop(app: AppHandle) {
 
             for mut record in records {
                 if !record.notified && NaiveDate::parse_from_str(&record.date, "%d/%m/%Y").unwrap() - Utc::now().date_naive() == Duration::days(1) {
-                    let _ = send_notification(app.clone(), Notification { title: "test".to_string(), body: record.to_string() });
+                    let _ = send_notification(app.clone(), Notification { title: "test".to_string(), body: format_notification_body(&record) });
                     record.notified = true;
                     let _ = {
                         let mut guard = state.lock().unwrap();
@@ -51,4 +51,8 @@ pub fn notification_loop(app: AppHandle) {
         }
     });
     ()
+}
+
+fn format_notification_body(record: &Record) -> String {
+    format!("you have {} due at {} the day {}", record.name, record.time, record.date)
 }
