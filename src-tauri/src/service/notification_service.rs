@@ -18,36 +18,35 @@ pub fn notification_loop(app: AppHandle) {
     thread::spawn(move ||{
         loop{
             let state: State<'_, Mutex<Option<Database>>> = app.state();
-            let mut db = {
-                let guard = state.lock().unwrap();
-                guard
-            };
-
-            if db.is_none() {
-                println!("database doesn't exist yet");
-                ()
-            } else {
-                if let Some(ref mut db) = *db {
+            let records = {
+                let mut guard = state.lock().unwrap();
+                if let Some(ref mut db) = *guard {
                     match db.get_all_records() {
-                        Ok(records) => {
-                            for mut record in records {
-                                if !record.notified && NaiveDate::parse_from_str(&record.date, "%d/%m/%Y").unwrap() - Utc::now().date_naive() == Duration::days(1) {
-                                    let _ = send_notification(app.clone(), Notification { title: "test".to_string(), body: record.to_string() });
-                                    record.notified = true;
-                                    let _ = db.update_record(record);
-                                }
-                            }
-                        },
-                        Err(e) => {
-                            println!("{:?}", e);
-                            ()
-                        }
+                        Ok(records) => records,
+                        _ => Vec::new()
                     }
                 } else {
-                    println!("database error");
-                    ()
+                    Vec::new()
                 }
-            }
+            };
+
+            for mut record in records {
+                if !record.notified && NaiveDate::parse_from_str(&record.date, "%d/%m/%Y").unwrap() - Utc::now().date_naive() == Duration::days(1) {
+                    let _ = send_notification(app.clone(), Notification { title: "test".to_string(), body: record.to_string() });
+                    record.notified = true;
+                    let _ = {
+                        let mut guard = state.lock().unwrap();
+                        if let Some(ref mut db) = *guard {
+                            match db.update_record(record) {
+                                Ok(_) => (),
+                                _ => ()
+                            }
+                        } else {
+                            ()
+                        }
+                    };
+                }
+            }           
             thread::sleep(time::Duration::from_millis(1000));
         }
     });
