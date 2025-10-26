@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, utils::{functions::Functions, helper::{invoke_function, invoke_function_async, invoke_function_store, invoke_function_vec_async}}};
+use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, utils::{functions::Functions, helper::{invoke_function, invoke_function_async, invoke_function_store, invoke_function_store_async, invoke_function_vec_async}}};
 use shared::models::{record::Record, storage_entry::StorageEntry};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
@@ -18,14 +18,17 @@ extern "C" {
 pub fn app() -> Html {
     
     let record_list: UseStateHandle<Vec<Record>> = use_state(||Vec::new());
+    let delay = use_state(||String::from("0/60"));
     
     let clone_list = record_list.clone();
+    let delay_clone = delay.clone();
     use_effect_with((), move |_|{
         spawn_local(async move {
             invoke_function_async("create_database", None, None).await;
             invoke_function_async("initialize_database", None, None).await;  
             invoke_function_vec_async("get_all_records", Some(clone_list.clone()), None).await;
             invoke_function("notification_loop", None, None);
+            invoke_function_store_async("get_storage", Some(delay_clone.clone()), Some(StorageEntry { key: "delay".to_string(), value: "".to_string() })).await;
         });
         
         ||{}
@@ -92,7 +95,7 @@ pub fn app() -> Html {
                     <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler}/>
                 </div>
             </div>
-            <Settings callback={settings_handler}/>
+            <Settings callback={settings_handler} delay={(*delay).clone()} />
         </div>
     }
 }

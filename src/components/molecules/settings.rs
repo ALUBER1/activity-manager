@@ -1,4 +1,5 @@
 use std::time::Duration;
+use shared::utils::normalize::NormalizeDelay;
 use web_sys::Element;
 use yew::{function_component, html, use_state, Callback, Html, NodeRef, Properties};
 
@@ -6,7 +7,8 @@ use crate::components::atoms::{button::Button, color_picker::ColorPicker, notifi
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
-    pub callback: Callback<String>
+    pub callback: Callback<String>,
+    pub delay: String
 }
 
 #[function_component(Settings)]
@@ -62,7 +64,16 @@ pub fn create_setting(prop: &Props) -> Html {
                 <Setting label={"header color"}><ColorPicker item="head-background-color" call_back={get_input_values.clone()} index=1 /></Setting>
                 <Setting label={"input color"}><ColorPicker item="input-background-color" call_back={get_input_values.clone()} index=2 /></Setting>
                 <Setting label={"text color"}><ColorPicker item="text-color" call_back={get_input_values.clone()} index=3 /></Setting>
-                <Setting label={"notification delay"}><NotificationInput name="days/minutes" on_change={notification_delay_handle.clone()} color={" "} /></Setting>
+                <Setting label={"notification delay"}><NotificationInput name="days/minutes" on_change={notification_delay_handle.clone()} value = {
+                    if prop.delay.contains("/") {
+                        prop.delay.clone()
+                    } else {
+                        let num = NormalizeDelay::normalize(prop.delay.clone());
+                        let days = num / 86400;
+                        let minutes = num / 60 - days * 24 * 60;
+                        format!("{}/{}", days, minutes)
+                    }
+                } /></Setting>
             </div>
             <Button onclick={listener.clone()} id="settings"><span class={format!("material-symbols-outlined {}", *class)}>{"settings"}</span></Button>
         </div>

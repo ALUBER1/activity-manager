@@ -1,7 +1,7 @@
 use std::{sync::Mutex, thread, time};
 
 use chrono::{Local, NaiveDate, NaiveDateTime, NaiveTime};
-use shared::{errors::notification_error::NotificationError, models::{notification::Notification, record::Record}};
+use shared::{errors::notification_error::NotificationError, models::{notification::Notification, record::Record}, utils::normalize::NormalizeDelay};
 use tauri::{AppHandle, Manager, State};
 use crate::{gateway::notifications_gateway::NotificationGateway, repository::{database_repository::Database, storage_repository::StorageRepository}};
 
@@ -35,14 +35,8 @@ pub fn notification_loop(app: AppHandle) {
             let delay = {
                 let guard = storage_repository.lock().unwrap();
                 match (*guard).get(clone, "delay".to_string()) {
-                    Ok(value) => value.split(":")
-                                            .nth(1)
-                                            .unwrap()
-                                            .replace("\"", "")
-                                            .replace("}", "")
-                                            .parse::<u64>()
-                                            .unwrap(),
-                    Err(_) => 3600_u64
+                    Ok(value) => NormalizeDelay::normalize(value),
+                    Err(_) => 3600_i64
                 }
             };
 
@@ -52,7 +46,7 @@ pub fn notification_loop(app: AppHandle) {
                 let date_time = NaiveDateTime::new(date, time);
                 let now = Local::now().naive_local();
                 let diff = (date_time - now).num_seconds();
-                if record.notified_at.is_empty() && (diff > (delay - 60_u64).try_into().unwrap() && diff < delay.try_into().unwrap()) {
+                if record.notified_at.is_empty() && (diff >= delay - 60_i64 && diff <= delay) {
                     let _ = send_notification(app.clone(), Notification { title: record.name.clone(), body: format_notification_body(&record) });
                     record.notified_at = Local::now().format("%d/%m/%Y,%H:%M").to_string();
                     let _ = {

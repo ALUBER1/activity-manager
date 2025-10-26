@@ -73,7 +73,7 @@ pub fn invoke_function_vec<'a>(function: &'a str, result: Option<UseStateHandle<
     }
 }
 
-pub fn invoke_function_store<'a>(function: &'a str, result: Option<Rc<UseStateHandle<Record>>>, args: Option<StorageEntry>) where 'a:'static{
+pub fn invoke_function_store<'a>(function: &'a str, result: Option<UseStateHandle<String>>, args: Option<StorageEntry>) where 'a:'static{
     if args.is_none(){
         spawn_local(async{
             let buffer = invoke(function, JsValue::null()).await;
@@ -84,5 +84,15 @@ pub fn invoke_function_store<'a>(function: &'a str, result: Option<Rc<UseStateHa
             let buffer = invoke(function, to_value(&ArgsStore{storageEntry: args.unwrap()}).unwrap()).await;
             if !result.is_none() {result.unwrap().set(from_value(buffer).expect("wasn't able to extract value"));}
         })
+    }
+}
+
+pub async fn invoke_function_store_async<'a>(function: &'a str, result: Option<UseStateHandle<String>>, args: Option<StorageEntry>) where 'a:'static{
+    if args.is_none(){
+        let buffer = invoke(function, JsValue::null()).await;
+        if !result.is_none() {result.unwrap().set(from_value(buffer).expect("wasn't able to extract value"));}
+    } else {
+        let buffer = invoke(function, to_value(&ArgsStore{storageEntry: args.unwrap()}).unwrap()).await;
+        if !result.is_none() {result.unwrap().set(from_value(buffer).expect("wasn't able to extract value"));}
     }
 }

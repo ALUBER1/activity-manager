@@ -6,7 +6,7 @@ use yew::prelude::*;
 pub struct Props {
     pub name: String,
     pub on_change: Callback<String>,
-    pub color: String
+    pub value: String
 }
 
 #[function_component(NotificationInput)]
@@ -19,6 +19,6 @@ pub fn text_input(props: &Props) -> Html{
     });
     
     html!{
-        <input type="text" autocomplete = "off" name = {props.name.clone()} placeholder = {props.name.clone()} onfocusout = {onchange} style = {format!("background-color: {}", props.color.clone())}/>
+        <input type="text" autocomplete = "off" name = {props.name.clone()} placeholder = {props.name.clone()} onfocusout = {onchange} value = {props.value.clone()} />
     }
 }
