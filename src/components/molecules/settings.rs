@@ -1,9 +1,8 @@
 use std::time::Duration;
-use gloo::console::log;
 use web_sys::Element;
 use yew::{function_component, html, use_state, Callback, Html, NodeRef, Properties};
 
-use crate::components::atoms::{button::Button, color_picker::{ColorPicker, _Props::call_back}, notification_input::NotificationInput, setting::Setting};
+use crate::components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {

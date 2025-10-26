@@ -1,6 +1,6 @@
-use std::{sync::{Mutex, MutexGuard}, thread, time};
+use std::{sync::Mutex, thread, time};
 
-use chrono::{Duration, Local, NaiveDate, NaiveDateTime, NaiveTime, TimeZone, Utc};
+use chrono::{Local, NaiveDate, NaiveDateTime, NaiveTime};
 use shared::{errors::notification_error::NotificationError, models::{notification::Notification, record::Record}};
 use tauri::{AppHandle, Manager, State};
 use crate::{gateway::notifications_gateway::NotificationGateway, repository::{database_repository::Database, storage_repository::StorageRepository}};

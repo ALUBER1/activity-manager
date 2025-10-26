@@ -18,6 +18,7 @@ pub struct Args{
     pub record: Record
 }
 
+#[allow(non_snake_case)]
 #[derive(Serialize, Deserialize)]
 pub struct ArgsStore{
     pub storageEntry: StorageEntry
