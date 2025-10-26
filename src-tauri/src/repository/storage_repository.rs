@@ -1,4 +1,4 @@
-use std::{fs::{self, File}, path::Path};
+use std::fs::{self, File};
 
 use serde_json::json;
 use shared::errors::storage_error::StorageError;
