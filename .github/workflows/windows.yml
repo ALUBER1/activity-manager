@@ -50,7 +50,7 @@ jobs:
         run: cargo tauri build
             
       - name: rename installer
-        run: Rename-Item -Path "target/release/bundle/msi/activity-manager_0.1.0_x64_en-US.msi" -NewName "activity-manager-${{github.ref_name}}.msi"
+        run: Rename-Item -Path "target/release/bundle/msi/activity-manager_0.1.0_x64_en-US.msi" -NewName "activity-manager-${{github.ref_name}}.msi -Force"
             
       - name: Create GitHub Release  
         uses: softprops/action-gh-release@v2  
