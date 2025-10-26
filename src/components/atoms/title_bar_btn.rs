@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-use crate::functions::Functions;
+use crate::utils::functions::Functions;
 
 #[derive(PartialEq, Properties)]
 pub struct Props {

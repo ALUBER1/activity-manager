@@ -1,7 +1,8 @@
 use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, record_list::RecordList, title_bar::TitleBar, settings::Settings}, functions::Functions, helper::{invoke_function, invoke_function_vec}};
-use shared::models::record::Record;
+use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, utils::{functions::Functions, helper::{invoke_function, invoke_function_async, invoke_function_store, invoke_function_vec_async}}};
+use shared::models::{record::Record, storage_entry::StorageEntry};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
 extern "C" {
@@ -20,21 +21,35 @@ pub fn app() -> Html {
     
     let clone_list = record_list.clone();
     use_effect_with((), move |_|{
-        invoke_function("create_database", None, None);
-        invoke_function("initialize_database", None, None);  
-        invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
+        spawn_local(async move {
+            invoke_function_async("create_database", None, None).await;
+            invoke_function_async("initialize_database", None, None).await;  
+            invoke_function_vec_async("get_all_records", Some(clone_list.clone()), None).await;
+            invoke_function("notification_loop", None, None);
+        });
+        
         ||{}
     });
     let clone_list = record_list.clone();
-    let on_submit = Callback::from(move |data: Record| {
-        invoke_function("add_record", None, Some(Record { uuid: "".to_string(), ..data}));
-        invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
+    let on_submit = Callback::from(move |record: Record| {
+        let record = record.clone();
+        let clone_list = clone_list.clone();
+        spawn_local(async move{
+            invoke_function_async("add_record", None, Some(Record { uuid: "".to_string(), ..record})).await;
+            invoke_function_vec_async("get_all_records", Some(clone_list.clone()), None).await;
+            ()
+        });
     });
 
     let clone_list = record_list.clone();
     let delete_handler = Callback::from(move |record: Record|{
-        invoke_function("delete_record", None, Some(Record::from(record)));
-        invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
+        let record = record.clone();
+        let clone_list = clone_list.clone();
+        spawn_local(async move {
+            invoke_function_async("delete_record", None, Some(record)).await;
+            invoke_function_vec_async("get_all_records", Some(clone_list.clone()), None).await;
+            ()
+        });
     });
 
     let title_handler = Callback::from(move |function: Functions| {
@@ -47,12 +62,21 @@ pub fn app() -> Html {
 
     let clone_list = record_list.clone();
     let edit_handler = Callback::from(move |record: Record|{
-        invoke_function("delete_record", None, Some(Record::from(record)));
-        invoke_function_vec("get_all_records", Some(clone_list.clone()), None);
+        let record = record.clone();
+        let clone_list = clone_list.clone();
+        spawn_local(async move {
+            invoke_function_async("delete_record", None, Some(record)).await;
+            invoke_function_vec_async("get_all_records", Some(clone_list.clone()), None).await;
+            ()
+        });
     });
 
     let settings_handler = Callback::from(move |input: String|{
-        change_background(&input);
+        if input.contains("#") {
+            change_background(&input);
+        } else {
+            invoke_function_store("store_storage", None, Some(StorageEntry{key: String::from("delay"), value: input}));
+        }
     });
     
     html! {
