@@ -50,7 +50,9 @@ jobs:
         run: cargo tauri build
             
       - name: rename installer
-        run: Rename-Item -Path "target/release/bundle/nsis/activity-manager_0.1.0_x64-setup.exe" -NewName "activity-manager-${{github.ref_name}}-installer.exe" -Force
+        run: |
+          if (Test-Path "target/release/bundle/nsis/activity-manager-${{github.ref_name}}-installer.exe") { Remove-Item "target/release/bundle/nsis/activity-manager-${{github.ref_name}}-installer.exe" }
+          Rename-Item -Path "target/release/bundle/nsis/activity-manager_0.1.0_x64-setup.exe" -NewName "activity-manager-${{github.ref_name}}-installer.exe" -Force
             
       - name: Create GitHub Release  
         uses: softprops/action-gh-release@v2  
