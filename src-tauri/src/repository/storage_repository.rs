@@ -1,6 +1,8 @@
+use std::{fs::{self, File}, path::Path};
+
 use serde_json::json;
 use shared::errors::storage_error::StorageError;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 use tauri_plugin_store::StoreExt;
 
 #[derive(Clone)]
@@ -9,8 +11,20 @@ pub struct StorageRepository {
 }
 
 impl StorageRepository {
-    pub fn new(path: &str) -> Self {
-        StorageRepository{path: path.to_string()}
+    pub fn new(app: AppHandle) -> Self {
+        let mut dir = app.path().app_data_dir().unwrap();
+        dir.push("storage");
+
+        if !fs::exists(&dir).unwrap() {
+            fs::create_dir(&dir).unwrap();
+            dir.push("storage.json");
+            File::create(&dir).unwrap();
+        } else {
+            dir.push("storage.json");
+        }
+
+
+        StorageRepository{path: dir.to_str().unwrap().to_string()}
     }
 
     pub fn store(&self, app: AppHandle, key: String, value: String) -> Result<(), StorageError> {
@@ -33,8 +47,10 @@ impl StorageRepository {
     pub fn get(&self, app: AppHandle, key: String) -> Result<String, StorageError> {
         let storage = app.store(self.path.clone());
         if let Ok(store) = storage {
+            println!("accessed storage");
             let value = store.get(&key);
             if let Some(value) = value {
+                println!("got value {}", value);
                 store.close_resource();
                 Ok(value.to_string())
             } else {

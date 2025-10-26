@@ -40,7 +40,7 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_notifications::init())
         .manage(Mutex::new(None::<Database>))
-        .manage(Mutex::new(StorageRepository::new("./storage/storage.json")))
+        .manage(Mutex::new(None::<StorageRepository>))
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             update_record,

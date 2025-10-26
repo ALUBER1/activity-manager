@@ -30,13 +30,17 @@ pub fn notification_loop(app: AppHandle) {
                 }
             };
 
-            let storage_repository: State<'_, Mutex<StorageRepository>> = app.state();
+            let storage_repository: State<'_, Mutex<Option<StorageRepository>>> = app.state();
             let clone = app.clone();
             let delay = {
-                let guard = storage_repository.lock().unwrap();
-                match (*guard).get(clone, "delay".to_string()) {
-                    Ok(value) => NormalizeDelay::normalize(value),
-                    Err(_) => 3600_i64
+                let mut guard = storage_repository.lock().unwrap();
+                if let Some(ref mut storage) = *guard {
+                    match storage.get(clone, "delay".to_string()) {
+                        Ok(value) => NormalizeDelay::normalize(value),
+                        Err(_) => 3600_i64
+                    }
+                } else {
+                    3600_i64
                 }
             };
 

@@ -22,13 +22,17 @@ pub fn app() -> Html {
     
     let clone_list = record_list.clone();
     let delay_clone = delay.clone();
+    let temp = use_state(||String::new());
     use_effect_with((), move |_|{
         spawn_local(async move {
             invoke_function_async("create_database", None, None).await;
             invoke_function_async("initialize_database", None, None).await;  
             invoke_function_vec_async("get_all_records", Some(clone_list.clone()), None).await;
             invoke_function("notification_loop", None, None);
-            invoke_function_store_async("get_storage", Some(delay_clone.clone()), Some(StorageEntry { key: "delay".to_string(), value: "".to_string() })).await;
+            invoke_function_store_async("get_storage", Some(temp.clone()), Some(StorageEntry { key: "delay".to_string(), value: "".to_string() })).await;
+            if !(*temp).is_empty() {
+                delay_clone.set((*temp).clone());
+            }
         });
         
         ||{}
