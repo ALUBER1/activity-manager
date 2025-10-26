@@ -1,5 +1,6 @@
 use rusqlite::{params, Connection, Error};
 use shared::models::record::Record;
+use tauri::{AppHandle, Manager};
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -8,8 +9,12 @@ pub struct Database {
 }
 
 impl Database {
-    pub fn new() -> Result<Database, Error> {
-        let connection = Connection::open("./database/database.db")?;
+    pub fn new(app: AppHandle) -> Result<Database, Error> {
+        let mut path = app.path().app_data_dir().unwrap();
+        path.push("database");
+        std::fs::create_dir_all(&path).expect("Failed to create app data dir");
+        path.push("database.db");
+        let connection = Connection::open(path)?;
         Ok(Database { conn: connection })
     }
 

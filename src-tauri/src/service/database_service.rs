@@ -1,13 +1,13 @@
 use crate::repository::database_repository::Database;
 use shared::models::record::Record;
 use std::sync::Mutex;
-use tauri::State;
+use tauri::{AppHandle, State};
 
 #[tauri::command]
-pub fn create_database(state: State<'_, Mutex<Option<Database>>>) {
+pub fn create_database(app: AppHandle, state: State<'_, Mutex<Option<Database>>>) {
     let mut db = state.lock().unwrap();
     if db.is_none() {
-        match Database::new() {
+        match Database::new(app) {
             Ok(database) => {
                 *db = Some(database);
                 println!("db opened correctly")
