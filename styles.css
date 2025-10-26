@@ -196,17 +196,23 @@ span {
   height: 100%;
   background-color: var(--head-background-color);
   transition: width 700ms ease;
+  container-type: inline-size;
+}
+
+@container (width: 300px) {
+  .setting {
+    transition: opacity 300ms ease;
+    opacity: 1 !important;
+  }
 }
 
 .show-panel {
   width: 300px;
   border-top: 1px solid var(--background-color);
-  content-visibility: visible;
 }
 
 .hide-panel {
   width: 60px;
-  content-visibility: hidden;
 }
 
 #settings-container {
@@ -265,6 +271,7 @@ div:has( > .color-picker-container) {
   position: relative;
   flex-direction: row;
   flex-wrap: wrap;
+  opacity: 0;
 }
 
 .settings-divisor {
@@ -314,4 +321,11 @@ div:has( > .color-picker-container) {
   width: 80%;
   height: fit-content;
   line-height: calc(2.5em - 50%);
+}
+
+.setting > input {
+  position: relative;
+  width: 100px;
+  margin: 0;
+  margin-left: 30px;
 }

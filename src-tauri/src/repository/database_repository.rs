@@ -74,7 +74,13 @@ impl Database {
     pub fn update_record(&mut self, record: Record) -> Result<(), Error> {
         match self.conn.execute(
             "UPDATE events SET name=?1, date=?2, time=?3, notified_at=?5 WHERE uuid = ?4",
-            [record.name, record.date, record.time, record.uuid, record.notified_at],
+            [
+                record.name,
+                record.date,
+                record.time,
+                record.uuid,
+                record.notified_at,
+            ],
         ) {
             Ok(_) => Ok(()),
             Err(e) => Err(e),

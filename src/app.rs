@@ -1,8 +1,8 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, utils::{functions::Functions, helper::{invoke_function, invoke_function_async, invoke_function_vec_async}}};
-use shared::models::record::Record;
+use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, utils::{functions::Functions, helper::{invoke_function, invoke_function_async, invoke_function_store, invoke_function_vec_async}}};
+use shared::models::{record::Record, storage_entry::StorageEntry};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
 extern "C" {
@@ -72,7 +72,11 @@ pub fn app() -> Html {
     });
 
     let settings_handler = Callback::from(move |input: String|{
-        change_background(&input);
+        if input.contains("#") {
+            change_background(&input);
+        } else {
+            invoke_function_store("store_storage", None, Some(StorageEntry{key: String::from("delay"), value: input}));
+        }
     });
     
     html! {

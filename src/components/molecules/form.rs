@@ -2,15 +2,13 @@ use std::ops::Deref;
 use gloo::timers::callback::Timeout;
 use yew::prelude::*;
 use crate::components::{atoms::{submit_button::SubmitButton, text_input::TextInput}};
-use shared::models::record::Record as Event;
+use shared::{models::record::Record as Event, style::default_colors::DefaultColors};
 use chrono::{Local, NaiveDate, NaiveTime};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub on_submit: Callback<Event>
 }
-
-const INVALID_COLOR: &str = "#cc0b0b";
 
 #[function_component(Form)]
 pub fn form(props: &Props) -> Html{
@@ -47,7 +45,7 @@ pub fn form(props: &Props) -> Html{
         let mut correct = true;
         
         if NaiveDate::parse_from_str(&data.date, "%d/%m/%Y").is_err() || is_future_date(&data.date) == 0 {
-            date_clone.set(INVALID_COLOR.to_string());
+            date_clone.set(DefaultColors::INVALID_COLOR.to_string());
             correct = false;
             let date_clone = date_clone.clone();
             Timeout::new(timer, move || {
@@ -55,7 +53,7 @@ pub fn form(props: &Props) -> Html{
             }).forget();
         }
         if data.name.is_empty() {
-            name_clone.set(INVALID_COLOR.to_string());
+            name_clone.set(DefaultColors::INVALID_COLOR.to_string());
             correct = false;
             let name_clone = name_clone.clone();
             Timeout::new(timer, move || {
@@ -63,7 +61,7 @@ pub fn form(props: &Props) -> Html{
             }).forget();
         }
         if NaiveTime::parse_from_str(&data.time, "%H:%M").is_err() || !is_future_time(&data.time, is_future_date(&data.date)) {
-            time_clone.set(INVALID_COLOR.to_string());
+            time_clone.set(DefaultColors::INVALID_COLOR.to_string());
             correct = false;
             let time_clone = time_clone.clone();
             Timeout::new(timer, move || {

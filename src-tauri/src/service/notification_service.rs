@@ -1,9 +1,9 @@
-use std::{sync::Mutex, thread, time};
+use std::{sync::{Mutex, MutexGuard}, thread, time};
 
-use chrono::{Duration, NaiveDate, Utc};
+use chrono::{Duration, Local, NaiveDate, NaiveDateTime, NaiveTime, TimeZone, Utc};
 use shared::{errors::notification_error::NotificationError, models::{notification::Notification, record::Record}};
 use tauri::{AppHandle, Manager, State};
-use crate::{gateway::notifications_gateway::NotificationGateway, repository::database_repository::Database};
+use crate::{gateway::notifications_gateway::NotificationGateway, repository::{database_repository::Database, storage_repository::StorageRepository}};
 
 #[tauri::command]
 pub fn send_notification(app: AppHandle, notification: Notification) -> Result<(), NotificationError> {
@@ -17,9 +17,9 @@ pub fn send_notification(app: AppHandle, notification: Notification) -> Result<(
 pub fn notification_loop(app: AppHandle) {
     thread::spawn(move ||{
         loop{
-            let state: State<'_, Mutex<Option<Database>>> = app.state();
+            let database: State<'_, Mutex<Option<Database>>> = app.state();
             let records = {
-                let mut guard = state.lock().unwrap();
+                let mut guard = database.lock().unwrap();
                 if let Some(ref mut db) = *guard {
                     match db.get_all_records() {
                         Ok(records) => records,
@@ -30,12 +30,33 @@ pub fn notification_loop(app: AppHandle) {
                 }
             };
 
+            let storage_repository: State<'_, Mutex<StorageRepository>> = app.state();
+            let clone = app.clone();
+            let delay = {
+                let guard = storage_repository.lock().unwrap();
+                match (*guard).get(clone, "delay".to_string()) {
+                    Ok(value) => value.split(":")
+                                            .nth(1)
+                                            .unwrap()
+                                            .replace("\"", "")
+                                            .replace("}", "")
+                                            .parse::<u64>()
+                                            .unwrap(),
+                    Err(_) => 3600_u64
+                }
+            };
+
             for mut record in records {
-                if record.notified_at.is_empty() && NaiveDate::parse_from_str(&record.date, "%d/%m/%Y").unwrap() - Utc::now().date_naive() == Duration::days(1) {
+                let date = NaiveDate::parse_from_str(&record.date, "%d/%m/%Y").unwrap();
+                let time = NaiveTime::parse_from_str(&record.time, "%H:%M").unwrap();
+                let date_time = NaiveDateTime::new(date, time);
+                let now = Local::now().naive_local();
+                let diff = (date_time - now).num_seconds();
+                if record.notified_at.is_empty() && (diff > (delay - 60_u64).try_into().unwrap() && diff < delay.try_into().unwrap()) {
                     let _ = send_notification(app.clone(), Notification { title: record.name.clone(), body: format_notification_body(&record) });
-                    record.notified_at = Utc::now().format("%d/%m/%Y").to_string();
+                    record.notified_at = Local::now().format("%d/%m/%Y,%H:%M").to_string();
                     let _ = {
-                        let mut guard = state.lock().unwrap();
+                        let mut guard = database.lock().unwrap();
                         if let Some(ref mut db) = *guard {
                             match db.update_record(record) {
                                 Ok(_) => (),

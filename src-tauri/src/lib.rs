@@ -4,10 +4,10 @@ pub mod repository;
 #[macro_use]
 pub mod service;
 
+use crate::{repository::{database_repository::Database, storage_repository::StorageRepository}};
+use service::{database_service::*, notification_service::*, storage_service::*};
 use std::sync::Mutex;
 use tauri::{AppHandle, Manager};
-use service::{database_service::*, notification_service::*};
-use crate::repository::database_repository::Database;
 
 #[tauri::command]
 fn close_app(app_handle: AppHandle) {
@@ -37,8 +37,10 @@ fn maximize_app(app_handle: AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_notifications::init())
         .manage(Mutex::new(None::<Database>))
+        .manage(Mutex::new(StorageRepository::new("./storage/storage.json")))
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             update_record,
@@ -52,7 +54,9 @@ pub fn run() {
             get_all_records,
             delete_record,
             send_notification,
-            notification_loop
+            notification_loop,
+            store_storage,
+            get_storage
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

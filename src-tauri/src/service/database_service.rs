@@ -1,7 +1,7 @@
-use std::sync::Mutex;
-use shared::models::record::Record;
-use tauri::State;
 use crate::repository::database_repository::Database;
+use shared::models::record::Record;
+use std::sync::Mutex;
+use tauri::State;
 
 #[tauri::command]
 pub fn create_database(state: State<'_, Mutex<Option<Database>>>) {
