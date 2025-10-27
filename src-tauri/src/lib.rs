@@ -7,7 +7,7 @@ pub mod service;
 use crate::{repository::{database_repository::Database, storage_repository::StorageRepository}};
 use service::{database_service::*, notification_service::*, storage_service::*};
 use std::sync::Mutex;
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, menu::{Menu, MenuItem}, tray::{TrayIcon, TrayIconBuilder}};
 
 #[tauri::command]
 fn close_app(app_handle: AppHandle) {
@@ -34,6 +34,20 @@ fn maximize_app(app_handle: AppHandle) {
     }
 }
 
+#[tauri::command]
+fn tray_app(app_handle: AppHandle) {
+    let close = MenuItem::with_id(&app_handle, "close", "close", true, None::<&str>).unwrap();
+
+    let menu = Menu::with_items(&app_handle, &[&close]).unwrap();
+
+    let tray = TrayIconBuilder::new()
+        .menu(&menu)
+        .show_menu_on_left_click(false)
+        .icon(app_handle.default_window_icon().unwrap().clone())
+        .build(&app_handle)
+        .unwrap();
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -56,7 +70,8 @@ pub fn run() {
             send_notification,
             notification_loop,
             store_storage,
-            get_storage
+            get_storage,
+            tray_app
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
