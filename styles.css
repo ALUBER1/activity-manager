@@ -136,6 +136,7 @@ html, body {
 
 #Maximize:hover,
 #Minimize:hover,
+#Tray:hover,
 #submit:hover {
   transition: background-color 0.5s;
   background-color: grey;
@@ -203,7 +204,7 @@ span {
 
 @container (width: 300px) {
   .setting {
-    transition: opacity 300ms ease;
+    transition: opacity 450ms ease;
     opacity: 1 !important;
   }
 }
@@ -232,7 +233,7 @@ span {
   text-align: left;
   white-space: nowrap;
   overflow-wrap: normal;
-  
+
   & + input {
     margin-left: 10px;
   }
