@@ -7,7 +7,7 @@ pub mod service;
 use crate::{repository::{database_repository::Database, storage_repository::StorageRepository}};
 use service::{database_service::*, notification_service::*, storage_service::*};
 use std::sync::Mutex;
-use tauri::{AppHandle, Manager, menu::{Menu, MenuItem}, tray::{TrayIcon, TrayIconBuilder}};
+use tauri::{AppHandle, Manager, menu::{Menu, MenuItem}, tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent}};
 
 #[tauri::command]
 fn close_app(app_handle: AppHandle) {
@@ -36,16 +36,48 @@ fn maximize_app(app_handle: AppHandle) {
 
 #[tauri::command]
 fn tray_app(app_handle: AppHandle) {
-    let close = MenuItem::with_id(&app_handle, "close", "close", true, None::<&str>).unwrap();
+    #[cfg_attr(all(target_os = "windows",not(debug_assertions)), windows_subsystem = "windows")]
+    {
+        if let Some(window) = app_handle.get_webview_window("main") {
+            let _ = window.hide();
+        }
+        let close = MenuItem::with_id(&app_handle, "close", "close", true, None::<&str>).unwrap();
 
-    let menu = Menu::with_items(&app_handle, &[&close]).unwrap();
+        let menu = Menu::with_items(&app_handle, &[&close]).unwrap();
 
-    let tray = TrayIconBuilder::new()
-        .menu(&menu)
-        .show_menu_on_left_click(false)
-        .icon(app_handle.default_window_icon().unwrap().clone())
-        .build(&app_handle)
-        .unwrap();
+        let cloned = app_handle.clone();
+        let _ = TrayIconBuilder::with_id("tray")
+            .menu(&menu)
+            .show_menu_on_left_click(false)
+            .on_menu_event(move |_tray, event| match event.id.as_ref() {
+                "close" => {
+                    close_app(cloned.clone());
+                },
+                _ => {
+
+                }
+            })
+            .on_tray_icon_event(|tray: &TrayIcon, event| match event {
+                TrayIconEvent::Click { 
+                    id: _, 
+                    position: _, 
+                    rect: _, 
+                    button: MouseButton::Left, 
+                    button_state: MouseButtonState::Up
+                } => {
+                    let app = tray.app_handle();
+                    if let Some(window) = app.get_webview_window("main") {
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                        let _ = tray.set_visible(false);
+                    }
+                },
+                _ => {}
+            })
+            .icon(app_handle.default_window_icon().unwrap().clone())
+            .build(&app_handle)
+            .unwrap();
+    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
