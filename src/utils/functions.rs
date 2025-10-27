@@ -4,7 +4,8 @@ use core::fmt;
 pub enum Functions {
     Close,
     Minimize,
-    Maximize
+    Maximize,
+    Tray
 } 
 
 impl fmt::Display for Functions {

@@ -23,6 +23,7 @@ pub fn button(label: &Props) -> Html {
     html!{
         <div data-tauri-drag-region="true" id="head">
                 <h1 data-tauri-drag-region="true" id="title">{"Activity manager"}</h1>
+                <TitleButton id={Functions::Tray} on_click={handler.clone()}><span class="material-symbols-outlined">{"arrow_downward_alt"}</span></TitleButton>
                 <TitleButton id={Functions::Minimize} on_click={handler.clone()}><span class="material-symbols-outlined">{"remove"}</span></TitleButton>
                 <TitleButton id={Functions::Maximize} on_click={handler.clone()}><span class="material-symbols-outlined">{if !(*maximize_class) {"fullscreen"} else {"fullscreen_exit"}}</span></TitleButton>
                 <TitleButton id={Functions::Close} on_click={handler.clone()}><span class="material-symbols-outlined">{"close"}</span></TitleButton>

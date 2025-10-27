@@ -63,7 +63,8 @@ pub fn app() -> Html {
         match function {
             Functions::Close => invoke_function("close_app", None, None),
             Functions::Minimize => invoke_function("minimize_app", None, None),
-            Functions::Maximize => invoke_function("maximize_app", None, None)
+            Functions::Maximize => invoke_function("maximize_app", None, None),
+            Functions::Tray => invoke_function("tray_app", None, None),
         }
     });
 

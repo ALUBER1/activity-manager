@@ -47,7 +47,6 @@ impl StorageRepository {
     pub fn get(&self, app: AppHandle, key: String) -> Result<String, StorageError> {
         let storage = app.store(self.path.clone());
         if let Ok(store) = storage {
-            println!("accessed storage");
             let value = store.get(&key);
             if let Some(value) = value {
                 println!("got value {}", value);
