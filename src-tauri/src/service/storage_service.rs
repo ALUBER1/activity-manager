@@ -27,7 +27,7 @@ pub fn store_storage(app: AppHandle, storage_entry: StorageEntry, state: State<'
 }
 
 #[tauri::command]
-pub fn get_storage(app: AppHandle, storage_entry: StorageEntry, state: State<'_, Mutex<Option<StorageRepository>>>) -> String {
+pub fn get_storage(app: AppHandle, storage_entry: StorageEntry, state: State<'_, Mutex<Option<StorageRepository>>>) -> StorageEntry {
     let mut temp = state.lock().unwrap();
     if temp.is_none() {
         *temp = Some(StorageRepository::new(app.clone()));
@@ -36,13 +36,15 @@ pub fn get_storage(app: AppHandle, storage_entry: StorageEntry, state: State<'_,
     drop(temp);
 
     if let Some(storage) = storage {
-        let result = storage.get(app, storage_entry.key);
+        let result = storage.get(app, storage_entry.key.clone());
         if let Err(e) = result {
             println!("error getting value: {}", e.message);
         } else {
-            return result.unwrap();
+            let value = result.unwrap();
+            println!("got: {:?}", &value);
+            return StorageEntry::new_delay(value);
         }
     }
-    
-    String::new()
+    println!("error getting storage");
+    StorageEntry::default()
 }

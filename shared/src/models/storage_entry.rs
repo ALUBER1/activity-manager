@@ -1,8 +1,14 @@
 use macros::AutoNew;
 use serde::{Deserialize, Serialize};
 
-#[derive(AutoNew, Serialize, Deserialize)]
+#[derive(AutoNew, Serialize, Deserialize, Default, Clone, PartialEq)]
 pub struct StorageEntry {
     pub key: String,
     pub value: String
+}
+
+impl StorageEntry {
+    pub fn new_delay(value: String) -> Self {
+        StorageEntry{ key: "delay".to_string(), value }
+    }
 }

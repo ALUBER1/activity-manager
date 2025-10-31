@@ -49,7 +49,6 @@ impl StorageRepository {
         if let Ok(store) = storage {
             let value = store.get(&key);
             if let Some(value) = value {
-                println!("got value {}", value);
                 store.close_resource();
                 Ok(value.to_string())
             } else {
