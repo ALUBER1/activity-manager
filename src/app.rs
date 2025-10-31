@@ -1,8 +1,8 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, utils::{functions::Functions, helper::{invoke_function, invoke_function_async, invoke_function_store, invoke_function_store_async, invoke_function_vec_async}}};
-use shared::models::{record::Record, storage_entry::StorageEntry};
+use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, models::setting_value::SettingValue, utils::{functions::Functions, helper::*}};
+use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
 extern "C" {
@@ -18,25 +18,36 @@ extern "C" {
 pub fn app() -> Html {
     
     let record_list: UseStateHandle<Vec<Record>> = use_state(||Vec::new());
-    let delay = use_state(||String::from("0/60"));
+    let delay = use_state(||StorageEntry::new_delay("0/60".to_string()));
     
     let clone_list = record_list.clone();
     let delay_clone = delay.clone();
-    let temp = use_state(||String::new());
+    let temp = use_state(||StorageEntry::default());
+    let temp_clone = temp.clone();
     use_effect_with((), move |_|{
         spawn_local(async move {
             invoke_function_async("create_database", None, None).await;
             invoke_function_async("initialize_database", None, None).await;  
             invoke_function_vec_async("get_all_records", Some(clone_list.clone()), None).await;
             invoke_function("notification_loop", None, None);
-            invoke_function_store_async("get_storage", Some(temp.clone()), Some(StorageEntry { key: "delay".to_string(), value: "".to_string() })).await;
-            if !(*temp).is_empty() {
-                delay_clone.set((*temp).clone());
-            }
+
+            invoke_function_store_async("get_storage", Some(delay_clone.clone()), Some(StorageEntry::new_delay(String::new()))).await;
+            invoke_function_store_async("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("text-color".to_string(), String::new()))).await;
+            invoke_function_store_async("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("background-color".to_string(), String::new()))).await;
+            invoke_function_store_async("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("input-background-color".to_string(), String::new()))).await;
+            invoke_function_store_async("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("head-background-color".to_string(), String::new()))).await;
         });
         
         ||{}
     });
+    
+    use_effect_with((*temp).clone(), move |temp| {
+        if !(*temp).value.is_empty() {
+            let tmp = SettingValue::from((*temp).clone()).serialize();
+            change_background(&tmp);
+        }
+    });
+    
     let clone_list = record_list.clone();
     let on_submit = Callback::from(move |record: Record| {
         let record = record.clone();
@@ -79,11 +90,15 @@ pub fn app() -> Html {
         });
     });
 
-    let settings_handler = Callback::from(move |input: String|{
-        if input.contains("#") {
-            change_background(&input);
+    
+    let delay_clone = delay.clone();
+    let settings_handler = Callback::from(move |input: SettingValue|{
+        if input.from_color_picker {
+            change_background(&input.serialize());
+            invoke_function_store("store_storage", None, Some(StorageEntry::new_color(input.value.clone(), input.setting)));
         } else {
-            invoke_function_store("store_storage", None, Some(StorageEntry{key: String::from("delay"), value: input}));
+            invoke_function_store("store_storage", None, Some(StorageEntry::new_delay(input.value.clone())));
+            delay_clone.set(StorageEntry::new_delay(NormalizeDelay::convert_to_string(input.value)));
         }
     });
     

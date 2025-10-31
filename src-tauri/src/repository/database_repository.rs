@@ -34,7 +34,7 @@ impl Database {
         }
     }
 
-    pub fn add_record(&mut self, record: Record) -> Result<(), Error> {
+    pub fn add_record(&mut self, record: Record) -> Result<Record, Error> {
         match self.conn.execute(
             "INSERT INTO events(uuid, name, date, time, notified_at) VALUES (?1, ?2, ?3, ?4, ?5)",
             params![
@@ -45,7 +45,7 @@ impl Database {
                 record.notified_at
             ],
         ) {
-            Ok(_) => Ok(()),
+            Ok(_) => Ok(record),
             Err(e) => Err(e),
         }
     }

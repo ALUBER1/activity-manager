@@ -30,9 +30,9 @@ impl StorageRepository {
     pub fn store(&self, app: AppHandle, key: String, value: String) -> Result<(), StorageError> {
         let storage = app.store(self.path.clone());
         if let Ok(store) = storage {
-            println!("saving {}", value);
-            store.set(key, json!({"value": value}));
-            println!("saved {}", value);
+            println!("saving {} at {}", value, key);
+            store.set(&key, json!({"value": value}));
+            println!("saved {} at {}", value, key);
             if let Err(_) = store.save() {
                 return Err(StorageError::storage_value_set_error(value));
             }
@@ -49,7 +49,6 @@ impl StorageRepository {
         if let Ok(store) = storage {
             let value = store.get(&key);
             if let Some(value) = value {
-                println!("got value {}", value);
                 store.close_resource();
                 Ok(value.to_string())
             } else {

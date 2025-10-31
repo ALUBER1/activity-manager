@@ -4,11 +4,11 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement};
 use yew::prelude::*;
 
-use crate::{app::init_pickr, components::atoms::button::Button};
+use crate::{app::init_pickr, components::atoms::button::Button, models::setting_value::SettingValue};
 
 #[derive(Properties,PartialEq)]
 pub struct Props {
-    pub call_back: Callback<String>,
+    pub call_back: Callback<SettingValue>,
     pub item: String,
     pub index: u32
 }
@@ -22,19 +22,21 @@ pub fn color_picker(prop: &Props) -> Html {
     let onclick = Callback::from(move |_|{
         let input = document().get_elements_by_class_name("pcr-result");
         let temp = input.get_with_index(index).unwrap().unchecked_into::<HtmlInputElement>();
-        callback.emit((*name).clone() + &temp.value() + "#" + &index.to_string());
+        callback.emit(SettingValue::new((*name).clone(), temp.value(), true, index.to_string()));
+        //callback.emit((*name).clone() + &temp.value() + "#" + &index.to_string());
     });
     
     let callback = prop.call_back.clone();
     let name = use_state(||{prop.item.clone()});
     let index = prop.index.clone();
     let default_onclick = Callback::from(move |_|{
-        callback.emit((*name).clone() + &DefaultColors::get(&name) + "#" + &index.to_string());
+        callback.emit(SettingValue::new((*name).clone(), DefaultColors::get(&name), true, index.to_string()));
+        //callback.emit((*name).clone() + &DefaultColors::get(&name) + "#" + &index.to_string());
     });
     
     let name = prop.item.clone();
     use_effect_with((), move |_|{    
-        init_pickr("#".to_string()+&name, DefaultColors::get(&name));
+        init_pickr(format!("#{}", name), DefaultColors::get(&name));
     });
 
     html!{

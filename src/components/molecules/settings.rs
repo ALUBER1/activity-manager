@@ -1,14 +1,13 @@
-use std::time::Duration;
-use shared::utils::normalize::NormalizeDelay;
+use shared::{models::storage_entry::StorageEntry, utils::normalize::NormalizeDelay};
 use web_sys::Element;
 use yew::{function_component, html, use_state, Callback, Html, NodeRef, Properties};
 
-use crate::components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting};
+use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting}, models::setting_value::SettingValue};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
-    pub callback: Callback<String>,
-    pub delay: String
+    pub callback: Callback<SettingValue>,
+    pub delay: StorageEntry
 }
 
 #[function_component(Settings)]
@@ -34,27 +33,13 @@ pub fn create_setting(prop: &Props) -> Html {
     });
 
     let on_change = prop.callback.clone();
-    let get_input_values = Callback::from(move |input: String|{
+    let get_input_values = Callback::from(move |input: SettingValue|{
         on_change.emit(input);
     });
 
     let on_change = prop.callback.clone();
     let notification_delay_handle = Callback::from(move |input: String|{
-        if !input.chars().any(|c|{c.is_alphabetic()}) {
-            let mut split = input.split("/");
-            if let Some(days) = split.nth(0) {
-                let days_num: u64 = days.parse::<u64>().unwrap();
-                if let Some(minutes) = split.nth(0) {
-                    let minutes_num: u64 = minutes.parse::<u64>().unwrap() + days_num * 24 * 60;
-                    let duration = Duration::from_secs(minutes_num * 60);
-                    on_change.emit(duration.as_secs().to_string());
-                } else {
-                    let duration = Duration::from_secs(days_num * 24 * 60 * 60);
-                    on_change.emit(duration.as_secs().to_string());
-                }
-            }
-            
-        }
+        on_change.emit(SettingValue::new("delay".to_string(), NormalizeDelay::convert_to_num(input), false, String::new()));
     });
 
     html!{
@@ -65,10 +50,10 @@ pub fn create_setting(prop: &Props) -> Html {
                 <Setting label={"input color"}><ColorPicker item="input-background-color" call_back={get_input_values.clone()} index=2 /></Setting>
                 <Setting label={"text color"}><ColorPicker item="text-color" call_back={get_input_values.clone()} index=3 /></Setting>
                 <Setting label={"notification delay"}><NotificationInput name="days/minutes" on_change={notification_delay_handle.clone()} value = {
-                    if prop.delay.contains("/") {
-                        prop.delay.clone()
+                    if prop.delay.value.contains("/") {
+                        prop.delay.value.clone()
                     } else {
-                        let num = NormalizeDelay::normalize(prop.delay.clone());
+                        let num = NormalizeDelay::normalize(prop.delay.value.clone());
                         let days = num / 86400;
                         let minutes = num / 60 - days * 24 * 60;
                         format!("{}/{}", days, minutes)

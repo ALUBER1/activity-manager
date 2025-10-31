@@ -44,7 +44,7 @@ pub fn add_record(record: Record, state: State<'_, Mutex<Option<Database>>>) {
     } else {
         if let Some(ref mut database) = *db {
             match database.add_record(record) {
-                Ok(_) => println!("record inserted"),
+                Ok(r) => println!("record inserted: {:?}", r),
                 Err(e) => println!("{:?}", e),
             }
         } else {
