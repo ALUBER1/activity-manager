@@ -33,7 +33,7 @@ pub fn create_setting(prop: &Props) -> Html {
     });
 
     let on_change = prop.callback.clone();
-    let get_input_values = Callback::from(move |input: SettingValue|{\
+    let get_input_values = Callback::from(move |input: SettingValue|{
         on_change.emit(input);
     });
 
