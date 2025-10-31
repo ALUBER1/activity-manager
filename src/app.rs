@@ -1,6 +1,9 @@
+use std::time::Duration;
+
+use gloo::console::log;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
-use yew::prelude::*;
+use yew::{platform::time::sleep, prelude::*};
 use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, models::setting_value::SettingValue, utils::{functions::Functions, helper::*}};
 use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
@@ -22,17 +25,32 @@ pub fn app() -> Html {
     
     let clone_list = record_list.clone();
     let delay_clone = delay.clone();
+    let temp = use_state(||StorageEntry::default());
+    let temp_clone = temp.clone();
     use_effect_with((), move |_|{
         spawn_local(async move {
             invoke_function_async("create_database", None, None).await;
             invoke_function_async("initialize_database", None, None).await;  
             invoke_function_vec_async("get_all_records", Some(clone_list.clone()), None).await;
             invoke_function("notification_loop", None, None);
+
             invoke_function_store_async("get_storage", Some(delay_clone.clone()), Some(StorageEntry::new_delay(String::new()))).await;
+            invoke_function_store_async("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("text-color".to_string(), String::new()))).await;
+            invoke_function_store_async("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("background-color".to_string(), String::new()))).await;
+            invoke_function_store_async("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("input-background-color".to_string(), String::new()))).await;
+            invoke_function_store_async("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("head-background-color".to_string(), String::new()))).await;
         });
         
         ||{}
     });
+    
+    use_effect_with((*temp).clone(), move |temp| {
+        if !(*temp).value.is_empty() {
+            let tmp = SettingValue::from((*temp).clone()).serialize();
+            change_background(&tmp);
+        }
+    });
+    
     let clone_list = record_list.clone();
     let on_submit = Callback::from(move |record: Record| {
         let record = record.clone();

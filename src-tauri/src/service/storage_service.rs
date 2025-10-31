@@ -42,7 +42,7 @@ pub fn get_storage(app: AppHandle, storage_entry: StorageEntry, state: State<'_,
         } else {
             let value = result.unwrap();
             println!("got: {:?}", &value);
-            return StorageEntry::new_delay(value);
+            return StorageEntry::new(storage_entry.key, value);
         }
     }
     println!("error getting storage");

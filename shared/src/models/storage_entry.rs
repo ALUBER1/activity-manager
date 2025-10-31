@@ -1,7 +1,7 @@
 use macros::AutoNew;
 use serde::{Deserialize, Serialize};
 
-#[derive(AutoNew, Serialize, Deserialize, Default, Clone, PartialEq)]
+#[derive(AutoNew, Serialize, Deserialize, Default, Clone, PartialEq, Debug)]
 pub struct StorageEntry {
     pub key: String,
     pub value: String

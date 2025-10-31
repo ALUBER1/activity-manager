@@ -1,3 +1,5 @@
+use shared::{models::storage_entry::StorageEntry, utils::normalize::NormalizeDelay};
+
 #[derive(Debug)]
 pub struct SettingValue {
     pub setting: String,
@@ -19,5 +21,9 @@ impl SettingValue {
 
     pub fn serialize(&self) -> String {
         format!("{}#{}#{}", self.setting, self.value, self.index)
+    }
+
+    pub fn from(input: StorageEntry) -> Self {
+        SettingValue { setting: input.key, value: NormalizeDelay::normalize_color(input.value), index: String::from("0"), from_color_picker: false }
     }
 }

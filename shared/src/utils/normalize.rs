@@ -13,6 +13,15 @@ impl NormalizeDelay {
             .unwrap()
     }
 
+    pub fn normalize_color(value: String) -> String {
+        value.split(":")
+            .nth(1)
+            .unwrap()
+            .replace("\"", "")
+            .replace("}", "")
+            .replace("\\", "")
+    } //{\"value\":\"#8E1818\"}
+
     pub fn convert_to_num(input: String) -> String {
         if !input.chars().any(|c|{c.is_alphabetic()}) {
             let mut split = input.split("/");
