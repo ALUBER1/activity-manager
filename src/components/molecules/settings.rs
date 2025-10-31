@@ -1,12 +1,13 @@
+use gloo::console::log;
 use shared::{models::storage_entry::StorageEntry, utils::normalize::NormalizeDelay};
 use web_sys::Element;
 use yew::{function_component, html, use_state, Callback, Html, NodeRef, Properties};
 
-use crate::components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting};
+use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting}, models::setting_value::SettingValue};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
-    pub callback: Callback<String>,
+    pub callback: Callback<SettingValue>,
     pub delay: StorageEntry
 }
 
@@ -33,13 +34,14 @@ pub fn create_setting(prop: &Props) -> Html {
     });
 
     let on_change = prop.callback.clone();
-    let get_input_values = Callback::from(move |input: String|{
+    let get_input_values = Callback::from(move |input: SettingValue|{
+        log!(format!("{:?}", input));
         on_change.emit(input);
     });
 
     let on_change = prop.callback.clone();
     let notification_delay_handle = Callback::from(move |input: String|{
-        on_change.emit(NormalizeDelay::convert_to_num(input));
+        on_change.emit(SettingValue::new("delay".to_string(), NormalizeDelay::convert_to_num(input), false, String::new()));
     });
 
     html!{

@@ -11,4 +11,8 @@ impl StorageEntry {
     pub fn new_delay(value: String) -> Self {
         StorageEntry{ key: "delay".to_string(), value }
     }
+
+    pub fn new_color(value: String, setting: String) -> Self {
+        StorageEntry { key: setting, value }
+    }
 }

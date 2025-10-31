@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 use wasm_bindgen_futures::spawn_local;
-use yew::UseStateHandle;
+use yew::prelude::*;
 use shared::models::{record::Record, storage_entry::StorageEntry};
 
 #[wasm_bindgen]

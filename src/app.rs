@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, utils::{functions::Functions, helper::*}};
+use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, models::setting_value::SettingValue, utils::{functions::Functions, helper::*}};
 use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
@@ -77,12 +77,13 @@ pub fn app() -> Html {
 
     
     let delay_clone = delay.clone();
-    let settings_handler = Callback::from(move |input: String|{
-        if input.contains("#") {
-            change_background(&input);
+    let settings_handler = Callback::from(move |input: SettingValue|{
+        if input.from_color_picker {
+            change_background(&input.serialize());
+            invoke_function_store("store_storage", None, Some(StorageEntry::new_color(input.value.clone(), input.setting)));
         } else {
-            invoke_function_store("store_storage", None, Some(StorageEntry::new_delay(input.clone())));
-            delay_clone.set(StorageEntry::new_delay(NormalizeDelay::convert_to_string(input)));
+            invoke_function_store("store_storage", None, Some(StorageEntry::new_delay(input.value.clone())));
+            delay_clone.set(StorageEntry::new_delay(NormalizeDelay::convert_to_string(input.value)));
         }
     });
     
