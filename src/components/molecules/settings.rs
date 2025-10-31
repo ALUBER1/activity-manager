@@ -1,4 +1,3 @@
-use gloo::console::log;
 use shared::{models::storage_entry::StorageEntry, utils::normalize::NormalizeDelay};
 use web_sys::Element;
 use yew::{function_component, html, use_state, Callback, Html, NodeRef, Properties};
@@ -34,8 +33,7 @@ pub fn create_setting(prop: &Props) -> Html {
     });
 
     let on_change = prop.callback.clone();
-    let get_input_values = Callback::from(move |input: SettingValue|{
-        log!(format!("{:?}", input));
+    let get_input_values = Callback::from(move |input: SettingValue|{\
         on_change.emit(input);
     });
 

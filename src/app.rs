@@ -1,9 +1,6 @@
-use std::time::Duration;
-
-use gloo::console::log;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
-use yew::{platform::time::sleep, prelude::*};
+use yew::prelude::*;
 use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, models::setting_value::SettingValue, utils::{functions::Functions, helper::*}};
 use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
