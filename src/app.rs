@@ -105,10 +105,6 @@ pub fn app() -> Html {
             }
         });
     });
-
-    let password_handler = Callback::from(move |_password: String| {
-        todo!()
-    });
     
     html! {
         <div id="main">
@@ -124,7 +120,7 @@ pub fn app() -> Html {
                 </div>
             </div>
             <Settings callback={settings_handler} delay={(*delay).clone()} />
-            <PasswordScreen callback={password_handler} />
+            <PasswordScreen correct_password={String::new()} />
         </div>
     }
 }

@@ -5,7 +5,8 @@ use yew::{Callback, Event, Html, Properties, function_component, html};
 #[derive(Properties, PartialEq)]
 pub struct Prop {
     pub callback: Callback<String>,
-    pub show: bool
+    pub show: bool,
+    pub color: String
 }
 
 #[function_component(PasswordInput)]
@@ -22,6 +23,6 @@ pub fn password_input(prop: &Prop) -> Html {
             } else {
                 "password"
             }
-        } />
+        } style={format!("background-color: {}", prop.color)}/>
     }
 }

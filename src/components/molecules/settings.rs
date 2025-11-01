@@ -1,6 +1,5 @@
 use shared::{models::storage_entry::StorageEntry, utils::normalize::NormalizeDelay};
-use web_sys::Element;
-use yew::{function_component, html, use_state, Callback, Html, NodeRef, Properties};
+use yew::{function_component, html, use_state, Callback, Html, Properties};
 
 use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting}, models::setting_value::SettingValue};
 
