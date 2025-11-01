@@ -6,14 +6,17 @@ use tauri::{AppHandle, State};
 use crate::repository::storage_repository::StorageRepository;
 
 #[tauri::command]
-pub fn store_storage(app: AppHandle, storage_entry: StorageEntry, state: State<'_, Mutex<Option<StorageRepository>>>) {
+pub fn store_storage(
+    app: AppHandle,
+    storage_entry: StorageEntry,
+    state: State<'_, Mutex<Option<StorageRepository>>>,
+) {
     let mut temp = state.lock().unwrap();
     if temp.is_none() {
         *temp = Some(StorageRepository::new(app.clone()));
     }
     let storage = temp.clone();
     drop(temp);
-
 
     if let Some(storage) = storage {
         println!("got storage");
@@ -23,11 +26,14 @@ pub fn store_storage(app: AppHandle, storage_entry: StorageEntry, state: State<'
             println!("stored value {}", storage_entry.value);
         }
     }
-    
 }
 
 #[tauri::command]
-pub fn get_storage(app: AppHandle, storage_entry: StorageEntry, state: State<'_, Mutex<Option<StorageRepository>>>) -> StorageEntry {
+pub fn get_storage(
+    app: AppHandle,
+    storage_entry: StorageEntry,
+    state: State<'_, Mutex<Option<StorageRepository>>>,
+) -> StorageEntry {
     let mut temp = state.lock().unwrap();
     if temp.is_none() {
         *temp = Some(StorageRepository::new(app.clone()));
