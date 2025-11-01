@@ -218,6 +218,7 @@ span {
 }
 
 .hide-panel {
+  content-visibility: hidden;
   width: 60px;
 }
 

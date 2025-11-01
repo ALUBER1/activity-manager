@@ -12,24 +12,11 @@ pub struct Props {
 
 #[function_component(Settings)]
 pub fn create_setting(prop: &Props) -> Html {
-    let class = use_state(||String::new());
-    let cloned_class: yew::UseStateHandle<String> = class.clone();
-
+    let show = use_state(||false);
     
-    
-    let test: NodeRef = NodeRef::default();
-    let cloned_test = test.clone();
+    let show_clone = show.clone();
     let listener = Callback::from(move |_| {
-        
-        let element = cloned_test.cast::<Element>().unwrap();
-
-        if element.class_name().eq("show-panel") {    
-            cloned_class.set(String::new());
-            element.set_class_name("hide-panel");
-        } else {
-            cloned_class.set(String::from("spin"));
-            element.set_class_name("show-panel");
-        }
+        show_clone.set(!*show_clone);
     });
 
     let on_change = prop.callback.clone();
@@ -44,7 +31,13 @@ pub fn create_setting(prop: &Props) -> Html {
 
     html!{
         <div id="settings-container">
-            <div id="settings-panel" class="hide-panel" ref={test.clone()}>
+            <div id="settings-panel" class={
+                if *show {
+                    "show-panel"
+                } else {
+                    "hide-panel"
+                }
+            }>
                 <Setting label={"background color"}><ColorPicker item="background-color" call_back={get_input_values.clone()} index=0 /></Setting>
                 <Setting label={"header color"}><ColorPicker item="head-background-color" call_back={get_input_values.clone()} index=1 /></Setting>
                 <Setting label={"input color"}><ColorPicker item="input-background-color" call_back={get_input_values.clone()} index=2 /></Setting>
@@ -60,7 +53,11 @@ pub fn create_setting(prop: &Props) -> Html {
                     }
                 } /></Setting>
             </div>
-            <Button onclick={listener.clone()} id="settings"><span class={format!("material-symbols-outlined {}", *class)}>{"settings"}</span></Button>
+            <Button onclick={listener.clone()} id="settings"><span class={format!("material-symbols-outlined {}", if *show {
+                "spin"
+            } else {
+                ""
+            })}>{"settings"}</span></Button>
         </div>
     }
 }
