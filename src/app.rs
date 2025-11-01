@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, record_list::RecordList, settings::Settings, title_bar::TitleBar}, models::setting_value::SettingValue, utils::{functions::Functions, helper::*}};
+use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar}, models::setting_value::SettingValue, utils::{functions::Functions, helper::*}};
 use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
@@ -28,14 +28,14 @@ pub fn app() -> Html {
         spawn_local(async move {
             invoke_function_async("create_database", None, None).await;
             invoke_function_async("initialize_database", None, None).await;  
-            invoke_function_vec_async("get_all_records", Some(clone_list.clone()), None).await;
+            invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
             invoke_function("notification_loop", None, None);
 
-            invoke_function_store_async("get_storage", Some(delay_clone.clone()), Some(StorageEntry::new_delay(String::new()))).await;
-            invoke_function_store_async("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("text-color".to_string(), String::new()))).await;
-            invoke_function_store_async("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("background-color".to_string(), String::new()))).await;
-            invoke_function_store_async("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("input-background-color".to_string(), String::new()))).await;
-            invoke_function_store_async("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("head-background-color".to_string(), String::new()))).await;
+            invoke_function_store("get_storage", Some(delay_clone.clone()), Some(StorageEntry::new_delay(String::new()))).await;
+            invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("text-color".to_string(), String::new()))).await;
+            invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("background-color".to_string(), String::new()))).await;
+            invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("input-background-color".to_string(), String::new()))).await;
+            invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("head-background-color".to_string(), String::new()))).await;
         });
         
         ||{}
@@ -54,7 +54,7 @@ pub fn app() -> Html {
         let clone_list = clone_list.clone();
         spawn_local(async move{
             invoke_function_async("add_record", None, Some(Record { uuid: "".to_string(), ..record})).await;
-            invoke_function_vec_async("get_all_records", Some(clone_list.clone()), None).await;
+            invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
             ()
         });
     });
@@ -65,7 +65,7 @@ pub fn app() -> Html {
         let clone_list = clone_list.clone();
         spawn_local(async move {
             invoke_function_async("delete_record", None, Some(record)).await;
-            invoke_function_vec_async("get_all_records", Some(clone_list.clone()), None).await;
+            invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
             ()
         });
     });
@@ -85,7 +85,7 @@ pub fn app() -> Html {
         let clone_list = clone_list.clone();
         spawn_local(async move {
             invoke_function_async("delete_record", None, Some(record)).await;
-            invoke_function_vec_async("get_all_records", Some(clone_list.clone()), None).await;
+            invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
             ()
         });
     });
@@ -93,13 +93,21 @@ pub fn app() -> Html {
     
     let delay_clone = delay.clone();
     let settings_handler = Callback::from(move |input: SettingValue|{
-        if input.from_color_picker {
-            change_background(&input.serialize());
-            invoke_function_store("store_storage", None, Some(StorageEntry::new_color(input.value.clone(), input.setting)));
-        } else {
-            invoke_function_store("store_storage", None, Some(StorageEntry::new_delay(input.value.clone())));
-            delay_clone.set(StorageEntry::new_delay(NormalizeDelay::convert_to_string(input.value)));
-        }
+        let delay_clone = delay_clone.clone();
+        let input = input.clone();
+        spawn_local(async move {
+            if input.from_color_picker {
+                change_background(&input.serialize());
+                invoke_function_store("store_storage", None, Some(StorageEntry::new_color(input.value.clone(), input.setting))).await;
+            } else {
+                invoke_function_store("store_storage", None, Some(StorageEntry::new_delay(input.value.clone()))).await;
+                delay_clone.set(StorageEntry::new_delay(NormalizeDelay::convert_to_string(input.value)));
+            }
+        });
+    });
+
+    let password_handler = Callback::from(move |_password: String| {
+        todo!()
     });
     
     html! {
@@ -116,6 +124,7 @@ pub fn app() -> Html {
                 </div>
             </div>
             <Settings callback={settings_handler} delay={(*delay).clone()} />
+            <PasswordScreen callback={password_handler} />
         </div>
     }
 }

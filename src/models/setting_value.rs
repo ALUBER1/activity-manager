@@ -1,6 +1,6 @@
 use shared::{models::storage_entry::StorageEntry, utils::normalize::NormalizeDelay};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SettingValue {
     pub setting: String,
     pub value: String,

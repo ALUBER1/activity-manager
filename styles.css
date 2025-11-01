@@ -5,9 +5,11 @@
   --background-color: #3c3c3c;
   --head-background-color: #272727;
   --input-background-color: #313131;
+  --head-height: 52.5px;
 }
 
-input[type= "text"] {
+input[type= "text"],
+input[type= "password"] {
   background-color: var(--input-background-color);
   color: var(--text-color);
   padding-left: 5px;
@@ -99,6 +101,7 @@ html, body {
 
 #head {
   width: 100%;
+  height: var(--head-height);
   background-color: var(--head-background-color);
   display: flex;
   justify-content: flex-end;
@@ -338,4 +341,51 @@ div:has( > .color-picker-container) {
   width: 100px;
   margin: 0;
   margin-left: 30px;
+}
+
+#screen-blocker {
+  z-index: 9998;
+  height: 100%;
+  width: 100%;
+  background-color: var(--background-color);
+}
+
+#password-screen {
+  position: absolute;
+  top: var(--head-height);
+  left: 0px;
+  z-index: 10000;
+  width: 100%;
+  height: calc(100% - var(--head-height));
+}
+
+#password-input {
+  position: absolute;
+  height: var(--field-height);
+  width: var(--field-width);
+  top: calc(50% - (var(--field-height)/2) - (var(--head-height)/2));
+  left: calc(50% - (var(--field-width)/2));
+  margin: 0px;
+  text-align: center;
+  padding: 0px;
+}
+
+#password-submit-button {
+  height: var(--field-height);
+  width: var(--field-width);
+  position: absolute;
+  top: calc(50% + (var(--field-height)/2) - (var(--head-height)/2));
+  left: calc(50% - (var(--field-width)/2));
+  border: 1px solid var(--text-color);
+  margin-top: 15px;
+
+  &:hover {
+    transition: background-color 0.3s ease-in-out;
+    background-color: gray;
+  }
+}
+
+#password-form {
+  --field-height: 2em;
+  --field-width: 20em;
 }
