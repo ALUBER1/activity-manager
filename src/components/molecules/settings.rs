@@ -1,7 +1,9 @@
-use shared::{models::storage_entry::StorageEntry, utils::normalize::NormalizeDelay};
-use yew::{function_component, html, use_state, Callback, Html, Properties};
+use shared::{models::storage_entry::StorageEntry, style::default_colors::DefaultColors, utils::normalize::NormalizeDelay};
+use wasm_bindgen::JsCast;
+use web_sys::HtmlInputElement;
+use yew::{Callback, Event, Html, Properties, function_component, html, use_state};
 
-use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting}, models::setting_value::SettingValue};
+use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting, text_input::TextInput}, models::setting_value::SettingValue};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
@@ -28,6 +30,17 @@ pub fn create_setting(prop: &Props) -> Html {
         on_change.emit(SettingValue::new("delay".to_string(), NormalizeDelay::convert_to_num(input), false, String::new()));
     });
 
+    let on_change = prop.callback.clone();
+    let password_handle = Callback::from(move |input: String|{
+        on_change.emit(SettingValue::new("password".to_string(), input, false, String::new()));
+    });
+
+    let on_change = prop.callback.clone();
+    let password_abilitated_handle = Callback::from(move |event: Event|{
+        let input = event.target().unwrap().unchecked_into::<HtmlInputElement>().value();
+        on_change.emit(SettingValue::new("password-abilitated".to_string(), input, false, String::new()));
+    });
+
     html!{
         <div id="settings-container">
             <div id="settings-panel" class={
@@ -51,6 +64,7 @@ pub fn create_setting(prop: &Props) -> Html {
                         format!("{}/{}", days, minutes)
                     }
                 } /></Setting>
+                <Setting label={"password"}><input type="checkbox" onchange={password_abilitated_handle} /><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()}/></Setting>
             </div>
             <Button onclick={listener.clone()} id="settings"><span class={format!("material-symbols-outlined {}", if *show {
                 "spin"

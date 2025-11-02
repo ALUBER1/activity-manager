@@ -39,7 +39,7 @@ pub fn verify(storage_entry: StorageEntry, app: AppHandle, state: State<'_, Mute
         Ok(p) => p,
         Err(_) => {println!("problem");return StorageEntry::default();}
     };
-    println!("is ok: {}", argon2.verify_password(storage_entry.value.as_bytes(), &parsed).is_ok());
+    println!("is ok: {}", argon2.verify_password(storage_entry.value.as_bytes(), &parsed).is_ok().to_string());
     StorageEntry::new(storage_entry.key, argon2.verify_password(storage_entry.value.as_bytes(), &parsed).is_ok().to_string())
 }
 

@@ -1,3 +1,4 @@
+use gloo::console::log;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
@@ -19,11 +20,15 @@ pub fn app() -> Html {
     
     let record_list: UseStateHandle<Vec<Record>> = use_state(||Vec::new());
     let delay = use_state(||StorageEntry::new_delay("0/60".to_string()));
+    let temp = use_state(||StorageEntry::default());
+    let password_abilitated = use_state(||StorageEntry::default());
+    let correct = use_state(||StorageEntry::new("password".to_string(), false.to_string()));
     
     let clone_list = record_list.clone();
     let delay_clone = delay.clone();
-    let temp = use_state(||StorageEntry::default());
     let temp_clone = temp.clone();
+    let password_abilitated_clone = password_abilitated.clone();
+    
     use_effect_with((), move |_|{
         spawn_local(async move {
             invoke_function_async("create_database", None, None).await;
@@ -36,6 +41,7 @@ pub fn app() -> Html {
             invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("background-color".to_string(), String::new()))).await;
             invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("input-background-color".to_string(), String::new()))).await;
             invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("head-background-color".to_string(), String::new()))).await;
+            invoke_function_store("get_storage", Some(password_abilitated_clone.clone()), Some(StorageEntry::new("password-abilitated".to_string(), String::new()))).await;
         });
         
         ||{}
@@ -100,11 +106,37 @@ pub fn app() -> Html {
                 change_background(&input.serialize());
                 invoke_function_store("store_storage", None, Some(StorageEntry::new_color(input.value.clone(), input.setting))).await;
             } else {
-                invoke_function_store("store_storage", None, Some(StorageEntry::new_delay(input.value.clone()))).await;
-                delay_clone.set(StorageEntry::new_delay(NormalizeDelay::convert_to_string(input.value)));
+                match &*(input.value) {
+                    "delay" => {
+                        invoke_function_store("store_storage", None, Some(StorageEntry::new_delay(input.value.clone()))).await;
+                        delay_clone.set(StorageEntry::new_delay(NormalizeDelay::convert_to_string(input.value)));
+                    },
+                    "password" => {
+                        invoke_function_store("store_password", None, Some(StorageEntry::new(input.setting.clone(), input.value.clone()))).await;
+                    },
+                    "password-abilitated" => {
+                        if input.value.eq("true") {
+                            log!("true");
+                            invoke_function_store("store_storage", None, Some(StorageEntry::new("password-abilitated".to_string(), "true".to_string()))).await;
+
+                        } else {
+                            invoke_function_store("store_storage", None, Some(StorageEntry::new("password-abilitated".to_string(), "".to_string()))).await;
+                        }
+                    },
+                    _ => ()
+                }
             }
         });
     });
+
+    let correct_clone = correct.clone();
+    let password_handler = Callback::from(move |password: String| {
+        let correct = correct_clone.clone();
+        spawn_local(async move {
+            invoke_function_store("verify", Some(correct.clone()), Some(StorageEntry::new("password".to_string(), password))).await;
+        });
+    });
+    log!((*correct).value.clone());
     
     html! {
         <div id="main">
@@ -116,11 +148,17 @@ pub fn app() -> Html {
             </div>
             <div id="non-fixed">
                 <div id="record-list">
-                    <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler}/>
+                    <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler} />
                 </div>
             </div>
             <Settings callback={settings_handler} delay={(*delay).clone()} />
-            <PasswordScreen correct_password={String::new()} />
+            <PasswordScreen invalid={
+                if (*correct).value.eq("false") {
+                    true
+                } else {
+                    false
+                }
+            } abilitated={(*password_abilitated).clone().value.is_empty()} callback={password_handler} />
         </div>
     }
 }
