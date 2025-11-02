@@ -1,7 +1,8 @@
+use gloo::console::log;
 use shared::{models::storage_entry::StorageEntry, style::default_colors::DefaultColors, utils::normalize::NormalizeDelay};
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
-use yew::{Callback, Event, Html, Properties, function_component, html, use_state};
+use yew::{Callback, Event, Html, MouseEvent, Properties, function_component, html, use_state};
 
 use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting, text_input::TextInput}, models::setting_value::SettingValue};
 
@@ -36,9 +37,10 @@ pub fn create_setting(prop: &Props) -> Html {
     });
 
     let on_change = prop.callback.clone();
-    let password_abilitated_handle = Callback::from(move |event: Event|{
-        let input = event.target().unwrap().unchecked_into::<HtmlInputElement>().value();
-        on_change.emit(SettingValue::new("password-abilitated".to_string(), input, false, String::new()));
+    let password_abilitated_handle = Callback::from(move |event: MouseEvent|{
+        let input = event.target().unwrap().unchecked_into::<HtmlInputElement>().checked();
+            log!(format!("input: {}", input));
+        on_change.emit(SettingValue::new("password-abilitated".to_string(), input.to_string(), false, String::new()));
     });
 
     html!{
@@ -64,7 +66,7 @@ pub fn create_setting(prop: &Props) -> Html {
                         format!("{}/{}", days, minutes)
                     }
                 } /></Setting>
-                <Setting label={"password"}><input type="checkbox" onchange={password_abilitated_handle} /><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()}/></Setting>
+                <Setting label={"password"}><input type="checkbox" onclick={password_abilitated_handle} /><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()}/></Setting>
             </div>
             <Button onclick={listener.clone()} id="settings"><span class={format!("material-symbols-outlined {}", if *show {
                 "spin"

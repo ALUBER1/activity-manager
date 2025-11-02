@@ -1,8 +1,7 @@
-use gloo::console::log;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar}, models::setting_value::SettingValue, utils::{functions::Functions, helper::*}};
+use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar}, models::setting_value::SettingValue, utils::{functions::Functions, helper::*, logger::log}};
 use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
@@ -106,7 +105,7 @@ pub fn app() -> Html {
                 change_background(&input.serialize());
                 invoke_function_store("store_storage", None, Some(StorageEntry::new_color(input.value.clone(), input.setting))).await;
             } else {
-                match &*(input.value) {
+                match &*(input.setting) {
                     "delay" => {
                         invoke_function_store("store_storage", None, Some(StorageEntry::new_delay(input.value.clone()))).await;
                         delay_clone.set(StorageEntry::new_delay(NormalizeDelay::convert_to_string(input.value)));
@@ -116,9 +115,7 @@ pub fn app() -> Html {
                     },
                     "password-abilitated" => {
                         if input.value.eq("true") {
-                            log!("true");
                             invoke_function_store("store_storage", None, Some(StorageEntry::new("password-abilitated".to_string(), "true".to_string()))).await;
-
                         } else {
                             invoke_function_store("store_storage", None, Some(StorageEntry::new("password-abilitated".to_string(), "".to_string()))).await;
                         }
@@ -131,13 +128,15 @@ pub fn app() -> Html {
 
     let correct_clone = correct.clone();
     let password_handler = Callback::from(move |password: String| {
+        log("password: {}", &[&password]);
         let correct = correct_clone.clone();
         spawn_local(async move {
             invoke_function_store("verify", Some(correct.clone()), Some(StorageEntry::new("password".to_string(), password))).await;
         });
     });
-    log!((*correct).value.clone());
-    
+
+    log("password abilitated: $0, correct: $1", &[&NormalizeDelay::normalize_color((*password_abilitated).clone().value), &(*correct).clone().value]);
+
     html! {
         <div id="main">
             <div id="fixed">
@@ -152,13 +151,15 @@ pub fn app() -> Html {
                 </div>
             </div>
             <Settings callback={settings_handler} delay={(*delay).clone()} />
-            <PasswordScreen invalid={
-                if (*correct).value.eq("false") {
-                    true
-                } else {
-                    false
-                }
-            } abilitated={(*password_abilitated).clone().value.is_empty()} callback={password_handler} />
+            if NormalizeDelay::normalize_color((*password_abilitated).clone().value).eq("true") {
+                <PasswordScreen invalid={
+                    if (*correct).value.eq("false") {
+                        true
+                    } else {
+                        false
+                    }
+                } callback={password_handler} />
+            }
         </div>
     }
 }
