@@ -1,21 +1,15 @@
-use gloo::{console::log, timers::callback::Timeout};
-use shared::style::default_colors::DefaultColors;
-use yew::{Callback, Html, Properties, SubmitEvent, function_component, html, use_state};
-use crate::{components::atoms::{password_input::PasswordInput, submit_button::SubmitButton}, utils::logger::log};
-
-#[derive(Properties, PartialEq)]
-pub struct Prop {
-    pub callback: Callback<String>,
-    pub invalid: bool
-}
+use gloo::timers::callback::Timeout;
+use shared::{models::storage_entry::StorageEntry, style::default_colors::DefaultColors};
+use wasm_bindgen_futures::spawn_local;
+use yew::{Callback, Html, SubmitEvent, function_component, html, use_effect_with, use_state};
+use crate::{components::atoms::{password_input::PasswordInput, submit_button::SubmitButton}, utils::helper::invoke_function_store};
 
 #[function_component(PasswordScreen)]
-pub fn password_screen(prop: &Prop) -> Html {
+pub fn password_screen() -> Html {
     let password = use_state(||String::new());
     let show = use_state(||false);
-    let color = use_state(||String::new());
-    
-    let timer = 1000;
+    let correct = use_state(||StorageEntry::default());
+    let color = use_state(||DefaultColors::INPUT_BACKGROUND_COLOR);
     
     let password_clone = password.clone();
     let handler = Callback::from(move |password: String| {
@@ -28,41 +22,48 @@ pub fn password_screen(prop: &Prop) -> Html {
     });
     
     
-    let callback = prop.callback.clone();
-    let color_clone = color.clone();
-    let invalid = prop.invalid.clone();
     let password_clone = password.clone();
+    let correct_clone = correct.clone();
     let submit_handler = Callback::from(move |event: SubmitEvent| {
-        callback.emit((*password_clone).clone());
+        let password_clone = password_clone.clone();
+        let correct_clone = correct_clone.clone();
         event.prevent_default();
-        if !invalid {
-            
-        } else {
-            let color_clone = color_clone.clone();
-            color_clone.set(DefaultColors::INVALID_COLOR.to_string());
-            Timeout::new(timer, move || {
-                color_clone.set("".to_string());
+        spawn_local(async move{
+            invoke_function_store("verify", Some(correct_clone.clone()), Some(StorageEntry::new("password".to_string(), (*password_clone).clone()))).await;
+        });
+    });
+    
+    let color_clone = color.clone();
+    let correct_clone = correct.clone();
+    use_effect_with((*correct).value.clone(), move|correct| {
+        if correct.eq("false") {
+            color_clone.set(DefaultColors::INVALID_COLOR);
+            Timeout::new(700, move || {
+                color_clone.set(DefaultColors::INPUT_BACKGROUND_COLOR);
             }).forget();
+            correct_clone.set(StorageEntry::default());
         }
     });
 
     html!{
-        <div id="password-screen" >
-            <div id="screen-blocker" />
-            <form id="password-form" onsubmit={submit_handler}>
-                <PasswordInput callback={handler} show={*show} color={(*color).clone()}/>
-                <button id="show" type="button" onclick={password_button_onclick} >
-                    <span class="material-symbols-outlined">{
-                        if *show {
-                            "visibility_off"
-                        } else {
-                            "visibility"
-                        }
-                    }</span>
-                </button>
-                <SubmitButton id="password-submit-button">{"login"}</SubmitButton>
-            </form>
-        </div>
+        if !(*correct).value.eq("true") {
+            <div id="password-screen" >
+                <div id="screen-blocker" />
+                <form id="password-form" onsubmit={submit_handler}>
+                    <PasswordInput callback={handler} show={*show} color={*color}/>
+                    <button id="show" type="button" onclick={password_button_onclick} >
+                        <span class="material-symbols-outlined">{
+                            if *show {
+                                "visibility_off"
+                            } else {
+                                "visibility"
+                            }
+                        }</span>
+                    </button>
+                    <SubmitButton id="password-submit-button">{"login"}</SubmitButton>
+                </form>
+            </div>
+        }
     }
     
 }

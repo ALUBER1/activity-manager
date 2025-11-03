@@ -14,9 +14,12 @@ impl NormalizeDelay {
 
     pub fn normalize_color(value: String) -> String {
         if value.is_empty() {return String::new();}
-        value.split(":")
-            .collect::<Vec<&str>>()[1]
-            .replace("\"", "")
+        let vec = value.split(":")
+            .collect::<Vec<&str>>();
+        if vec.len() == 1 {
+            return vec[0].to_string();
+        }
+        vec[1].replace("\"", "")
             .replace("}", "")
             .replace("\\", "")
     }
