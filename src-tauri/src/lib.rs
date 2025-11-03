@@ -82,9 +82,9 @@ pub fn run() {
 
             let salt_path = app
                 .path()
-                .app_local_data_dir()
-                .expect("could not resolve app local data path")
-                .join("your-salt-file.txt");
+                .app_data_dir()
+                .expect("could not resolve app data path")
+                .join("secrets\\salt.txt");
             if let Some(parent_dir) = salt_path.parent() {
                 fs::create_dir_all(parent_dir)?;
             }
@@ -94,6 +94,7 @@ pub fn run() {
                 let mut file = fs::File::create(&salt_path)?;
                 file.write_all(&salt)?;
             }
+            
             app.handle()
                 .plugin(tauri_plugin_stronghold::Builder::with_argon2(&salt_path).build())?;
 
