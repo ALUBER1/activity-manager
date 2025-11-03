@@ -1,8 +1,7 @@
-use gloo::console::log;
 use shared::{models::storage_entry::StorageEntry, style::default_colors::DefaultColors, utils::normalize::NormalizeDelay};
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
-use yew::{Callback, Html, MouseEvent, Properties, function_component, html, use_state};
+use yew::{Callback, Html, MouseEvent, Properties, function_component, html, use_effect_with, use_state};
 
 use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting, text_input::TextInput}, models::setting_value::SettingValue};
 
@@ -16,6 +15,12 @@ pub struct Props {
 #[function_component(Settings)]
 pub fn create_setting(prop: &Props) -> Html {
     let show = use_state(||false);
+    let password_abilitated = use_state(||prop.password_abilitated);
+
+    let password_abilitated_clone = password_abilitated.clone();
+    use_effect_with(prop.password_abilitated, move |abilitated| {
+        password_abilitated_clone.set(*abilitated);
+    });
     
     let show_clone = show.clone();
     let listener = Callback::from(move |_| {
@@ -38,9 +43,10 @@ pub fn create_setting(prop: &Props) -> Html {
     });
 
     let on_change = prop.callback.clone();
+    let password_abilitated_clone = password_abilitated.clone();
     let password_abilitated_handle = Callback::from(move |event: MouseEvent|{
         let input = event.target().unwrap().unchecked_into::<HtmlInputElement>().checked();
-            log!(format!("input: {}", input));
+        password_abilitated_clone.set(!*password_abilitated_clone);
         on_change.emit(SettingValue::new("password-abilitated".to_string(), input.to_string(), false, String::new()));
     });
 
@@ -67,7 +73,10 @@ pub fn create_setting(prop: &Props) -> Html {
                         format!("{}/{}", days, minutes)
                     }
                 } /></Setting>
-                <Setting label={"password"}><input type="checkbox" onclick={password_abilitated_handle} checked={prop.password_abilitated} /><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()}/></Setting>
+                <Setting label={"password abilitated"}><input type="checkbox" onclick={password_abilitated_handle} checked={*password_abilitated} /></Setting>
+                if *password_abilitated {
+                    <Setting label={"password"}><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()}/></Setting> 
+                }
             </div>
             <Button onclick={listener.clone()} id="settings"><span class={format!("material-symbols-outlined {}", if *show {
                 "spin"

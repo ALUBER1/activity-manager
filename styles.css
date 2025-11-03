@@ -237,6 +237,9 @@ span {
   text-align: left;
   white-space: nowrap;
   overflow-wrap: normal;
+  user-select: none;
+  border-right: 1px solid var(--background-color);
+  height: 100%;
 
   & + input {
     margin-left: 10px;
@@ -283,17 +286,26 @@ div:has( > .color-picker-container) {
   align-items: center;
   position: relative;
   flex-direction: row;
-  flex-wrap: wrap;
   opacity: 0;
+  justify-content: space-between;
+  height: 26px;
 }
 
 .settings-divisor {
-  display: inline;
+  position: relative;
   width: 100%;
   height: 1px;
   border: 0;
   border-top: 1px solid var(--background-color);
   padding: 0;
+  opacity: 0;
+}
+
+@container (width: 300px) {
+  .settings-divisor {
+    transition: opacity 450ms ease;
+    opacity: 1 !important;
+  }
 }
 
 .pcr-app {
@@ -342,6 +354,7 @@ div:has( > .color-picker-container) {
   width: 100px;
   margin: 0;
   margin-left: 30px;
+  margin-right: 5px;
 }
 
 #screen-blocker {
@@ -401,4 +414,9 @@ input[type=password]::-ms-clear
   position: absolute;
   top: calc(50% - (var(--field-height)/2) - (var(--head-height)/2) + 3px);
   left: calc(50% - (var(--field-width)/2) + var(--field-width) + 10px);
+}
+
+input[type="checkbox"] {
+  width: fit-content;
+  margin-right: 18%;
 }

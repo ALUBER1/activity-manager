@@ -118,11 +118,7 @@ pub fn app() -> Html {
                         invoke_function_store("store_password", None, Some(StorageEntry::new(input.setting.clone(), input.value.clone()))).await;
                     },
                     "password-abilitated" => {
-                        if input.value.eq("true") {
-                            invoke_function_store("store_storage", None, Some(StorageEntry::new("password-abilitated".to_string(), "true".to_string()))).await;
-                        } else {
-                            invoke_function_store("store_storage", None, Some(StorageEntry::new("password-abilitated".to_string(), "".to_string()))).await;
-                        }
+                        invoke_function_store("store_storage", None, Some(StorageEntry::new(input.setting.clone(), input.value.clone()))).await;
                     },
                     _ => ()
                 }
