@@ -1,13 +1,15 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_downward_alt,close,delete,edit,fullscreen,fullscreen_exit,remove,send,settings");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_downward_alt,close,delete,edit,fullscreen,fullscreen_exit,remove,send,settings,visibility,visibility_off");
 
 :root {
   --text-color: #a9a9a9;
   --background-color: #3c3c3c;
   --head-background-color: #272727;
   --input-background-color: #313131;
+  --head-height: 52.5px;
 }
 
-input[type= "text"] {
+input[type= "text"],
+input[type= "password"] {
   background-color: var(--input-background-color);
   color: var(--text-color);
   padding-left: 5px;
@@ -99,6 +101,7 @@ html, body {
 
 #head {
   width: 100%;
+  height: var(--head-height);
   background-color: var(--head-background-color);
   display: flex;
   justify-content: flex-end;
@@ -215,6 +218,7 @@ span {
 }
 
 .hide-panel {
+  content-visibility: hidden;
   width: 60px;
 }
 
@@ -233,6 +237,9 @@ span {
   text-align: left;
   white-space: nowrap;
   overflow-wrap: normal;
+  user-select: none;
+  border-right: 1px solid var(--background-color);
+  height: 100%;
 
   & + input {
     margin-left: 10px;
@@ -279,17 +286,26 @@ div:has( > .color-picker-container) {
   align-items: center;
   position: relative;
   flex-direction: row;
-  flex-wrap: wrap;
   opacity: 0;
+  justify-content: space-between;
+  height: 26px;
 }
 
 .settings-divisor {
-  display: inline;
+  position: relative;
   width: 100%;
   height: 1px;
   border: 0;
   border-top: 1px solid var(--background-color);
   padding: 0;
+  opacity: 0;
+}
+
+@container (width: 300px) {
+  .settings-divisor {
+    transition: opacity 450ms ease;
+    opacity: 1 !important;
+  }
 }
 
 .pcr-app {
@@ -338,4 +354,69 @@ div:has( > .color-picker-container) {
   width: 100px;
   margin: 0;
   margin-left: 30px;
+  margin-right: 5px;
+}
+
+#screen-blocker {
+  z-index: 9998;
+  height: 100%;
+  width: 100%;
+  background-color: var(--background-color);
+}
+
+#password-screen {
+  position: absolute;
+  top: var(--head-height);
+  left: 0px;
+  z-index: 10000;
+  width: 100%;
+  height: calc(100% - var(--head-height));
+}
+
+#password-input {
+  position: absolute;
+  height: var(--field-height);
+  width: var(--field-width);
+  top: calc(50% - (var(--field-height)/2) - (var(--head-height)/2));
+  left: calc(50% - (var(--field-width)/2));
+  margin: 0px;
+  text-align: center;
+  padding: 0px;
+}
+
+#password-submit-button {
+  height: var(--field-height);
+  width: var(--field-width);
+  position: absolute;
+  top: calc(50% + (var(--field-height)/2) - (var(--head-height)/2));
+  left: calc(50% - (var(--field-width)/2));
+  border: 1px solid var(--text-color);
+  margin-top: 15px;
+  
+  &:hover {
+    transition: background-color 0.3s ease-in-out;
+    background-color: gray;
+  }
+}
+
+#password-form {
+  --field-height: 2em;
+  --field-width: 20em;
+}
+
+input[type=password]::-ms-reveal,
+input[type=password]::-ms-clear
+{
+    display: none;
+}
+
+#show {
+  position: absolute;
+  top: calc(50% - (var(--field-height)/2) - (var(--head-height)/2) + 3px);
+  left: calc(50% - (var(--field-width)/2) + var(--field-width) + 10px);
+}
+
+input[type="checkbox"] {
+  width: fit-content;
+  margin-right: 18%;
 }

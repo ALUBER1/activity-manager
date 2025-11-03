@@ -21,7 +21,7 @@ impl Database {
     pub fn initialize(&mut self) -> Result<(), Error> {
         match self.conn.execute(
             "CREATE TABLE IF NOT EXISTS events(
-            uuid TEXT,
+            uuid TEXT PRIMARY KEY,
             name TEXT,
             date TEXT,
             time TEXT,

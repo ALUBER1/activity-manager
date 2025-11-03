@@ -5,8 +5,7 @@ pub struct NormalizeDelay;
 impl NormalizeDelay {
     pub fn normalize(value: String) -> i64 {
         value.split(":")
-            .nth(1)
-            .unwrap()
+            .collect::<Vec<&str>>()[1]
             .replace("\"", "")
             .replace("}", "")
             .parse::<i64>()
@@ -14,13 +13,16 @@ impl NormalizeDelay {
     }
 
     pub fn normalize_color(value: String) -> String {
-        value.split(":")
-            .nth(1)
-            .unwrap()
-            .replace("\"", "")
+        if value.is_empty() {return String::new();}
+        let vec = value.split(":")
+            .collect::<Vec<&str>>();
+        if vec.len() == 1 {
+            return vec[0].to_string();
+        }
+        vec[1].replace("\"", "")
             .replace("}", "")
             .replace("\\", "")
-    } //{\"value\":\"#8E1818\"}
+    }
 
     pub fn convert_to_num(input: String) -> String {
         if !input.chars().any(|c|{c.is_alphabetic()}) {

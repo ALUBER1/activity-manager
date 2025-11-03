@@ -1,77 +1,99 @@
 use std::{sync::Mutex, thread, time};
 
+use crate::{
+    gateway::notifications_gateway::NotificationGateway,
+    repository::{database_repository::Database, storage_repository::StorageRepository},
+};
 use chrono::{Local, NaiveDate, NaiveDateTime, NaiveTime};
-use shared::{errors::notification_error::NotificationError, models::{notification::Notification, record::Record}, utils::normalize::NormalizeDelay};
+use shared::{
+    errors::notification_error::NotificationError,
+    models::{notification::Notification, record::Record},
+    utils::normalize::NormalizeDelay,
+};
 use tauri::{AppHandle, Manager, State};
-use crate::{gateway::notifications_gateway::NotificationGateway, repository::{database_repository::Database, storage_repository::StorageRepository}};
 
 #[tauri::command]
-pub fn send_notification(app: AppHandle, notification: Notification) -> Result<(), NotificationError> {
+pub fn send_notification(
+    app: AppHandle,
+    notification: Notification,
+) -> Result<(), NotificationError> {
     match NotificationGateway::send_notification(&app, notification) {
         Ok(()) => Ok(()),
-        Err(e) => {println!("error sending notification");Err(NotificationError{message: e.to_string()})}
+        Err(e) => {
+            println!("error sending notification");
+            Err(NotificationError {
+                message: e.to_string(),
+            })
+        }
     }
 }
 
 #[tauri::command]
 pub fn notification_loop(app: AppHandle) {
-    thread::spawn(move ||{
-        loop{
-            let database: State<'_, Mutex<Option<Database>>> = app.state();
-            let records = {
-                let mut guard = database.lock().unwrap();
-                if let Some(ref mut db) = *guard {
-                    match db.get_all_records() {
-                        Ok(records) => records,
-                        _ => Vec::new()
-                    }
-                } else {
-                    Vec::new()
+    thread::spawn(move || loop {
+        let database: State<'_, Mutex<Option<Database>>> = app.state();
+        let records = {
+            let mut guard = database.lock().unwrap();
+            if let Some(ref mut db) = *guard {
+                match db.get_all_records() {
+                    Ok(records) => records,
+                    _ => Vec::new(),
                 }
-            };
+            } else {
+                Vec::new()
+            }
+        };
 
-            let storage_repository: State<'_, Mutex<Option<StorageRepository>>> = app.state();
-            let clone = app.clone();
-            let delay = {
-                let mut guard = storage_repository.lock().unwrap();
-                if let Some(ref mut storage) = *guard {
-                    match storage.get(clone, "delay".to_string()) {
-                        Ok(value) => NormalizeDelay::normalize(value),
-                        Err(_) => 3600_i64
-                    }
-                } else {
-                    3600_i64
+        let storage_repository: State<'_, Mutex<Option<StorageRepository>>> = app.state();
+        let clone = app.clone();
+        let delay = {
+            let mut guard = storage_repository.lock().unwrap();
+            if let Some(ref mut storage) = *guard {
+                match storage.get(clone, "delay".to_string()) {
+                    Ok(value) => NormalizeDelay::normalize(value),
+                    Err(_) => 3600_i64,
                 }
-            };
+            } else {
+                3600_i64
+            }
+        };
 
-            for mut record in records {
-                let date = NaiveDate::parse_from_str(&record.date, "%d/%m/%Y").unwrap();
-                let time = NaiveTime::parse_from_str(&record.time, "%H:%M").unwrap();
-                let date_time = NaiveDateTime::new(date, time);
-                let now = Local::now().naive_local();
-                let diff = (date_time - now).num_seconds();
-                if record.notified_at.is_empty() && (diff >= delay - 60_i64 && diff <= delay) {
-                    let _ = send_notification(app.clone(), Notification { title: record.name.clone(), body: format_notification_body(&record) });
-                    record.notified_at = Local::now().format("%d/%m/%Y,%H:%M").to_string();
-                    let _ = {
-                        let mut guard = database.lock().unwrap();
-                        if let Some(ref mut db) = *guard {
-                            match db.update_record(record) {
-                                Ok(_) => (),
-                                _ => ()
-                            }
-                        } else {
-                            ()
+        for mut record in records {
+            let date = NaiveDate::parse_from_str(&record.date, "%d/%m/%Y").unwrap();
+            let time = NaiveTime::parse_from_str(&record.time, "%H:%M").unwrap();
+            let date_time = NaiveDateTime::new(date, time);
+            let now = Local::now().naive_local();
+            let diff = (date_time - now).num_seconds();
+            if record.notified_at.is_empty() && (diff >= delay - 60_i64 && diff <= delay) {
+                let _ = send_notification(
+                    app.clone(),
+                    Notification {
+                        title: record.name.clone(),
+                        body: format_notification_body(&record),
+                    },
+                );
+                record.notified_at = Local::now().format("%d/%m/%Y,%H:%M").to_string();
+                let _ = {
+                    let mut guard = database.lock().unwrap();
+                    if let Some(ref mut db) = *guard {
+                        match db.update_record(record) {
+                            Ok(_) => (),
+                            _ => (),
                         }
-                    };
-                }
-            }           
-            thread::sleep(time::Duration::from_millis(1000));
+                    } else {
+                        ()
+                    }
+                };
+            }
         }
+        thread::sleep(time::Duration::from_millis(1000));
     });
     ()
 }
 
 fn format_notification_body(record: &Record) -> String {
-    format!("you have {} due at {} the day {}", record.name, record.time, record.date)
+    format!(
+        "you have {} due at {} the day {}",
+        record.name, record.time, record.date
+    )
 }

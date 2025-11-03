@@ -11,6 +11,7 @@
     "core:window:default",
     "core:window:allow-start-dragging",
     "notifications:default",
-    "store:default"
+    "store:default",
+    "stronghold:default"
   ]
 }

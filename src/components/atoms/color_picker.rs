@@ -23,7 +23,6 @@ pub fn color_picker(prop: &Props) -> Html {
         let input = document().get_elements_by_class_name("pcr-result");
         let temp = input.get_with_index(index).unwrap().unchecked_into::<HtmlInputElement>();
         callback.emit(SettingValue::new((*name).clone(), temp.value(), true, index.to_string()));
-        //callback.emit((*name).clone() + &temp.value() + "#" + &index.to_string());
     });
     
     let callback = prop.call_back.clone();
@@ -31,7 +30,6 @@ pub fn color_picker(prop: &Props) -> Html {
     let index = prop.index.clone();
     let default_onclick = Callback::from(move |_|{
         callback.emit(SettingValue::new((*name).clone(), DefaultColors::get(&name), true, index.to_string()));
-        //callback.emit((*name).clone() + &DefaultColors::get(&name) + "#" + &index.to_string());
     });
     
     let name = prop.item.clone();

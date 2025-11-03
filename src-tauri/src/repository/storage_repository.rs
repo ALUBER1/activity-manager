@@ -7,7 +7,7 @@ use tauri_plugin_store::StoreExt;
 
 #[derive(Clone)]
 pub struct StorageRepository {
-    pub path: String
+    pub path: String,
 }
 
 impl StorageRepository {
@@ -23,8 +23,9 @@ impl StorageRepository {
             dir.push("storage.json");
         }
 
-
-        StorageRepository{path: dir.to_str().unwrap().to_string()}
+        StorageRepository {
+            path: dir.to_str().unwrap().to_string(),
+        }
     }
 
     pub fn store(&self, app: AppHandle, key: String, value: String) -> Result<(), StorageError> {
@@ -56,7 +57,9 @@ impl StorageRepository {
                 Err(StorageError::storage_value_access_error(key))
             }
         } else {
-            Err(StorageError { message: "error accessing storage".to_string() })
+            Err(StorageError {
+                message: "error accessing storage".to_string(),
+            })
         }
     }
 }

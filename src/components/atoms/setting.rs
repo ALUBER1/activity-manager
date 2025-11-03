@@ -9,10 +9,12 @@ pub struct Props {
 #[function_component(Setting)]
 pub fn setting(prop: &Props) -> Html {
     html!{
-        <div class="setting">
-            <p class="setting-label">{prop.label.clone()}</p>
-            {prop.children.clone()}
+        <>
+            <div class="setting">
+                <p class="setting-label">{prop.label.clone()}</p>
+                {prop.children.clone()}
+            </div>
             <hr class="settings-divisor"/>
-        </div>
+        </>
     }
 }

@@ -1,35 +1,30 @@
-use shared::{models::storage_entry::StorageEntry, utils::normalize::NormalizeDelay};
-use web_sys::Element;
-use yew::{function_component, html, use_state, Callback, Html, NodeRef, Properties};
+use shared::{models::storage_entry::StorageEntry, style::default_colors::DefaultColors, utils::normalize::NormalizeDelay};
+use wasm_bindgen::JsCast;
+use web_sys::HtmlInputElement;
+use yew::{Callback, Html, MouseEvent, Properties, function_component, html, use_effect_with, use_state};
 
-use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting}, models::setting_value::SettingValue};
+use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting, text_input::TextInput}, models::setting_value::SettingValue};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub callback: Callback<SettingValue>,
-    pub delay: StorageEntry
+    pub delay: StorageEntry,
+    pub password_abilitated: bool
 }
 
 #[function_component(Settings)]
 pub fn create_setting(prop: &Props) -> Html {
-    let class = use_state(||String::new());
-    let cloned_class: yew::UseStateHandle<String> = class.clone();
+    let show = use_state(||false);
+    let password_abilitated = use_state(||prop.password_abilitated);
 
+    let password_abilitated_clone = password_abilitated.clone();
+    use_effect_with(prop.password_abilitated, move |abilitated| {
+        password_abilitated_clone.set(*abilitated);
+    });
     
-    
-    let test: NodeRef = NodeRef::default();
-    let cloned_test = test.clone();
+    let show_clone = show.clone();
     let listener = Callback::from(move |_| {
-        
-        let element = cloned_test.cast::<Element>().unwrap();
-
-        if element.class_name().eq("show-panel") {    
-            cloned_class.set(String::new());
-            element.set_class_name("hide-panel");
-        } else {
-            cloned_class.set(String::from("spin"));
-            element.set_class_name("show-panel");
-        }
+        show_clone.set(!*show_clone);
     });
 
     let on_change = prop.callback.clone();
@@ -42,9 +37,28 @@ pub fn create_setting(prop: &Props) -> Html {
         on_change.emit(SettingValue::new("delay".to_string(), NormalizeDelay::convert_to_num(input), false, String::new()));
     });
 
+    let on_change = prop.callback.clone();
+    let password_handle = Callback::from(move |input: String|{
+        on_change.emit(SettingValue::new("password".to_string(), input, false, String::new()));
+    });
+
+    let on_change = prop.callback.clone();
+    let password_abilitated_clone = password_abilitated.clone();
+    let password_abilitated_handle = Callback::from(move |event: MouseEvent|{
+        let input = event.target().unwrap().unchecked_into::<HtmlInputElement>().checked();
+        password_abilitated_clone.set(!*password_abilitated_clone);
+        on_change.emit(SettingValue::new("password-abilitated".to_string(), input.to_string(), false, String::new()));
+    });
+
     html!{
         <div id="settings-container">
-            <div id="settings-panel" class="hide-panel" ref={test.clone()}>
+            <div id="settings-panel" class={
+                if *show {
+                    "show-panel"
+                } else {
+                    "hide-panel"
+                }
+            }>
                 <Setting label={"background color"}><ColorPicker item="background-color" call_back={get_input_values.clone()} index=0 /></Setting>
                 <Setting label={"header color"}><ColorPicker item="head-background-color" call_back={get_input_values.clone()} index=1 /></Setting>
                 <Setting label={"input color"}><ColorPicker item="input-background-color" call_back={get_input_values.clone()} index=2 /></Setting>
@@ -59,8 +73,16 @@ pub fn create_setting(prop: &Props) -> Html {
                         format!("{}/{}", days, minutes)
                     }
                 } /></Setting>
+                <Setting label={"password abilitated"}><input type="checkbox" onclick={password_abilitated_handle} checked={*password_abilitated} /></Setting>
+                if *password_abilitated {
+                    <Setting label={"password"}><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()}/></Setting> 
+                }
             </div>
-            <Button onclick={listener.clone()} id="settings"><span class={format!("material-symbols-outlined {}", *class)}>{"settings"}</span></Button>
+            <Button onclick={listener.clone()} id="settings"><span class={format!("material-symbols-outlined {}", if *show {
+                "spin"
+            } else {
+                ""
+            })}>{"settings"}</span></Button>
         </div>
     }
 }
