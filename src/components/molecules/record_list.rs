@@ -1,8 +1,8 @@
-use yew::{function_component, html, Callback, Html, Properties};
+use yew::{Callback, Html, Properties, function_component, html, use_state};
 
 use shared::models::record::Record;
 
-use crate::components::atoms::record_button::RecordButton;
+use crate::components::{atoms::{button::Button, record_button::RecordButton}, molecules::edit_form::EditForm};
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct Props{
@@ -13,24 +13,55 @@ pub struct Props{
 
 #[function_component(RecordList)]
 pub fn record_list(records: &Props) -> Html{
+    let editing = use_state(||None::<Record>);
+
     let onclick = records.delete_callback.clone();
     let delete_handler = Callback::from(move |a: Record|{
         onclick.emit(a);
     });
 
-    let onclick = records.edit_callback.clone();
+    let editing_clone = editing.clone();
     let edit_handler = Callback::from(move |a: Record|{
-        onclick.emit(a);
+        editing_clone.set(Some(a));
     });
+
+    let editing_clone = editing.clone();
+    let cancel_handle = Callback::from(move |_| {
+        editing_clone.set(None);
+    });
+    
+    let editing_clone = editing.clone();
+    let onclick = records.edit_callback.clone();
+    let submit_handler = Callback::from(move |mut record: Record| {
+        record.uuid = (*editing_clone).clone().unwrap().uuid;
+        onclick.emit(record);
+    });
+
     html!{
-        {records.list.clone().into_iter().map(|element|{
-            html!{<div class="record-list-style">
-                <p class="record-label">{"name: "}{element.name.clone()}{", date: "}{element.date.clone()}{", time: "}{element.time.clone()}</p>
-                <div class="record-button">
-                    <RecordButton id = {element.clone()}  onclick = {delete_handler.clone()} ty={"delete"}/>
-                    <RecordButton id = {element}  onclick = {edit_handler.clone()} ty={"edit"}/>
+        <>
+            if let Some(record) = (*editing).clone() {
+                <div class="editing-panel">
+                    <div class="editing-form-container">
+                        <EditForm on_submit={submit_handler} record={record} cancel={cancel_handle} />
+                    </div>
                 </div>
-            </div>}
-        }).collect::<Html>()}
+            } else {
+                <div id="record-list">
+                    {
+                        records.list.clone().into_iter().map(|element|{
+                            html!{
+                                <div class="record-list-style">
+                                    <p class="record-label">{"name: "}{element.name.clone()}{", date: "}{element.date.clone()}{", time: "}{element.time.clone()}</p>
+                                    <div class="record-button">
+                                        <RecordButton id = {element.clone()}  onclick = {delete_handler.clone()} ty={"delete"}/>
+                                        <RecordButton id = {element}  onclick = {edit_handler.clone()} ty={"edit"}/>
+                                    </div>
+                                </div>
+                            }
+                        }).collect::<Html>()
+                    }
+                </div>
+            }
+        </>
     }
 }

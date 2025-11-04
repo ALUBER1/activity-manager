@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar}, models::setting_value::SettingValue, utils::{functions::Functions, helper::*}};
+use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar}, models::setting_value::SettingValue, utils::{functions::Functions, helper::*, logger::log}};
 use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
@@ -99,12 +99,11 @@ pub fn app() -> Html {
         let record = record.clone();
         let clone_list = clone_list.clone();
         spawn_local(async move {
-            invoke_function_async("delete_record", None, Some(record)).await;
+            invoke_function_async("update_record", None, Some(record)).await;
             invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
             ()
         });
     });
-
     
     let delay_clone = delay.clone();
     let settings_handler = Callback::from(move |input: SettingValue|{
@@ -137,13 +136,11 @@ pub fn app() -> Html {
             <div id="fixed">
                 <TitleBar on_click={title_handler}></TitleBar>
                 <div id="form">
-                    <Form on_submit = {on_submit}/>
+                    <Form on_submit = {on_submit} />
                 </div>
             </div>
             <div id="non-fixed">
-                <div id="record-list">
-                    <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler} />
-                </div>
+                <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler} />
             </div>
             <Settings callback={settings_handler} delay={(*delay).clone()} password_abilitated={(*password_abilitated).value.eq("true")}/>
             if (*password_abilitated).value.eq("true") {

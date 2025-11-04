@@ -26,7 +26,7 @@ impl Database {
             date TEXT,
             time TEXT,
             notified_at TEXT
-        );",
+        ) WITHOUT ROWID;",
             [],
         ) {
             Ok(_) => Ok(()),
@@ -77,14 +77,15 @@ impl Database {
     }
 
     pub fn update_record(&mut self, record: Record) -> Result<(), Error> {
+        println!("uuid: {}", record.uuid);
         match self.conn.execute(
             "UPDATE events SET name=?1, date=?2, time=?3, notified_at=?5 WHERE uuid = ?4",
             [
-                record.name,
-                record.date,
-                record.time,
-                record.uuid,
-                record.notified_at,
+                record.name.clone(),
+                record.date.clone(),
+                record.time.clone(),
+                record.uuid.clone(),
+                record.notified_at.clone(),
             ],
         ) {
             Ok(_) => Ok(()),
