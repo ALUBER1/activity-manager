@@ -4,9 +4,14 @@ pub struct NormalizeDelay;
 
 impl NormalizeDelay {
     pub fn normalize(value: String) -> i64 {
-        value.split(":")
-            .collect::<Vec<&str>>()[1]
-            .replace("\"", "")
+        if value.is_empty() {return 0_i64;}
+        let vec = value.split(":")
+            .collect::<Vec<&str>>();
+        if vec.len() == 1 {
+            return vec[0].parse::<i64>().unwrap();
+        }
+
+        vec[1].replace("\"", "")
             .replace("}", "")
             .parse::<i64>()
             .unwrap()

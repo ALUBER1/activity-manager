@@ -51,6 +51,5 @@ pub fn get_storage(
             return StorageEntry::new(storage_entry.key, value);
         }
     }
-    println!("error getting storage");
     StorageEntry::default()
 }

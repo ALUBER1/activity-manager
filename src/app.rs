@@ -18,7 +18,7 @@ extern "C" {
 pub fn app() -> Html {
     
     let record_list: UseStateHandle<Vec<Record>> = use_state(||Vec::new());
-    let delay = use_state(||StorageEntry::new_delay("0/60".to_string()));
+    let delay = use_state(||StorageEntry::default());
     let temp = use_state(||StorageEntry::default());
     let password_abilitated = use_state(||StorageEntry::default());
     
@@ -49,6 +49,12 @@ pub fn app() -> Html {
         if !(*temp).value.is_empty() {
             let tmp = SettingValue::from((*temp).clone()).serialize();
             change_background(&tmp);
+        }
+    });
+
+    use_effect_with((delay).clone(), move |delay| {
+        if (*delay).value.is_empty() {
+            delay.set(StorageEntry::new_delay("0/60".to_string()));
         }
     });
 

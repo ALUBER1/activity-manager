@@ -66,13 +66,7 @@ pub async fn invoke_function_store<'a>(function: &'a str, result: Option<UseStat
         let buffer = invoke(function, to_value(&ArgsStore{storageEntry: args.unwrap()}).unwrap()).await;
         if !result.is_none() {
             let value = from_value::<StorageEntry>(buffer).unwrap();
-            result.unwrap().set(
-                if value.value.is_empty() {
-                    StorageEntry::new_delay("0/60".to_string())
-                } else {
-                    value
-                }
-            );
+            result.unwrap().set(value);
         }
     }
 }
