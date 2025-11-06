@@ -1,37 +1,39 @@
 use std::ops::Deref;
 use gloo::timers::callback::Timeout;
 use yew::prelude::*;
-use crate::components::{atoms::{submit_button::SubmitButton, text_input::TextInput}};
-use shared::{models::record::Record as Event, style::default_colors::DefaultColors};
+use crate::components::{atoms::{submit_button::SubmitButton, text_input::TextInput, button::Button}};
+use shared::{models::record::Record, style::default_colors::DefaultColors};
 use chrono::{Local, NaiveDate, NaiveTime};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
-    pub on_submit: Callback<Event>
+    pub on_submit: Callback<Record>,
+    pub cancel: Callback<bool>,
+    pub record: Record
 }
 
-#[function_component(Form)]
+#[function_component(EditForm)]
 pub fn form(props: &Props) -> Html{
     let timer = 3000;
 
-    let value_state = use_state(||Event::default());
+    let value_state = use_state(||props.record.clone());
     let name_color = use_state(||String::new());
     let date_color = use_state(||String::new());
     let time_color = use_state(||String::new());
 
     let cloned_value = value_state.clone();
     let on_changename = Callback::from(move |name|{
-        cloned_value.set(Event { name, ..cloned_value.deref().clone()});
+        cloned_value.set(Record { name, ..cloned_value.deref().clone()});
     });
 
     let cloned_value = value_state.clone();
     let on_changedate = Callback::from(move |date|{
-        cloned_value.set(Event { date,..cloned_value.deref().clone()});
+        cloned_value.set(Record { date,..cloned_value.deref().clone()});
     });
 
     let cloned_value = value_state.clone();
     let on_changetime = Callback::from(move |time|{
-        cloned_value.set(Event { time,..cloned_value.deref().clone()});
+        cloned_value.set(Record { time,..cloned_value.deref().clone()});
     });
 
     let cloned_value = value_state.clone();
@@ -74,12 +76,17 @@ pub fn form(props: &Props) -> Html{
     });
 
     html!{
-        <form onsubmit={on_submit}>
-            <TextInput name="name" on_change={on_changename} color={(*name_color).clone()} value={""} />
-            <TextInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()} value={""} />
-            <TextInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()} value={""} />
-            <SubmitButton id="submit"><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
-        </form>
+        <>
+            <form onsubmit={on_submit}>
+                <TextInput name="name" on_change={on_changename} color={(*name_color).clone()} value={(*value_state).name.clone()} />
+                <TextInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()} value={(*value_state).date.clone()} />
+                <TextInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()} value={(*value_state).time.clone()} />
+            </form>
+            <div class="editing-button-container">
+                <SubmitButton id="submit"><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
+                <Button onclick={props.cancel.clone()} id="cancel"><span class="material-symbols-outlined">{"cancel"}</span></Button>
+            </div>
+        </>
     }
 }
 
