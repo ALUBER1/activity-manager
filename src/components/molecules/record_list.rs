@@ -2,7 +2,7 @@ use yew::{Callback, Html, Properties, function_component, html, use_state};
 
 use shared::models::record::Record;
 
-use crate::components::{atoms::{button::Button, record_button::RecordButton}, molecules::edit_form::EditForm};
+use crate::components::{atoms::{record_button::RecordButton}, molecules::edit_form::EditForm};
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct Props{

@@ -76,13 +76,17 @@ pub fn form(props: &Props) -> Html{
     });
 
     html!{
-        <form onsubmit={on_submit}>
-            <TextInput name="name" on_change={on_changename} color={(*name_color).clone()} value={(*value_state).name.clone()} />
-            <TextInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()} value={(*value_state).date.clone()} />
-            <TextInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()} value={(*value_state).time.clone()} />
-            <SubmitButton id="submit"><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
-            <Button onclick={props.cancel.clone()} id="cancel"><span class="material-symbols-outlined">{"cancel"}</span></Button>
-        </form>
+        <>
+            <form onsubmit={on_submit}>
+                <TextInput name="name" on_change={on_changename} color={(*name_color).clone()} value={(*value_state).name.clone()} />
+                <TextInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()} value={(*value_state).date.clone()} />
+                <TextInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()} value={(*value_state).time.clone()} />
+            </form>
+            <div class="editing-button-container">
+                <SubmitButton id="submit"><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
+                <Button onclick={props.cancel.clone()} id="cancel"><span class="material-symbols-outlined">{"cancel"}</span></Button>
+            </div>
+        </>
     }
 }
 
