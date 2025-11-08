@@ -7,3 +7,4 @@ pub mod setting;
 pub mod color_picker;
 pub mod notification_input;
 pub mod password_input;
+pub mod select;

@@ -8,5 +8,6 @@
     "text": "colore testo",
     "header": "colore barra",
     "delay": "orario di notifica",
-    "abilitated": "password abilitata"
+    "abilitated": "password abilitata",
+    "language": "cambia lingua"
 }

@@ -11,11 +11,13 @@ pub struct Prop {
 
 #[function_component(PasswordInput)]
 pub fn password_input(prop: &Prop) -> Html {
-    let callback = prop.callback.clone();
-    let onchange = Callback::from(move |event: Event| {
-        let value = event.target().unwrap().unchecked_into::<HtmlInputElement>().value();
-        callback.emit(value);
-    });
+    let onchange = {
+        let callback = prop.callback.clone();
+        Callback::from(move |event: Event| {
+            let value = event.target().unwrap().unchecked_into::<HtmlInputElement>().value();
+            callback.emit(value);
+        })
+    };
     html!{
         <input id="password-input" onchange={onchange} type={
             if prop.show {

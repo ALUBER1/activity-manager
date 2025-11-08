@@ -8,5 +8,6 @@
     "text": "text color",
     "header": "header color",
     "delay": "notification delay",
-    "abilitated": "password abilitated"
+    "abilitated": "password abilitated",
+    "language": "change language"
 }

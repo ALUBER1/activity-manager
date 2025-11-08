@@ -18,27 +18,35 @@ pub fn record_list(records: &Props) -> Html{
 
     let editing = use_state(||None::<Record>);
 
+    let delete_handler = {
     let onclick = records.delete_callback.clone();
-    let delete_handler = Callback::from(move |a: Record|{
-        onclick.emit(a);
-    });
+    Callback::from(move |a: Record|{
+            onclick.emit(a);
+        })
+    };
 
-    let editing_clone = editing.clone();
-    let edit_handler = Callback::from(move |a: Record|{
-        editing_clone.set(Some(a));
-    });
+    let edit_handler = {
+        let editing_clone = editing.clone();
+        Callback::from(move |a: Record|{
+            editing_clone.set(Some(a));
+        })
+    };
 
-    let editing_clone = editing.clone();
-    let cancel_handle = Callback::from(move |_| {
-        editing_clone.set(None);
-    });
+    let cancel_handle = {
+        let editing_clone = editing.clone();
+        Callback::from(move |_| {
+            editing_clone.set(None);
+        })
+    };
     
-    let editing_clone = editing.clone();
-    let onclick = records.edit_callback.clone();
-    let submit_handler = Callback::from(move |mut record: Record| {
-        record.uuid = (*editing_clone).clone().unwrap().uuid;
-        onclick.emit(record);
-    });
+    let submit_handler = {
+        let editing_clone = editing.clone();
+        let onclick = records.edit_callback.clone();
+        Callback::from(move |mut record: Record| {
+            record.uuid = (*editing_clone).clone().unwrap().uuid;
+            onclick.emit(record);
+        })
+    };
 
     html!{
         <>

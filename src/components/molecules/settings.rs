@@ -4,7 +4,7 @@ use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::{Callback, Html, MouseEvent, Properties, function_component, html, use_effect_with, use_state};
 
-use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, setting::Setting, text_input::TextInput}, models::setting_value::SettingValue};
+use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, select::Select, setting::Setting, text_input::TextInput}, models::setting_value::SettingValue};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
@@ -15,7 +15,13 @@ pub struct Props {
 
 #[function_component(Settings)]
 pub fn create_setting(prop: &Props) -> Html {
-    let (i18n, _set_language) = use_translation();
+    let (i18n, set_language) = use_translation();
+
+    let valid_languages = 
+        vec![
+            "it".to_string(), 
+            "en".to_string()
+        ];
 
     let show = use_state(||false);
     let password_abilitated = use_state(||prop.password_abilitated);
@@ -25,33 +31,52 @@ pub fn create_setting(prop: &Props) -> Html {
         password_abilitated_clone.set(*abilitated);
     });
     
-    let show_clone = show.clone();
-    let listener = Callback::from(move |_| {
-        show_clone.set(!*show_clone);
-    });
+    let listener = {
+        let show_clone = show.clone();
+        Callback::from(move |_| {
+            show_clone.set(!*show_clone);
+        })
+    };
 
-    let on_change = prop.callback.clone();
-    let get_input_values = Callback::from(move |input: SettingValue|{
-        on_change.emit(input);
-    });
+    let get_input_values = {
+        let on_change = prop.callback.clone();
+        Callback::from(move |input: SettingValue|{
+            on_change.emit(input);
+        })
+    };
 
-    let on_change = prop.callback.clone();
-    let notification_delay_handle = Callback::from(move |input: String|{
-        on_change.emit(SettingValue::new("delay".to_string(), NormalizeDelay::convert_to_num(input), false, String::new()));
-    });
+    let notification_delay_handle = {
+        let on_change = prop.callback.clone();
+        Callback::from(move |input: String|{
+            on_change.emit(SettingValue::new("delay".to_string(), NormalizeDelay::convert_to_num(input), false, String::new()));
+        })
+    };
 
-    let on_change = prop.callback.clone();
-    let password_handle = Callback::from(move |input: String|{
-        on_change.emit(SettingValue::new("password".to_string(), input, false, String::new()));
-    });
+    let password_handle = {
+        let on_change = prop.callback.clone();
+        Callback::from(move |input: String|{
+            on_change.emit(SettingValue::new("password".to_string(), input, false, String::new()));
+        })
+    };
 
-    let on_change = prop.callback.clone();
-    let password_abilitated_clone = password_abilitated.clone();
-    let password_abilitated_handle = Callback::from(move |event: MouseEvent|{
-        let input = event.target().unwrap().unchecked_into::<HtmlInputElement>().checked();
-        password_abilitated_clone.set(!*password_abilitated_clone);
-        on_change.emit(SettingValue::new("password-abilitated".to_string(), input.to_string(), false, String::new()));
-    });
+    let password_abilitated_handle = {
+        let on_change = prop.callback.clone();
+        let password_abilitated_clone = password_abilitated.clone();
+        Callback::from(move |event: MouseEvent|{
+            let input = event.target().unwrap().unchecked_into::<HtmlInputElement>().checked();
+            password_abilitated_clone.set(!*password_abilitated_clone);
+            on_change.emit(SettingValue::new("password-abilitated".to_string(), input.to_string(), false, String::new()));
+        })
+    };
+
+    let language_handle = {
+        let valid_languages = valid_languages.clone();
+        Callback::from(move |value: String| {
+            if valid_languages.contains(&value) {
+                set_language.emit(value);
+            }
+        })
+    };
 
     html!{
         <div id="settings-container">
@@ -80,6 +105,9 @@ pub fn create_setting(prop: &Props) -> Html {
                 if *password_abilitated {
                     <Setting label={"password"}><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()} value={""}/></Setting> 
                 }
+                <Setting label={i18n.t("language")}>
+                    <Select selections={valid_languages} onchange={language_handle}/>
+                </Setting>
             </div>
             <Button onclick={listener.clone()} id="settings"><span class={format!("material-symbols-outlined {}", if *show {
                 "spin"
