@@ -20,7 +20,8 @@ pub fn create_setting(prop: &Props) -> Html {
     let valid_languages = 
         vec![
             "it".to_string(), 
-            "en".to_string()
+            "en".to_string(), 
+            "fr".to_string()
         ];
 
     let show = use_state(||false);
@@ -71,9 +72,11 @@ pub fn create_setting(prop: &Props) -> Html {
 
     let language_handle = {
         let valid_languages = valid_languages.clone();
+        let on_change = prop.callback.clone();
         Callback::from(move |value: String| {
             if valid_languages.contains(&value) {
-                set_language.emit(value);
+                set_language.emit(value.clone());
+                on_change.emit(SettingValue::new("language".to_string(), value, false, String::new()))
             }
         })
     };
@@ -106,7 +109,7 @@ pub fn create_setting(prop: &Props) -> Html {
                     <Setting label={"password"}><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()} value={""}/></Setting> 
                 }
                 <Setting label={i18n.t("language")}>
-                    <Select selections={valid_languages} onchange={language_handle}/>
+                    <Select selections={valid_languages} onchange={language_handle} selected={i18n.get_current_language().to_string()}/>
                 </Setting>
             </div>
             <Button onclick={listener.clone()} id="settings"><span class={format!("material-symbols-outlined {}", if *show {
