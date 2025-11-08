@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+
+use i18nrs::{self, yew::I18nProvider};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
@@ -16,6 +19,10 @@ extern "C" {
 
 #[function_component(App)]
 pub fn app() -> Html {
+    let translations = HashMap::from([
+        ("it", include_str!("./i18n/it/base.json")),
+        ("en", include_str!("./i18n/en/base.json"))
+    ]);
     
     let record_list: UseStateHandle<Vec<Record>> = use_state(||Vec::new());
     let delay = use_state(||StorageEntry::default());
@@ -132,20 +139,25 @@ pub fn app() -> Html {
     });
 
     html! {
-        <div id="main">
-            <div id="fixed">
-                <TitleBar on_click={title_handler}></TitleBar>
-                <div id="form">
-                    <Form on_submit = {on_submit} />
+        <I18nProvider 
+            translations={translations}
+            default_language={"en".to_string()}
+        >
+            <div id="main">
+                <div id="fixed">
+                    <TitleBar on_click={title_handler}></TitleBar>
+                    <div id="form">
+                        <Form on_submit = {on_submit} />
+                    </div>
                 </div>
+                <div id="non-fixed">
+                    <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler} />
+                </div>
+                <Settings callback={settings_handler} delay={(*delay).clone()} password_abilitated={(*password_abilitated).value.eq("true")}/>
+                if (*password_abilitated).value.eq("true") {
+                    <PasswordScreen />
+                }
             </div>
-            <div id="non-fixed">
-                <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler} />
-            </div>
-            <Settings callback={settings_handler} delay={(*delay).clone()} password_abilitated={(*password_abilitated).value.eq("true")}/>
-            if (*password_abilitated).value.eq("true") {
-                <PasswordScreen />
-            }
-        </div>
+        </I18nProvider>
     }
 }

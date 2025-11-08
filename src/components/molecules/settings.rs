@@ -1,3 +1,4 @@
+use i18nrs::yew::use_translation;
 use shared::{models::storage_entry::StorageEntry, style::default_colors::DefaultColors, utils::normalize::NormalizeDelay};
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
@@ -14,6 +15,8 @@ pub struct Props {
 
 #[function_component(Settings)]
 pub fn create_setting(prop: &Props) -> Html {
+    let (i18n, _set_language) = use_translation();
+
     let show = use_state(||false);
     let password_abilitated = use_state(||prop.password_abilitated);
 
@@ -59,11 +62,11 @@ pub fn create_setting(prop: &Props) -> Html {
                     "hide-panel"
                 }
             }>
-                <Setting label={"background color"}><ColorPicker item="background-color" call_back={get_input_values.clone()} index=0 /></Setting>
-                <Setting label={"header color"}><ColorPicker item="head-background-color" call_back={get_input_values.clone()} index=1 /></Setting>
-                <Setting label={"input color"}><ColorPicker item="input-background-color" call_back={get_input_values.clone()} index=2 /></Setting>
-                <Setting label={"text color"}><ColorPicker item="text-color" call_back={get_input_values.clone()} index=3 /></Setting>
-                <Setting label={"notification delay"}><NotificationInput name="days/minutes" on_change={notification_delay_handle.clone()} value = {
+                <Setting label={i18n.t("background")}><ColorPicker item="background-color" call_back={get_input_values.clone()} index=0 /></Setting>
+                <Setting label={i18n.t("header")}><ColorPicker item="head-background-color" call_back={get_input_values.clone()} index=1 /></Setting>
+                <Setting label={i18n.t("input")}><ColorPicker item="input-background-color" call_back={get_input_values.clone()} index=2 /></Setting>
+                <Setting label={i18n.t("text")}><ColorPicker item="text-color" call_back={get_input_values.clone()} index=3 /></Setting>
+                <Setting label={i18n.t("delay")}><NotificationInput name="days/minutes" on_change={notification_delay_handle.clone()} value = {
                     if prop.delay.value.contains("/") {
                         prop.delay.value.clone()
                     } else {
@@ -73,7 +76,7 @@ pub fn create_setting(prop: &Props) -> Html {
                         format!("{}/{}", days, minutes)
                     }
                 } /></Setting>
-                <Setting label={"password abilitated"}><input type="checkbox" onclick={password_abilitated_handle} checked={*password_abilitated} /></Setting>
+                <Setting label={i18n.t("abilitated")}><input type="checkbox" onclick={password_abilitated_handle} checked={*password_abilitated} /></Setting>
                 if *password_abilitated {
                     <Setting label={"password"}><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()} value={""}/></Setting> 
                 }

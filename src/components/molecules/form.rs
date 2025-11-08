@@ -1,5 +1,6 @@
 use std::ops::Deref;
 use gloo::timers::callback::Timeout;
+use i18nrs::yew::use_translation;
 use yew::prelude::*;
 use crate::components::{atoms::{submit_button::SubmitButton, text_input::TextInput}};
 use shared::{models::record::Record as Event, style::default_colors::DefaultColors};
@@ -13,6 +14,7 @@ pub struct Props {
 #[function_component(Form)]
 pub fn form(props: &Props) -> Html{
     let timer = 3000;
+    let (i18n, _set_language) = use_translation();
 
     let value_state = use_state(||Event::default());
     let name_color = use_state(||String::new());
@@ -75,9 +77,9 @@ pub fn form(props: &Props) -> Html{
 
     html!{
         <form onsubmit={on_submit}>
-            <TextInput name="name" on_change={on_changename} color={(*name_color).clone()} value={""} />
-            <TextInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()} value={""} />
-            <TextInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()} value={""} />
+            <TextInput name={i18n.t("name")} on_change={on_changename} color={(*name_color).clone()} value={""} />
+            <TextInput name={i18n.t("date")} on_change={on_changedate} color={(*date_color).clone()} value={""} />
+            <TextInput name={i18n.t("time")} on_change={on_changetime} color={(*time_color).clone()} value={""} />
             <SubmitButton id="submit"><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
         </form>
     }

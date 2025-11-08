@@ -1,0 +1,12 @@
+{
+    "name": "nome",
+    "date": "data (gg/mm/aaaa)",
+    "date2": "data",
+    "time": "orario",
+    "background": "colore sfondo",
+    "input": "colore input",
+    "text": "colore testo",
+    "header": "colore barra",
+    "delay": "orario di notifica",
+    "abilitated": "password abilitata"
+}

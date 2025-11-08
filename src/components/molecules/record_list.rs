@@ -1,3 +1,4 @@
+use i18nrs::yew::use_translation;
 use yew::{Callback, Html, Properties, function_component, html, use_state};
 
 use shared::models::record::Record;
@@ -13,6 +14,8 @@ pub struct Props{
 
 #[function_component(RecordList)]
 pub fn record_list(records: &Props) -> Html{
+    let (i18n, _set_language) = use_translation();
+
     let editing = use_state(||None::<Record>);
 
     let onclick = records.delete_callback.clone();
@@ -51,7 +54,19 @@ pub fn record_list(records: &Props) -> Html{
                         records.list.clone().into_iter().map(|element|{
                             html!{
                                 <div class="record-list-style">
-                                    <p class="record-label">{"name: "}{element.name.clone()}{", date: "}{element.date.clone()}{", time: "}{element.time.clone()}</p>
+                                    <p class="record-label">
+                                        {i18n.t("name")}
+                                        {": "}
+                                        {element.name.clone()}
+                                        {", "}
+                                        {i18n.t("date2")}
+                                        {": "}
+                                        {element.date.clone()}
+                                        {", "}
+                                        {i18n.t("time")}
+                                        {": "}
+                                        {element.time.clone()}
+                                    </p>
                                     <div class="record-button">
                                         <RecordButton id = {element.clone()}  onclick = {delete_handler.clone()} ty={"delete"}/>
                                         <RecordButton id = {element}  onclick = {edit_handler.clone()} ty={"edit"}/>
