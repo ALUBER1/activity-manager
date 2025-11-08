@@ -11,12 +11,14 @@ pub struct Props {
 
 #[function_component(NotificationInput)]
 pub fn text_input(props: &Props) -> Html{
-    let on_changecall = props.on_change.clone();
     
-    let onchange = Callback::from(move |event: FocusEvent|{
-        let input = event.target().unwrap().unchecked_into::<HtmlInputElement>().value();
-        on_changecall.emit(input);
-    });
+    let onchange = {
+        let on_changecall = props.on_change.clone();
+        Callback::from(move |event: FocusEvent|{
+            let input = event.target().unwrap().unchecked_into::<HtmlInputElement>().value();
+            on_changecall.emit(input);
+        })
+    };
     
     html!{
         <input type="text" autocomplete = "off" name = {props.name.clone()} placeholder = {props.name.clone()} onfocusout = {onchange} value = {props.value.clone()} />

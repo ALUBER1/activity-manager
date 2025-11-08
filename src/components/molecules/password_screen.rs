@@ -11,27 +11,32 @@ pub fn password_screen() -> Html {
     let correct = use_state(||StorageEntry::default());
     let color = use_state(||DefaultColors::INPUT_BACKGROUND_COLOR);
     
-    let password_clone = password.clone();
-    let handler = Callback::from(move |password: String| {
-        password_clone.set(password);
-    });
+    let handler = {
+        let password_clone = password.clone();
+        Callback::from(move |password: String| {
+            password_clone.set(password);
+        })
+    };
     
+    let password_button_onclick = {
     let show_clone = show.clone();
-    let password_button_onclick = Callback::from(move |_| {
-        show_clone.set(!*show_clone);
-    });
+        Callback::from(move |_| {
+            show_clone.set(!*show_clone);
+        })
+    };
     
-    
+    let submit_handler = {
     let password_clone = password.clone();
     let correct_clone = correct.clone();
-    let submit_handler = Callback::from(move |event: SubmitEvent| {
+    Callback::from(move |event: SubmitEvent| {
         let password_clone = password_clone.clone();
         let correct_clone = correct_clone.clone();
         event.prevent_default();
         spawn_local(async move{
             invoke_function_store("verify", Some(correct_clone.clone()), Some(StorageEntry::new("password".to_string(), (*password_clone).clone()))).await;
-        });
-    });
+            });
+        })
+    };
     
     let color_clone = color.clone();
     let correct_clone = correct.clone();

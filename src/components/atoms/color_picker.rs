@@ -16,21 +16,25 @@ pub struct Props {
 #[function_component(ColorPicker)]
 pub fn color_picker(prop: &Props) -> Html {
 
-    let callback = prop.call_back.clone();
-    let name = use_state(||{prop.item.clone()});
-    let index = prop.index.clone();
-    let onclick = Callback::from(move |_|{
-        let input = document().get_elements_by_class_name("pcr-result");
-        let temp = input.get_with_index(index).unwrap().unchecked_into::<HtmlInputElement>();
-        callback.emit(SettingValue::new((*name).clone(), temp.value(), true, index.to_string()));
-    });
+    let onclick = {
+        let callback = prop.call_back.clone();
+        let name = prop.item.clone();
+        let index = prop.index.clone();
+        Callback::from(move |_|{
+            let input = document().get_elements_by_class_name("pcr-result");
+            let temp = input.get_with_index(index).unwrap().unchecked_into::<HtmlInputElement>();
+            callback.emit(SettingValue::new(name.clone(), temp.value(), true, index.to_string()));
+        })
+    };
     
-    let callback = prop.call_back.clone();
-    let name = use_state(||{prop.item.clone()});
-    let index = prop.index.clone();
-    let default_onclick = Callback::from(move |_|{
-        callback.emit(SettingValue::new((*name).clone(), DefaultColors::get(&name), true, index.to_string()));
-    });
+    let default_onclick = {
+        let callback = prop.call_back.clone();
+        let index = prop.index.clone();
+        let name = prop.item.clone();
+        Callback::from(move |_|{
+            callback.emit(SettingValue::new(name.clone(), DefaultColors::get(&name), true, index.to_string()));
+        })
+    };
     
     let name = prop.item.clone();
     use_effect_with((), move |_|{    

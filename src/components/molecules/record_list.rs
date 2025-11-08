@@ -1,3 +1,4 @@
+use i18nrs::yew::use_translation;
 use yew::{Callback, Html, Properties, function_component, html, use_state};
 
 use shared::models::record::Record;
@@ -13,29 +14,39 @@ pub struct Props{
 
 #[function_component(RecordList)]
 pub fn record_list(records: &Props) -> Html{
+    let (i18n, _set_language) = use_translation();
+
     let editing = use_state(||None::<Record>);
 
+    let delete_handler = {
     let onclick = records.delete_callback.clone();
-    let delete_handler = Callback::from(move |a: Record|{
-        onclick.emit(a);
-    });
+    Callback::from(move |a: Record|{
+            onclick.emit(a);
+        })
+    };
 
-    let editing_clone = editing.clone();
-    let edit_handler = Callback::from(move |a: Record|{
-        editing_clone.set(Some(a));
-    });
+    let edit_handler = {
+        let editing_clone = editing.clone();
+        Callback::from(move |a: Record|{
+            editing_clone.set(Some(a));
+        })
+    };
 
-    let editing_clone = editing.clone();
-    let cancel_handle = Callback::from(move |_| {
-        editing_clone.set(None);
-    });
+    let cancel_handle = {
+        let editing_clone = editing.clone();
+        Callback::from(move |_| {
+            editing_clone.set(None);
+        })
+    };
     
-    let editing_clone = editing.clone();
-    let onclick = records.edit_callback.clone();
-    let submit_handler = Callback::from(move |mut record: Record| {
-        record.uuid = (*editing_clone).clone().unwrap().uuid;
-        onclick.emit(record);
-    });
+    let submit_handler = {
+        let editing_clone = editing.clone();
+        let onclick = records.edit_callback.clone();
+        Callback::from(move |mut record: Record| {
+            record.uuid = (*editing_clone).clone().unwrap().uuid;
+            onclick.emit(record);
+        })
+    };
 
     html!{
         <>
@@ -51,7 +62,19 @@ pub fn record_list(records: &Props) -> Html{
                         records.list.clone().into_iter().map(|element|{
                             html!{
                                 <div class="record-list-style">
-                                    <p class="record-label">{"name: "}{element.name.clone()}{", date: "}{element.date.clone()}{", time: "}{element.time.clone()}</p>
+                                    <p class="record-label">
+                                        {i18n.t("name")}
+                                        {": "}
+                                        {element.name.clone()}
+                                        {", "}
+                                        {i18n.t("date2")}
+                                        {": "}
+                                        {element.date.clone()}
+                                        {", "}
+                                        {i18n.t("time")}
+                                        {": "}
+                                        {element.time.clone()}
+                                    </p>
                                     <div class="record-button">
                                         <RecordButton id = {element.clone()}  onclick = {delete_handler.clone()} ty={"delete"}/>
                                         <RecordButton id = {element}  onclick = {edit_handler.clone()} ty={"edit"}/>

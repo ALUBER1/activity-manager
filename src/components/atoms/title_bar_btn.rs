@@ -12,11 +12,13 @@ pub struct Props {
 
 #[function_component(TitleButton)]
 pub fn button(label: &Props) -> Html {
-    let onclick = label.on_click.clone();
-    let id = label.id.clone();
-    let handler = Callback::from(move |_|{
-        onclick.emit(id.clone());
-    });
+    let handler = {
+        let onclick = label.on_click.clone();
+        let id = label.id.clone();
+        Callback::from(move |_|{
+            onclick.emit(id.clone());
+        })
+    };
     html!{
         <button id={label.id.to_string()} onclick={handler}>{for label.children.iter()}</button>
     }

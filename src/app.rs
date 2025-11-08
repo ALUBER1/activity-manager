@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+
+use i18nrs::{self, yew::I18nProvider};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
@@ -16,16 +19,23 @@ extern "C" {
 
 #[function_component(App)]
 pub fn app() -> Html {
+    let translations = HashMap::from([
+        ("it", include_str!("./i18n/it/base.json")),
+        ("en", include_str!("./i18n/en/base.json")),
+        ("fr", include_str!("./i18n/fr/base.json"))
+    ]);
     
     let record_list: UseStateHandle<Vec<Record>> = use_state(||Vec::new());
     let delay = use_state(||StorageEntry::default());
     let temp = use_state(||StorageEntry::default());
     let password_abilitated = use_state(||StorageEntry::default());
+    let language = use_state(||StorageEntry::default());
     
     let clone_list = record_list.clone();
     let delay_clone = delay.clone();
     let temp_clone = temp.clone();
     let password_abilitated_clone = password_abilitated.clone();
+    let language_clone = language.clone();
     
     use_effect_with((), move |_|{
         spawn_local(async move {
@@ -40,6 +50,7 @@ pub fn app() -> Html {
             invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("input-background-color".to_string(), String::new()))).await;
             invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("head-background-color".to_string(), String::new()))).await;
             invoke_function_store("get_storage", Some(password_abilitated_clone.clone()), Some(StorageEntry::new("password-abilitated".to_string(), String::new()))).await;
+            invoke_function_store("get_storage", Some(language_clone.clone()), Some(StorageEntry::new("password-abilitated".to_string(), String::new()))).await;
         });
         
         ||{}
@@ -55,6 +66,12 @@ pub fn app() -> Html {
     use_effect_with((delay).clone(), move |delay| {
         if (*delay).value.is_empty() {
             delay.set(StorageEntry::new_delay("0/60".to_string()));
+        }
+    });
+
+    use_effect_with((language).clone(), move |language| {
+        if (*language).value.is_empty() {
+            language.set(StorageEntry::new(String::from("language"), "en".to_string()));
         }
     });
 
@@ -122,7 +139,8 @@ pub fn app() -> Html {
                     "password" => {
                         invoke_function_store("store_password", None, Some(StorageEntry::new(input.setting.clone(), input.value.clone()))).await;
                     },
-                    "password-abilitated" => {
+                    "password-abilitated" |
+                    "language" => {
                         invoke_function_store("store_storage", None, Some(StorageEntry::new(input.setting.clone(), input.value.clone()))).await;
                     },
                     _ => ()
@@ -132,20 +150,25 @@ pub fn app() -> Html {
     });
 
     html! {
-        <div id="main">
-            <div id="fixed">
-                <TitleBar on_click={title_handler}></TitleBar>
-                <div id="form">
-                    <Form on_submit = {on_submit} />
+        <I18nProvider 
+            translations={translations}
+            default_language={(*language).value.clone()}
+        >
+            <div id="main">
+                <div id="fixed">
+                    <TitleBar on_click={title_handler}></TitleBar>
+                    <div id="form">
+                        <Form on_submit = {on_submit} />
+                    </div>
                 </div>
+                <div id="non-fixed">
+                    <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler} />
+                </div>
+                <Settings callback={settings_handler} delay={(*delay).clone()} password_abilitated={(*password_abilitated).value.eq("true")}/>
+                if (*password_abilitated).value.eq("true") {
+                    <PasswordScreen />
+                }
             </div>
-            <div id="non-fixed">
-                <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler} />
-            </div>
-            <Settings callback={settings_handler} delay={(*delay).clone()} password_abilitated={(*password_abilitated).value.eq("true")}/>
-            if (*password_abilitated).value.eq("true") {
-                <PasswordScreen />
-            }
-        </div>
+        </I18nProvider>
     }
 }

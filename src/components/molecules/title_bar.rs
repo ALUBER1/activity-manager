@@ -9,17 +9,19 @@ pub struct Props {
 
 #[function_component(TitleBar)]
 pub fn button(label: &Props) -> Html {
-    let onclick = label.on_click.clone();
-
     let maximize_class = use_state(||{false});
-    let maximize_class_clone = maximize_class.clone();
+    
+    let handler = {
+        let maximize_class_clone = maximize_class.clone();
+        let onclick = label.on_click.clone();
+        Callback::from(move |a: Functions|{
+            if a == Functions::Maximize {
+                maximize_class_clone.set(!(*maximize_class_clone));
+            }
+            onclick.emit(a.clone());
+        })
+    };
 
-    let handler = Callback::from(move |a: Functions|{
-        if a == Functions::Maximize {
-            maximize_class_clone.set(!(*maximize_class_clone));
-        }
-        onclick.emit(a.clone());
-    });
     html!{
         <div data-tauri-drag-region="true" id="head">
                 <h1 data-tauri-drag-region="true" id="title">{"Activity manager"}</h1>

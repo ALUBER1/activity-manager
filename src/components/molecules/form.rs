@@ -1,5 +1,6 @@
 use std::ops::Deref;
 use gloo::timers::callback::Timeout;
+use i18nrs::yew::use_translation;
 use yew::prelude::*;
 use crate::components::{atoms::{submit_button::SubmitButton, text_input::TextInput}};
 use shared::{models::record::Record as Event, style::default_colors::DefaultColors};
@@ -13,71 +14,80 @@ pub struct Props {
 #[function_component(Form)]
 pub fn form(props: &Props) -> Html{
     let timer = 3000;
+    let (i18n, _set_language) = use_translation();
 
     let value_state = use_state(||Event::default());
     let name_color = use_state(||String::new());
     let date_color = use_state(||String::new());
     let time_color = use_state(||String::new());
 
-    let cloned_value = value_state.clone();
-    let on_changename = Callback::from(move |name|{
-        cloned_value.set(Event { name, ..cloned_value.deref().clone()});
-    });
+    let on_changename = {
+        let cloned_value = value_state.clone();
+        Callback::from(move |name|{
+            cloned_value.set(Event { name, ..cloned_value.deref().clone()});
+        })
+    };
 
-    let cloned_value = value_state.clone();
-    let on_changedate = Callback::from(move |date|{
-        cloned_value.set(Event { date,..cloned_value.deref().clone()});
-    });
+    let on_changedate = {
+        let cloned_value = value_state.clone();
+        Callback::from(move |date|{
+            cloned_value.set(Event { date,..cloned_value.deref().clone()});
+        })
+    };
 
-    let cloned_value = value_state.clone();
-    let on_changetime = Callback::from(move |time|{
-        cloned_value.set(Event { time,..cloned_value.deref().clone()});
-    });
+    let on_changetime = {
+        let cloned_value = value_state.clone();
+        Callback::from(move |time|{
+            cloned_value.set(Event { time,..cloned_value.deref().clone()});
+        })
+    };
 
-    let cloned_value = value_state.clone();
-    let clone_submit = props.on_submit.clone();
-    let name_clone = name_color.clone();
-    let date_clone = date_color.clone();
-    let time_clone = time_color.clone();
-    let on_submit = Callback::from(move |event: SubmitEvent|{
-        event.prevent_default();
-        let data = cloned_value.deref().clone();
-        let mut correct = true;
-        
-        if NaiveDate::parse_from_str(&data.date, "%d/%m/%Y").is_err() || is_future_date(&data.date) == 0 {
-            date_clone.set(DefaultColors::INVALID_COLOR.to_string());
-            correct = false;
-            let date_clone = date_clone.clone();
-            Timeout::new(timer, move || {
-                date_clone.set("".to_string());
-            }).forget();
-        }
-        if data.name.is_empty() {
-            name_clone.set(DefaultColors::INVALID_COLOR.to_string());
-            correct = false;
-            let name_clone = name_clone.clone();
-            Timeout::new(timer, move || {
-                name_clone.set("".to_string());
-            }).forget();
-        }
-        if NaiveTime::parse_from_str(&data.time, "%H:%M").is_err() || !is_future_time(&data.time, is_future_date(&data.date)) {
-            time_clone.set(DefaultColors::INVALID_COLOR.to_string());
-            correct = false;
-            let time_clone = time_clone.clone();
-            Timeout::new(timer, move || {
-                time_clone.set("".to_string());
-            }).forget();
-        }
-        if correct {
-            clone_submit.emit(data);
-        }
-    });
+    let on_submit = {
+        let cloned_value = value_state.clone();
+        let clone_submit = props.on_submit.clone();
+        let name_clone = name_color.clone();
+        let date_clone = date_color.clone();
+        let time_clone = time_color.clone();
+        Callback::from(move |event: SubmitEvent|{
+            event.prevent_default();
+            let data = cloned_value.deref().clone();
+            let mut correct = true;
+            
+            if NaiveDate::parse_from_str(&data.date, "%d/%m/%Y").is_err() || is_future_date(&data.date) == 0 {
+                date_clone.set(DefaultColors::INVALID_COLOR.to_string());
+                correct = false;
+                let date_clone = date_clone.clone();
+                Timeout::new(timer, move || {
+                    date_clone.set("".to_string());
+                }).forget();
+            }
+            if data.name.is_empty() {
+                name_clone.set(DefaultColors::INVALID_COLOR.to_string());
+                correct = false;
+                let name_clone = name_clone.clone();
+                Timeout::new(timer, move || {
+                    name_clone.set("".to_string());
+                }).forget();
+            }
+            if NaiveTime::parse_from_str(&data.time, "%H:%M").is_err() || !is_future_time(&data.time, is_future_date(&data.date)) {
+                time_clone.set(DefaultColors::INVALID_COLOR.to_string());
+                correct = false;
+                let time_clone = time_clone.clone();
+                Timeout::new(timer, move || {
+                    time_clone.set("".to_string());
+                }).forget();
+            }
+            if correct {
+                clone_submit.emit(data);
+            }
+        })
+    };
 
     html!{
         <form onsubmit={on_submit}>
-            <TextInput name="name" on_change={on_changename} color={(*name_color).clone()} value={""} />
-            <TextInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()} value={""} />
-            <TextInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()} value={""} />
+            <TextInput name={i18n.t("name")} on_change={on_changename} color={(*name_color).clone()} value={""} />
+            <TextInput name={i18n.t("date")} on_change={on_changedate} color={(*date_color).clone()} value={""} />
+            <TextInput name={i18n.t("time")} on_change={on_changetime} color={(*time_color).clone()} value={""} />
             <SubmitButton id="submit"><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
         </form>
     }
