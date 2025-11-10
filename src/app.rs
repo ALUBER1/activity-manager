@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 
+use gloo::console::log;
 use i18nrs::{self, yew::I18nProvider};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar}, models::setting_value::SettingValue, utils::{functions::Functions, helper::*}};
+use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar, toast_notifications::ToastNotifications}, models::{setting_value::SettingValue, toast_notification_model::ToastNotificationModel}, utils::{functions::Functions, helper::*}};
 use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
@@ -30,6 +31,13 @@ pub fn app() -> Html {
     let temp = use_state(||StorageEntry::default());
     let password_abilitated = use_state(||StorageEntry::default());
     let language = use_state(||StorageEntry::default());
+    let toast_notifications = use_state(||
+        //Vec::<ToastNotificationModel>::new()
+            vec![ToastNotificationModel{id: 0, title: "test".to_string(), message: "test".to_string()},
+                    ToastNotificationModel{id: 1, title: "test".to_string(), message: "test".to_string()},
+                    ToastNotificationModel{id: 2, title: "test".to_string(), message: "test".to_string()},
+                    ToastNotificationModel{id: 3, title: "test".to_string(), message: "test".to_string()}]
+        );
     
     let clone_list = record_list.clone();
     let delay_clone = delay.clone();
@@ -149,6 +157,16 @@ pub fn app() -> Html {
         });
     });
 
+    let toast_delete_callback = {
+        let toast_notifications = toast_notifications.clone();
+        Callback::from(move |notification: ToastNotificationModel| {
+            let mut vec = (*toast_notifications).clone();
+            vec.swap_remove(notification.id);
+            log!(format!("{:?}", vec));
+            toast_notifications.set(vec); 
+        })
+    };
+
     html! {
         <I18nProvider 
             translations={translations}
@@ -168,6 +186,7 @@ pub fn app() -> Html {
                 if (*password_abilitated).value.eq("true") {
                     <PasswordScreen />
                 }
+                <ToastNotifications notifications={(*toast_notifications).clone()} delete_callback={toast_delete_callback}/>
             </div>
         </I18nProvider>
     }

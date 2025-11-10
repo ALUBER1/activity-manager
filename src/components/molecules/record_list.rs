@@ -19,8 +19,8 @@ pub fn record_list(records: &Props) -> Html{
     let editing = use_state(||None::<Record>);
 
     let delete_handler = {
-    let onclick = records.delete_callback.clone();
-    Callback::from(move |a: Record|{
+        let onclick = records.delete_callback.clone();
+        Callback::from(move |a: Record|{
             onclick.emit(a);
         })
     };
