@@ -50,36 +50,33 @@ pub fn form(props: &Props) -> Html{
         let time_clone = time_color.clone();
         Callback::from(move |event: SubmitEvent|{
             event.prevent_default();
-            let data = cloned_value.deref().clone();
-            let mut correct = true;
+            let mut data = cloned_value.deref().clone();
             
             if NaiveDate::parse_from_str(&data.date, "%d/%m/%Y").is_err() || is_future_date(&data.date) == 0 {
                 date_clone.set(DefaultColors::INVALID_COLOR.to_string());
-                correct = false;
                 let date_clone = date_clone.clone();
                 Timeout::new(timer, move || {
                     date_clone.set("".to_string());
                 }).forget();
+                data = Event{ date: String::from("!invalid!"), ..data };
             }
             if data.name.is_empty() {
                 name_clone.set(DefaultColors::INVALID_COLOR.to_string());
-                correct = false;
                 let name_clone = name_clone.clone();
                 Timeout::new(timer, move || {
                     name_clone.set("".to_string());
                 }).forget();
+                data = Event{ name: String::from("!invalid!"), ..data };
             }
             if NaiveTime::parse_from_str(&data.time, "%H:%M").is_err() || !is_future_time(&data.time, is_future_date(&data.date)) {
                 time_clone.set(DefaultColors::INVALID_COLOR.to_string());
-                correct = false;
                 let time_clone = time_clone.clone();
                 Timeout::new(timer, move || {
                     time_clone.set("".to_string());
                 }).forget();
+                data = Event{ time: String::from("!invalid!"), ..data };
             }
-            if correct {
-                clone_submit.emit(data);
-            }
+            clone_submit.emit(data);
         })
     };
 

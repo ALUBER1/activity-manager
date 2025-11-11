@@ -1,3 +1,5 @@
+use std::cell::Cell;
+
 use yew::{Callback, Html, Properties, function_component, html};
 
 use crate::{components::atoms::toast_notification::ToastNotification, models::toast_notification_model::ToastNotificationModel};
@@ -26,7 +28,7 @@ pub fn create_toast_notifications(prop: &Props) -> Html {
                         .enumerate()
                         .map(|(id, element)|{
                             html!{
-                                <ToastNotification notification={ToastNotificationModel{ id, ..element }} delete_callback={delete_handler.clone()} />
+                                <ToastNotification notification={ToastNotificationModel{id, ..element}} delete_callback={delete_handler.clone()} />
                             }
                         }
                     ).collect::<Html>()

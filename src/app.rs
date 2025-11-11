@@ -1,11 +1,10 @@
 use std::collections::HashMap;
 
-use gloo::console::log;
 use i18nrs::{self, yew::I18nProvider};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar, toast_notifications::ToastNotifications}, models::{setting_value::SettingValue, toast_notification_model::ToastNotificationModel}, utils::{functions::Functions, helper::*}};
+use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar, toast_notifications::ToastNotifications}, models::{setting_value::SettingValue, toast_notification_model::ToastNotificationModel}, utils::{functions::Functions, helper::*, logger::log}};
 use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
@@ -31,13 +30,7 @@ pub fn app() -> Html {
     let temp = use_state(||StorageEntry::default());
     let password_abilitated = use_state(||StorageEntry::default());
     let language = use_state(||StorageEntry::default());
-    let toast_notifications = use_state(||
-        //Vec::<ToastNotificationModel>::new()
-            vec![ToastNotificationModel{id: 0, title: "test".to_string(), message: "test".to_string()},
-                    ToastNotificationModel{id: 1, title: "test".to_string(), message: "test".to_string()},
-                    ToastNotificationModel{id: 2, title: "test".to_string(), message: "test".to_string()},
-                    ToastNotificationModel{id: 3, title: "test".to_string(), message: "test".to_string()}]
-        );
+    let toast_notifications: UseStateHandle<Vec<ToastNotificationModel>> = use_state(||Vec::new());
     
     let clone_list = record_list.clone();
     let delay_clone = delay.clone();
@@ -88,15 +81,35 @@ pub fn app() -> Html {
         password_abilitated_clone.set(StorageEntry::new(password_abilitated.key.clone(), NormalizeDelay::normalize_color((*password_abilitated).clone().value)));
     });
     
+    let toast_notifications_clone = toast_notifications.clone();
     let clone_list = record_list.clone();
     let on_submit = Callback::from(move |record: Record| {
-        let record = record.clone();
-        let clone_list = clone_list.clone();
-        spawn_local(async move{
-            invoke_function_async("add_record", None, Some(Record { uuid: "".to_string(), ..record})).await;
-            invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
-            ()
-        });
+        let mut correct = true;
+        let mut vec = (*toast_notifications_clone).clone();
+        
+        if record.date.eq("!invalid!") { 
+            vec.push(ToastNotificationModel::incorrect_field("date"));
+            correct = false;
+        }
+        if record.time.eq("!invalid!") {
+            vec.push(ToastNotificationModel::incorrect_field("time"));
+            correct = false;
+        }
+        if record.name.eq("!invalid!") {
+            vec.push(ToastNotificationModel::incorrect_field("name"));
+            correct = false;
+        }
+        toast_notifications_clone.set(vec);
+
+        if correct {
+            let record = record.clone();
+            let clone_list = clone_list.clone();
+            spawn_local(async move{
+                invoke_function_async("add_record", None, Some(Record { uuid: "".to_string(), ..record})).await;
+                invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
+                ()
+            });
+        }
     });
 
     let clone_list = record_list.clone();
@@ -156,14 +169,13 @@ pub fn app() -> Html {
             }
         });
     });
-
+    
     let toast_delete_callback = {
-        let toast_notifications = toast_notifications.clone();
+        let toast_notifications_clone = toast_notifications.clone();
         Callback::from(move |notification: ToastNotificationModel| {
-            let mut vec = (*toast_notifications).clone();
-            vec.swap_remove(notification.id);
-            log!(format!("{:?}", vec));
-            toast_notifications.set(vec); 
+            let mut vec = (*toast_notifications_clone).clone();
+            vec.retain(|element|{element.id != notification.id});
+            toast_notifications_clone.set(vec);
         })
     };
 
