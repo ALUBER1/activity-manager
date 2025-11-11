@@ -1,10 +1,10 @@
 use std::{collections::HashMap, sync::Mutex};
 
-use i18nrs::{self, yew::I18nProvider};
+use i18nrs::{self, yew::{I18nProvider, use_translation}};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar, toast_notifications::ToastNotifications}, errors::form_error::FormError, models::{setting_value::SettingValue, toast_notification_model::ToastNotificationModel}, utils::{functions::Functions, helper::*}};
+use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar, toast_notifications::ToastNotifications}, errors::{form_error::FormError, setting_error::SettingError}, models::{setting_value::SettingValue, toast_notification_model::ToastNotificationModel}, utils::{functions::Functions, helper::*}};
 use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
 #[allow(unused_imports)]
@@ -145,31 +145,38 @@ pub fn app() -> Html {
         }
     });
     
+    let toast_notifications_clone = toast_notifications.clone();
     let delay_clone = delay.clone();
-    let settings_handler = Callback::from(move |input: SettingValue|{
-        let delay_clone = delay_clone.clone();
-        let input = input.clone();
-        spawn_local(async move {
-            if input.from_color_picker {
-                change_background(&input.serialize());
-                invoke_function_store("store_storage", None, Some(StorageEntry::new_color(input.value.clone(), input.setting))).await;
-            } else {
-                match &*(input.setting) {
-                    "delay" => {
-                        invoke_function_store("store_storage", None, Some(StorageEntry::new_delay(input.value.clone()))).await;
-                        delay_clone.set(StorageEntry::new_delay(NormalizeDelay::convert_to_string(input.value)));
-                    },
-                    "password" => {
-                        invoke_function_store("store_password", None, Some(StorageEntry::new(input.setting.clone(), input.value.clone()))).await;
-                    },
-                    "password-abilitated" |
-                    "language" => {
-                        invoke_function_store("store_storage", None, Some(StorageEntry::new(input.setting.clone(), input.value.clone()))).await;
-                    },
-                    _ => ()
+    let settings_handler = Callback::from(move |input: Result<SettingValue, SettingError>|{
+        if let Ok(input) = input {
+            let delay_clone = delay_clone.clone();
+            let input = input.clone();
+            spawn_local(async move {
+                if input.from_color_picker {
+                    change_background(&input.serialize());
+                    invoke_function_store("store_storage", None, Some(StorageEntry::new_color(input.value.clone(), input.setting))).await;
+                } else {
+                    match &*(input.setting) {
+                        "delay" => {
+                            invoke_function_store("store_storage", None, Some(StorageEntry::new_delay(input.value.clone()))).await;
+                            delay_clone.set(StorageEntry::new_delay(NormalizeDelay::convert_to_string(input.value)));
+                        },
+                        "password" => {
+                            invoke_function_store("store_password", None, Some(StorageEntry::new(input.setting.clone(), input.value.clone()))).await;
+                        },
+                        "password-abilitated" |
+                        "language" => {
+                            invoke_function_store("store_storage", None, Some(StorageEntry::new(input.setting.clone(), input.value.clone()))).await;
+                        },
+                        _ => ()
+                    }
                 }
-            }
-        });
+            });
+        } else if let Err(error) = input {
+            let mut vec = (*toast_notifications_clone).clone();
+            vec.push(ToastNotificationModel::incorrect_setting(error));
+            toast_notifications_clone.set(vec);
+        }
     });
     
     let toast_delete_callback = {

@@ -2,7 +2,7 @@ use std::cell::Cell;
 
 use chrono::{Local, NaiveTime};
 
-use crate::errors::form_error::{ErrorReason, FormError};
+use crate::errors::{form_error::{FormError, FormErrorReason}, setting_error::{SettingError, SettingErrorReason}};
 
 #[derive(Clone, Debug, Default)]
 pub struct ToastNotificationModel {
@@ -19,10 +19,24 @@ impl ToastNotificationModel {
             id: id, 
             title: format!("incorrect field {}", error.field), 
             message: match error.error {
-                ErrorReason::Empty => format!("please fill form field {}", error.field),
-                ErrorReason::Past => String::from("please insert a future date time"),
-                ErrorReason::Format(format) => format!("{} should have format {}", error.field, format),
-                ErrorReason::Fallback(value) => format!("problem with value: {}", value)
+                FormErrorReason::Empty => format!("please fill form field {}", error.field),
+                FormErrorReason::Past => String::from("please insert a future date time"),
+                FormErrorReason::Format(format) => format!("{} should have format {}", error.field, format),
+                FormErrorReason::Fallback(value) => format!("problem with value {}", value)
+            },
+            created_at: Local::now().time()
+        }
+    }
+
+    pub fn incorrect_setting(error: SettingError) -> Self {
+        let id = next_id();
+        ToastNotificationModel { 
+            id: id, 
+            title: format!("incorrect field {}", error.field), 
+            message: match error.error {
+                SettingErrorReason::Empty => format!("please fill form field {}", error.field),
+                SettingErrorReason::Format(format) => format!("{} should have format {}", error.field, format),
+                SettingErrorReason::NonExistent => format!("please insert a valid input")
             },
             created_at: Local::now().time()
         }

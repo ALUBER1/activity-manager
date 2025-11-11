@@ -2,7 +2,7 @@ use std::ops::Deref;
 use gloo::timers::callback::Timeout;
 use i18nrs::yew::use_translation;
 use yew::prelude::*;
-use crate::{components::atoms::{submit_button::SubmitButton, text_input::TextInput}, errors::form_error::{ErrorReason, FormError}};
+use crate::{components::atoms::{submit_button::SubmitButton, text_input::TextInput}, errors::form_error::{FormErrorReason, FormError}};
 use shared::{models::record::Record as Event, style::default_colors::DefaultColors};
 use chrono::{Local, NaiveDate, NaiveTime};
 
@@ -66,13 +66,13 @@ pub fn form(props: &Props) -> Html{
                         field: "date".to_string(), 
                         error: 
                             if data.date.is_empty() {
-                                ErrorReason::Empty
+                                FormErrorReason::Empty
                             } else if NaiveDate::parse_from_str(&data.date, "%d/%m/%Y").is_err() {
-                                ErrorReason::Format("dd/mm/aaaa".to_string())
+                                FormErrorReason::Format("dd/mm/aaaa".to_string())
                             } else if is_future_date(&data.date) == 0 {
-                                ErrorReason::Past
+                                FormErrorReason::Past
                             } else {
-                                ErrorReason::Fallback(data.date.clone())
+                                FormErrorReason::Fallback(data.date.clone())
                             }
                     }
                 );
@@ -86,7 +86,7 @@ pub fn form(props: &Props) -> Html{
                 error_vec.push(
                     FormError { 
                         field: "name".to_string(), 
-                        error: ErrorReason::Empty
+                        error: FormErrorReason::Empty
                     }
                 );
             }
@@ -101,13 +101,13 @@ pub fn form(props: &Props) -> Html{
                         field: "time".to_string(), 
                         error: 
                             if data.time.is_empty() {
-                                ErrorReason::Empty
+                                FormErrorReason::Empty
                             } else if NaiveTime::parse_from_str(&data.time, "%H:%M").is_err() {
-                                ErrorReason::Format("hh:mm".to_string())
+                                FormErrorReason::Format("hh:mm".to_string())
                             } else if !is_future_time(&data.time, is_future_date(&data.date)) {
-                                ErrorReason::Past
+                                FormErrorReason::Past
                             } else {
-                                ErrorReason::Fallback(data.time.clone())
+                                FormErrorReason::Fallback(data.time.clone())
                             }
                     }
                 );

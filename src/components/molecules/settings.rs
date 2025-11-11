@@ -4,11 +4,11 @@ use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::{Callback, Html, MouseEvent, Properties, function_component, html, use_effect_with, use_state};
 
-use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, select::Select, setting::Setting, text_input::TextInput}, models::setting_value::SettingValue};
+use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notification_input::NotificationInput, select::Select, setting::Setting, text_input::TextInput}, errors::setting_error::{SettingError, SettingErrorReason}, models::setting_value::SettingValue};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
-    pub callback: Callback<SettingValue>,
+    pub callback: Callback<Result<SettingValue, SettingError>>,
     pub delay: StorageEntry,
     pub password_abilitated: bool
 }
@@ -42,21 +42,29 @@ pub fn create_setting(prop: &Props) -> Html {
     let get_input_values = {
         let on_change = prop.callback.clone();
         Callback::from(move |input: SettingValue|{
-            on_change.emit(input);
+            on_change.emit(Ok(input));
         })
     };
 
     let notification_delay_handle = {
         let on_change = prop.callback.clone();
         Callback::from(move |input: String|{
-            on_change.emit(SettingValue::new("delay".to_string(), NormalizeDelay::convert_to_num(input), false, String::new()));
+            if input.is_empty() {
+                on_change.emit(Ok(SettingValue::new("delay".to_string(), String::from("0"), false, String::new())));
+            } else {
+                if input.chars().any(|char| !matches!(char, '0'..='9' | '/')) {
+                    on_change.emit(Err(SettingError { field: "delay".to_string(), error: SettingErrorReason::Format("dd/mm o dd".to_string()) }))
+                } else {
+                    on_change.emit(Ok(SettingValue::new("delay".to_string(), NormalizeDelay::convert_to_num(input), false, String::new())));
+                }
+            }
         })
     };
 
     let password_handle = {
         let on_change = prop.callback.clone();
         Callback::from(move |input: String|{
-            on_change.emit(SettingValue::new("password".to_string(), input, false, String::new()));
+            on_change.emit(Ok(SettingValue::new("password".to_string(), input, false, String::new())));
         })
     };
 
@@ -66,7 +74,7 @@ pub fn create_setting(prop: &Props) -> Html {
         Callback::from(move |event: MouseEvent|{
             let input = event.target().unwrap().unchecked_into::<HtmlInputElement>().checked();
             password_abilitated_clone.set(!*password_abilitated_clone);
-            on_change.emit(SettingValue::new("password-abilitated".to_string(), input.to_string(), false, String::new()));
+            on_change.emit(Ok(SettingValue::new("password-abilitated".to_string(), input.to_string(), false, String::new())));
         })
     };
 
@@ -76,7 +84,9 @@ pub fn create_setting(prop: &Props) -> Html {
         Callback::from(move |value: String| {
             if valid_languages.contains(&value) {
                 set_language.emit(value.clone());
-                on_change.emit(SettingValue::new("language".to_string(), value, false, String::new()))
+                on_change.emit(Ok(SettingValue::new("language".to_string(), value, false, String::new())))
+            } else {
+                on_change.emit(Err(SettingError { field: "language".to_string(), error: SettingErrorReason::NonExistent }));
             }
         })
     };

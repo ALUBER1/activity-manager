@@ -1,8 +1,8 @@
 pub struct FormError {
     pub field: String,
-    pub error: ErrorReason
+    pub error: FormErrorReason
 }
 
-pub enum ErrorReason {
+pub enum FormErrorReason {
     Format(String), Empty, Past, Fallback(String)
 }

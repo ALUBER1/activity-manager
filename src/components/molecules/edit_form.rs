@@ -1,7 +1,8 @@
 use std::ops::Deref;
 use gloo::timers::callback::Timeout;
+use i18nrs::yew::use_translation;
 use yew::prelude::*;
-use crate::{components::atoms::{button::Button, edit_input::EditInput, submit_button::SubmitButton}, errors::form_error::{ErrorReason, FormError}};
+use crate::{components::atoms::{button::Button, edit_input::EditInput, submit_button::SubmitButton}, errors::form_error::{FormErrorReason, FormError}};
 use shared::{models::record::Record, style::default_colors::DefaultColors};
 use chrono::{Local, NaiveDate, NaiveTime};
 
@@ -15,6 +16,7 @@ pub struct Props {
 #[function_component(EditForm)]
 pub fn form(props: &Props) -> Html{
     let timer = 3000;
+    let (i18n, _set_language) = use_translation();
 
     let value_state = use_state(||props.record.clone());
     let name_color = use_state(||String::new());
@@ -64,13 +66,13 @@ pub fn form(props: &Props) -> Html{
                         field: "date".to_string(), 
                         error: 
                             if data.date.is_empty() {
-                                ErrorReason::Empty
+                                FormErrorReason::Empty
                             } else if NaiveDate::parse_from_str(&data.date, "%d/%m/%Y").is_err() {
-                                ErrorReason::Format("dd/mm/aaaa".to_string())
+                                FormErrorReason::Format("dd/mm/aaaa".to_string())
                             } else if is_future_date(&data.date) == 0 {
-                                ErrorReason::Past
+                                FormErrorReason::Past
                             } else {
-                                ErrorReason::Fallback(data.date.clone())
+                                FormErrorReason::Fallback(data.date.clone())
                             }
                     }
                 );
@@ -84,7 +86,7 @@ pub fn form(props: &Props) -> Html{
                 error_vec.push(
                     FormError { 
                         field: "name".to_string(), 
-                        error: ErrorReason::Empty
+                        error: FormErrorReason::Empty
                     }
                 );
             }
@@ -99,13 +101,13 @@ pub fn form(props: &Props) -> Html{
                         field: "time".to_string(), 
                         error: 
                             if data.time.is_empty() {
-                                ErrorReason::Empty
+                                FormErrorReason::Empty
                             } else if NaiveTime::parse_from_str(&data.time, "%H:%M").is_err() {
-                                ErrorReason::Format("hh:mm".to_string())
+                                FormErrorReason::Format("hh:mm".to_string())
                             } else if !is_future_time(&data.time, is_future_date(&data.date)) {
-                                ErrorReason::Past
+                                FormErrorReason::Past
                             } else {
-                                ErrorReason::Fallback(data.time.clone())
+                                FormErrorReason::Fallback(data.time.clone())
                             }
                     }
                 );
@@ -122,9 +124,9 @@ pub fn form(props: &Props) -> Html{
     html!{
         <form onsubmit={on_submit} class="edit-form">
             <div class="form-fields">
-                <EditInput name="name" on_change={on_changename} color={(*name_color).clone()} value={(*value_state).name.clone()} />
-                <EditInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()} value={(*value_state).date.clone()} />
-                <EditInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()} value={(*value_state).time.clone()} />
+                <EditInput name={i18n.t("name")} on_change={on_changename} color={(*name_color).clone()} value={(*value_state).name.clone()} />
+                <EditInput name={i18n.t("date")} on_change={on_changedate} color={(*date_color).clone()} value={(*value_state).date.clone()} />
+                <EditInput name={i18n.t("time")} on_change={on_changetime} color={(*time_color).clone()} value={(*value_state).time.clone()} />
             </div>
             <div class="editing-button-container">
                 <SubmitButton id="submit"><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
