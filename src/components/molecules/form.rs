@@ -2,7 +2,7 @@ use std::ops::Deref;
 use gloo::timers::callback::Timeout;
 use i18nrs::yew::use_translation;
 use yew::prelude::*;
-use crate::components::{atoms::{submit_button::SubmitButton, text_input::TextInput}};
+use crate::{components::atoms::{submit_button::SubmitButton, text_input::TextInput}};
 use shared::{models::record::Record as Event, style::default_colors::DefaultColors};
 use chrono::{Local, NaiveDate, NaiveTime};
 
@@ -30,15 +30,17 @@ pub fn form(props: &Props) -> Html{
 
     let on_changedate = {
         let cloned_value = value_state.clone();
-        Callback::from(move |date|{
-            cloned_value.set(Event { date,..cloned_value.deref().clone()});
+        Callback::from(move |date: String|{
+            let date = date.trim();
+            cloned_value.set(Event { date: String::from(date),..cloned_value.deref().clone()});
         })
     };
 
     let on_changetime = {
         let cloned_value = value_state.clone();
-        Callback::from(move |time|{
-            cloned_value.set(Event { time,..cloned_value.deref().clone()});
+        Callback::from(move |time: String|{
+            let time = time.trim();
+            cloned_value.set(Event { time: String::from(time),..cloned_value.deref().clone()});
         })
     };
 
@@ -82,9 +84,9 @@ pub fn form(props: &Props) -> Html{
 
     html!{
         <form onsubmit={on_submit}>
-            <TextInput name={i18n.t("name")} on_change={on_changename} color={(*name_color).clone()} value={""} />
-            <TextInput name={i18n.t("date")} on_change={on_changedate} color={(*date_color).clone()} value={""} />
-            <TextInput name={i18n.t("time")} on_change={on_changetime} color={(*time_color).clone()} value={""} />
+            <TextInput name={i18n.t("name")} on_change={on_changename} color={(*name_color).clone()} />
+            <TextInput name={i18n.t("date")} on_change={on_changedate} color={(*date_color).clone()} />
+            <TextInput name={i18n.t("time")} on_change={on_changetime} color={(*time_color).clone()} />
             <SubmitButton id="submit"><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
         </form>
     }

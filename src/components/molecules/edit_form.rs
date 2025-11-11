@@ -1,7 +1,7 @@
 use std::ops::Deref;
 use gloo::timers::callback::Timeout;
 use yew::prelude::*;
-use crate::components::{atoms::{submit_button::SubmitButton, text_input::TextInput, button::Button}};
+use crate::{components::atoms::{button::Button, edit_input::EditInput, submit_button::SubmitButton}, utils::logger::log};
 use shared::{models::record::Record, style::default_colors::DefaultColors};
 use chrono::{Local, NaiveDate, NaiveTime};
 
@@ -50,51 +50,50 @@ pub fn form(props: &Props) -> Html{
         let time_clone = time_color.clone();
         Callback::from(move |event: SubmitEvent|{
             event.prevent_default();
-            let data = cloned_value.deref().clone();
-            let mut correct = true;
+            let mut data = cloned_value.deref().clone();
             
             if NaiveDate::parse_from_str(&data.date, "%d/%m/%Y").is_err() || is_future_date(&data.date) == 0 {
                 date_clone.set(DefaultColors::INVALID_COLOR.to_string());
-                correct = false;
                 let date_clone = date_clone.clone();
                 Timeout::new(timer, move || {
                     date_clone.set("".to_string());
                 }).forget();
+                data = Record{ date: String::from("!invalid!"), ..data };
             }
             if data.name.is_empty() {
                 name_clone.set(DefaultColors::INVALID_COLOR.to_string());
-                correct = false;
                 let name_clone = name_clone.clone();
                 Timeout::new(timer, move || {
                     name_clone.set("".to_string());
                 }).forget();
+                data = Record{ name: String::from("!invalid!"), ..data };
             }
             if NaiveTime::parse_from_str(&data.time, "%H:%M").is_err() || !is_future_time(&data.time, is_future_date(&data.date)) {
                 time_clone.set(DefaultColors::INVALID_COLOR.to_string());
-                correct = false;
                 let time_clone = time_clone.clone();
                 Timeout::new(timer, move || {
                     time_clone.set("".to_string());
                 }).forget();
+                data = Record{ time: String::from("!invalid!"), ..data };
             }
-            if correct {
-                clone_submit.emit(data);
-            }
+            
+        log("ok", &[]);
+            clone_submit.emit(data);
         })
     };
 
     html!{
-        <>
-            <form onsubmit={on_submit}>
-                <TextInput name="name" on_change={on_changename} color={(*name_color).clone()} value={(*value_state).name.clone()} />
-                <TextInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()} value={(*value_state).date.clone()} />
-                <TextInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()} value={(*value_state).time.clone()} />
-            </form>
+        <form onsubmit={on_submit} class="edit-form">
+            <div class="form-fields">
+                <EditInput name="name" on_change={on_changename} color={(*name_color).clone()} value={(*value_state).name.clone()} />
+                <EditInput name="date (DD/MM/YYYY)" on_change={on_changedate} color={(*date_color).clone()} value={(*value_state).date.clone()} />
+                <EditInput name="time (HH:MM)" on_change={on_changetime} color={(*time_color).clone()} value={(*value_state).time.clone()} />
+            </div>
             <div class="editing-button-container">
                 <SubmitButton id="submit"><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
                 <Button onclick={props.cancel.clone()} id="cancel"><span class="material-symbols-outlined">{"cancel"}</span></Button>
             </div>
-        </>
+        </form>
     }
 }
 

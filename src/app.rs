@@ -89,6 +89,7 @@ pub fn app() -> Html {
     let on_submit = Callback::from(move |record: Record| {
         let mut correct = true;
         let mut vec = (*toast_notifications_clone).clone();
+        log("ok: {$0, $1, $2}", &[&record.name, &record.date, &record.time]);
         
         if record.date.eq("!invalid!") { 
             vec.push(ToastNotificationModel::incorrect_field("date"));
@@ -105,6 +106,7 @@ pub fn app() -> Html {
         toast_notifications_clone.set(vec);
 
         if correct {
+            log("ok: {$0, $1, $2}", &[&record.name, &record.date, &record.time]);
             let record = record.clone();
             let clone_list = clone_list.clone();
             spawn_local(async move{
@@ -135,15 +137,35 @@ pub fn app() -> Html {
         }
     });
 
+    let toast_notifications_clone = toast_notifications.clone();
     let clone_list = record_list.clone();
     let edit_handler = Callback::from(move |record: Record|{
-        let record = record.clone();
-        let clone_list = clone_list.clone();
-        spawn_local(async move {
-            invoke_function_async("update_record", None, Some(record)).await;
-            invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
-            ()
-        });
+        let mut correct = true;
+        let mut vec = (*toast_notifications_clone).clone();
+        log("ok", &[]);
+        if record.date.eq("!invalid!") { 
+            vec.push(ToastNotificationModel::incorrect_field("date"));
+            correct = false;
+        }
+        if record.time.eq("!invalid!") {
+            vec.push(ToastNotificationModel::incorrect_field("time"));
+            correct = false;
+        }
+        if record.name.eq("!invalid!") {
+            vec.push(ToastNotificationModel::incorrect_field("name"));
+            correct = false;
+        }
+        toast_notifications_clone.set(vec);
+
+        if correct {
+            let record = record.clone();
+            let clone_list = clone_list.clone();
+            spawn_local(async move{
+                invoke_function_async("update_record", None, Some(record)).await;
+                invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
+                ()
+            });
+        }
     });
     
     let delay_clone = delay.clone();

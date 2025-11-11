@@ -3,7 +3,7 @@ use yew::{Callback, Html, Properties, function_component, html, use_state};
 
 use shared::models::record::Record;
 
-use crate::components::{atoms::{record_button::RecordButton}, molecules::edit_form::EditForm};
+use crate::{components::{atoms::record_button::RecordButton, molecules::edit_form::EditForm}, utils::logger::log};
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct Props{
@@ -45,6 +45,7 @@ pub fn record_list(records: &Props) -> Html{
         Callback::from(move |mut record: Record| {
             record.uuid = (*editing_clone).clone().unwrap().uuid;
             onclick.emit(record);
+            editing_clone.set(None);
         })
     };
 

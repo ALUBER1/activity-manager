@@ -14,6 +14,6 @@ pub fn button(label: &Props) -> Html {
         onclick.emit(true);
     });
     html!{
-        <button id={label.id.clone()} onclick={handler}>{label.children.clone()}</button>
+        <button id={label.id.clone()} onclick={handler} type="button">{label.children.clone()}</button>
     }
 }

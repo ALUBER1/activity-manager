@@ -4,7 +4,7 @@ use wasm_bindgen::JsCast;
 use web_sys::HtmlElement;
 use yew::{Callback, Html, NodeRef, Properties, function_component, html, use_effect_with, use_state};
 
-use crate::{models::toast_notification_model::ToastNotificationModel, utils::logger::log};
+use crate::{models::toast_notification_model::ToastNotificationModel};
 
 #[derive(PartialEq, Properties)]
 pub struct Props {
@@ -35,7 +35,6 @@ pub fn create_toast_notification(prop: &Props) -> Html {
             let tmp = node.unchecked_into::<HtmlElement>();
             tmp.set_class_name("notification-container");
             visible_clone.set(false);
-            log("visible: $0", &[&(*visible_clone).to_string()]);
         }
     }).forget();
 
@@ -45,7 +44,6 @@ pub fn create_toast_notification(prop: &Props) -> Html {
     use_effect_with(visible.clone(), move |visible|{
         if !**visible {
             Timeout::new(600, move ||{
-                log("deleting: $0", &[&notification.id.to_string()]);
                 delete_callback.emit(notification);
             }).forget();
         }

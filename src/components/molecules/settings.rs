@@ -106,7 +106,7 @@ pub fn create_setting(prop: &Props) -> Html {
                 } /></Setting>
                 <Setting label={i18n.t("abilitated")}><input type="checkbox" onclick={password_abilitated_handle} checked={*password_abilitated} /></Setting>
                 if *password_abilitated {
-                    <Setting label={"password"}><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()} value={""}/></Setting> 
+                    <Setting label={"password"}><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()} /></Setting> 
                 }
                 <Setting label={i18n.t("language")}>
                     <Select selections={valid_languages} onchange={language_handle} selected={i18n.get_current_language().to_string()}/>

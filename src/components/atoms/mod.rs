@@ -9,3 +9,4 @@ pub mod notification_input;
 pub mod password_input;
 pub mod select;
 pub mod toast_notification;
+pub mod edit_input;
