@@ -1,6 +1,5 @@
 use std::{collections::HashMap, sync::Mutex};
 
-use gloo::console::log;
 use i18nrs::{self, yew::I18nProvider};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
@@ -8,8 +7,8 @@ use yew::prelude::*;
 use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar, toast_notifications::ToastNotifications}, models::{setting_value::SettingValue, toast_notification_model::ToastNotificationModel}, utils::{functions::Functions, helper::*}};
 use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
-// #[allow(unused_imports)]
-// use crate::utils::logger::log;
+#[allow(unused_imports)]
+use crate::utils::logger::log;
 
 #[wasm_bindgen(module="/src/js/variable_modify.js")]
 extern "C" {
@@ -181,10 +180,8 @@ pub fn app() -> Html {
         Callback::from(move |notification: ToastNotificationModel| {
             let vec = toast_notifications_mutex.lock();
             if let Ok(mut vec) = vec {
-                log!(format!("vec: {:?}, id: {}", vec, notification.id));
                 vec.retain(|element|{element.id != notification.id});
                 
-                log!(format!("vec after: {:?}, id: {}", vec, notification.id));
                 toast_notifications_clone.set((*vec).clone());
             }
         })
