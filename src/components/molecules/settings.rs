@@ -10,7 +10,7 @@ use crate::{components::atoms::{button::Button, color_picker::ColorPicker, notif
 pub struct Props {
     pub callback: Callback<Result<SettingValue, SettingError>>,
     pub delay: StorageEntry,
-    pub password_abilitated: bool
+    pub password_enabled: bool
 }
 
 #[function_component(Settings)]
@@ -25,11 +25,11 @@ pub fn create_setting(prop: &Props) -> Html {
         ];
 
     let show = use_state(||false);
-    let password_abilitated = use_state(||prop.password_abilitated);
+    let password_enabled = use_state(||prop.password_enabled);
 
-    let password_abilitated_clone = password_abilitated.clone();
-    use_effect_with(prop.password_abilitated, move |abilitated| {
-        password_abilitated_clone.set(*abilitated);
+    let password_enabled_clone = password_enabled.clone();
+    use_effect_with(prop.password_enabled, move |enabled| {
+        password_enabled_clone.set(*enabled);
     });
     
     let listener = {
@@ -68,13 +68,13 @@ pub fn create_setting(prop: &Props) -> Html {
         })
     };
 
-    let password_abilitated_handle = {
+    let password_enabled_handle = {
         let on_change = prop.callback.clone();
-        let password_abilitated_clone = password_abilitated.clone();
+        let password_enabled_clone = password_enabled.clone();
         Callback::from(move |event: MouseEvent|{
             let input = event.target().unwrap().unchecked_into::<HtmlInputElement>().checked();
-            password_abilitated_clone.set(!*password_abilitated_clone);
-            on_change.emit(Ok(SettingValue::new("password-abilitated".to_string(), input.to_string(), false, String::new())));
+            password_enabled_clone.set(!*password_enabled_clone);
+            on_change.emit(Ok(SettingValue::new("password-enabled".to_string(), input.to_string(), false, String::new())));
         })
     };
 
@@ -114,8 +114,8 @@ pub fn create_setting(prop: &Props) -> Html {
                         format!("{}/{}", days, minutes)
                     }
                 } /></Setting>
-                <Setting label={i18n.t("abilitated")}><input type="checkbox" onclick={password_abilitated_handle} checked={*password_abilitated} /></Setting>
-                if *password_abilitated {
+                <Setting label={i18n.t("enabled")}><input type="checkbox" onclick={password_enabled_handle} checked={*password_enabled} /></Setting>
+                if *password_enabled {
                     <Setting label={"password"}><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()} /></Setting> 
                 }
                 <Setting label={i18n.t("language")}>

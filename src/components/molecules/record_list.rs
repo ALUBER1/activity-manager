@@ -70,7 +70,7 @@ pub fn record_list(records: &Props) -> Html{
                                         {": "}
                                         {element.name.clone()}
                                         {", "}
-                                        {i18n.t("date2")}
+                                        {i18n.t("date")}
                                         {": "}
                                         {element.date.clone()}
                                         {", "}

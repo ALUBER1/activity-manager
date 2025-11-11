@@ -1,13 +1,25 @@
 {
     "name": "name",
-    "date": "date (gg/mm/aaaa)",
-    "date2": "date",
+    "date2": "date (dd/mm/aaaa)",
+    "date": "date",
     "time": "time",
+
     "background": "background color",
     "input": "input color",
     "text": "text color",
     "header": "header color",
+
     "delay": "notification delay",
-    "abilitated": "password abilitated",
-    "language": "change language"
+    "enabled": "password enabled",
+    "language": "change language",
+
+    "form_incorrect_field": "incorrect form field",
+    "empty_form_field": "please fill form field",
+    "past_datetime": "please insert a future date time",
+    "incorrect_format": "should have format",
+    "form_fallback": "problem with value",
+
+    "setting_incorrect_field": "incorrect setting field",
+    "empty_setting_field": "please fill setting field",
+    "invalid_setting": "please insert a valid input"
 }

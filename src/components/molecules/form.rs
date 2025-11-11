@@ -124,7 +124,7 @@ pub fn form(props: &Props) -> Html{
     html!{
         <form onsubmit={on_submit}>
             <TextInput name={i18n.t("name")} on_change={on_changename} color={(*name_color).clone()} />
-            <TextInput name={i18n.t("date")} on_change={on_changedate} color={(*date_color).clone()} />
+            <TextInput name={i18n.t("date2")} on_change={on_changedate} color={(*date_color).clone()} />
             <TextInput name={i18n.t("time")} on_change={on_changetime} color={(*time_color).clone()} />
             <SubmitButton id="submit"><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
         </form>

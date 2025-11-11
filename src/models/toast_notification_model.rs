@@ -1,8 +1,10 @@
-use std::cell::Cell;
+use std::{cell::Cell, collections::HashMap};
 
 use chrono::{Local, NaiveTime};
+use i18nrs::{I18n, I18nConfig};
+use shared::utils::normalize::NormalizeDelay;
 
-use crate::errors::{form_error::{FormError, FormErrorReason}, setting_error::{SettingError, SettingErrorReason}};
+use crate::{errors::{form_error::{FormError, FormErrorReason}, setting_error::{SettingError, SettingErrorReason}}};
 
 #[derive(Clone, Debug, Default)]
 pub struct ToastNotificationModel {
@@ -13,30 +15,56 @@ pub struct ToastNotificationModel {
 }
 
 impl ToastNotificationModel {
-    pub fn incorrect_field(error: FormError) -> Self {
+    pub fn incorrect_field(error: FormError, language: &str) -> Self {
+        let translations = HashMap::from([
+            match &*NormalizeDelay::normalize_color(language.to_string()) {
+                "en" => ("en", include_str!("../i18n/en/base.json")),
+                "fr" => ("fr", include_str!("../i18n/fr/base.json")),
+                "it" => ("it", include_str!("../i18n/it/base.json")),
+                _ => ("en", include_str!("../i18n/en/base.json"))
+            }
+        ]);
+
+        let config = I18nConfig {
+            translations: translations.clone()
+        };
+        let i18n = I18n::new(config, translations).unwrap();
         let id = next_id();
         ToastNotificationModel { 
             id: id, 
-            title: format!("incorrect field {}", error.field), 
+            title: format!("{} {}", i18n.t("form_incorrect_field"), i18n.t(&error.field)),
             message: match error.error {
-                FormErrorReason::Empty => format!("please fill form field {}", error.field),
-                FormErrorReason::Past => String::from("please insert a future date time"),
-                FormErrorReason::Format(format) => format!("{} should have format {}", error.field, format),
-                FormErrorReason::Fallback(value) => format!("problem with value {}", value)
+                FormErrorReason::Empty => format!("{} {}", i18n.t("empty_form_field"), i18n.t(&error.field)),
+                FormErrorReason::Past => i18n.t("past_datetime"),
+                FormErrorReason::Format(format) => format!("{} {} {}", error.field, i18n.t("incorrect_format"), format),
+                FormErrorReason::Fallback(value) => format!("{} {}", i18n.t("form_fallback"), value)
             },
             created_at: Local::now().time()
         }
     }
 
-    pub fn incorrect_setting(error: SettingError) -> Self {
+    pub fn incorrect_setting(error: SettingError, language: &str) -> Self {
+        let translations = HashMap::from([
+            match &*NormalizeDelay::normalize_color(language.to_string()) {
+                "en" => ("en", include_str!("../i18n/en/base.json")),
+                "fr" => ("fr", include_str!("../i18n/fr/base.json")),
+                "it" => ("it", include_str!("../i18n/it/base.json")),
+                _ => ("en", include_str!("../i18n/en/base.json"))
+            }
+        ]);
+
+        let config = I18nConfig {
+            translations: translations.clone()
+        };
+        let i18n = I18n::new(config, translations).unwrap();
         let id = next_id();
         ToastNotificationModel { 
             id: id, 
-            title: format!("incorrect field {}", error.field), 
+            title: format!("{} {}", i18n.t("setting_incorrect_field"), i18n.t(&error.field)), 
             message: match error.error {
-                SettingErrorReason::Empty => format!("please fill form field {}", error.field),
-                SettingErrorReason::Format(format) => format!("{} should have format {}", error.field, format),
-                SettingErrorReason::NonExistent => format!("please insert a valid input")
+                SettingErrorReason::Empty => format!("{} {}", i18n.t("empty_setting_field"), i18n.t(&error.field)),
+                SettingErrorReason::Format(format) => format!("{} {} {}", error.field, i18n.t("incorrect_format"), format),
+                SettingErrorReason::NonExistent => i18n.t("invalid_setting")
             },
             created_at: Local::now().time()
         }

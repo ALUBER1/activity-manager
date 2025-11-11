@@ -1,13 +1,25 @@
 {
     "name": "nome",
-    "date": "data (gg/mm/aaaa)",
-    "date2": "data",
+    "date2": "data (gg/mm/aaaa)",
+    "date": "data",
     "time": "orario",
+
     "background": "colore sfondo",
     "input": "colore input",
     "text": "colore testo",
     "header": "colore barra",
+
     "delay": "orario di notifica",
-    "abilitated": "password abilitata",
-    "language": "cambia lingua"
+    "enabled": "password abilitata",
+    "language": "cambia lingua",
+
+    "form_incorrect_field": "campo form sbagliato",
+    "empty_form_field": "inserisci campo form",
+    "past_datetime": "inserisci date e orario non passati",
+    "incorrect_format": "dovrebbe avere formato",
+    "form_fallback": "problema con valore",
+
+    "setting_incorrect_field": "campo impostazioni sbagliato",
+    "empty_setting_field": "inserisci campo impostazioni",
+    "invalid_setting": "inserisci un input corretto"
 }

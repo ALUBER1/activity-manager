@@ -125,7 +125,7 @@ pub fn form(props: &Props) -> Html{
         <form onsubmit={on_submit} class="edit-form">
             <div class="form-fields">
                 <EditInput name={i18n.t("name")} on_change={on_changename} color={(*name_color).clone()} value={(*value_state).name.clone()} />
-                <EditInput name={i18n.t("date")} on_change={on_changedate} color={(*date_color).clone()} value={(*value_state).date.clone()} />
+                <EditInput name={i18n.t("date2")} on_change={on_changedate} color={(*date_color).clone()} value={(*value_state).date.clone()} />
                 <EditInput name={i18n.t("time")} on_change={on_changetime} color={(*time_color).clone()} value={(*value_state).time.clone()} />
             </div>
             <div class="editing-button-container">

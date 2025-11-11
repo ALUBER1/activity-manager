@@ -566,6 +566,11 @@ input[type="checkbox"] {
 
 .notification-title {
   border-bottom: 1px solid var(--text-color);
+  height: 28px;
+  font-size: 1.1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .notification-progress {
@@ -577,7 +582,7 @@ input[type="checkbox"] {
 
 .notification-content {
   width: 100%;
-  height: calc(100% - 31px);
+  height: calc(100% - 28px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
