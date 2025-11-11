@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Mutex};
 
 use gloo::console::log;
 use i18nrs::{self, yew::I18nProvider};
@@ -175,14 +175,18 @@ pub fn app() -> Html {
     });
     
     let toast_delete_callback = {
+        let toast_notifications_mutex = Mutex::new((*toast_notifications).clone());
         let toast_notifications_clone = toast_notifications.clone();
+
         Callback::from(move |notification: ToastNotificationModel| {
-            let mut vec = (*toast_notifications_clone).clone();
-            log!(format!("vec: {:?}, id: {}", vec, notification.id));
-            vec.retain(|element|{element.id != notification.id});
-            
-            log!(format!("vec after: {:?}, id: {}", vec, notification.id));
-            toast_notifications_clone.set(vec);
+            let vec = toast_notifications_mutex.lock();
+            if let Ok(mut vec) = vec {
+                log!(format!("vec: {:?}, id: {}", vec, notification.id));
+                vec.retain(|element|{element.id != notification.id});
+                
+                log!(format!("vec after: {:?}, id: {}", vec, notification.id));
+                toast_notifications_clone.set((*vec).clone());
+            }
         })
     };
 

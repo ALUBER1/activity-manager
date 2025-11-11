@@ -1,3 +1,4 @@
+use chrono::{Duration, Local};
 use gloo::timers::callback::Timeout;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlElement;
@@ -25,24 +26,26 @@ pub fn create_toast_notification(prop: &Props) -> Html {
         }
     });
 
-    let notification = prop.notification.clone();
     let toast_clone: NodeRef = toast.clone();
     let visible_clone = visible.clone();
-    Timeout::new(5600, move||{
+    let timeout = Duration::milliseconds(5600) - (Local::now().time() - prop.notification.created_at);
+
+    Timeout::new(timeout.num_milliseconds().max(0) as u32, move||{
         if let Some(node) = toast_clone.get() {
-            log("deleting toast: $0", &[&notification.id.to_string()]);
             let tmp = node.unchecked_into::<HtmlElement>();
             tmp.set_class_name("notification-container");
             visible_clone.set(false);
+            log("visible: $0", &[&(*visible_clone).to_string()]);
         }
     }).forget();
+
 
     let notification = prop.notification.clone();
     let delete_callback = prop.delete_callback.clone();
     use_effect_with(visible.clone(), move |visible|{
         if !**visible {
-            log("deleting: $0", &[&notification.id.to_string()]);
             Timeout::new(600, move ||{
+                log("deleting: $0", &[&notification.id.to_string()]);
                 delete_callback.emit(notification);
             }).forget();
         }

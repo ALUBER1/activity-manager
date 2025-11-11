@@ -1,6 +1,6 @@
 use yew::{Callback, Html, Properties, function_component, html};
 
-use crate::{components::atoms::toast_notification::ToastNotification, models::toast_notification_model::ToastNotificationModel, utils::logger::log};
+use crate::{components::atoms::toast_notification::ToastNotification, models::toast_notification_model::ToastNotificationModel};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
@@ -23,9 +23,10 @@ pub fn create_toast_notifications(prop: &Props) -> Html {
                 {
                     prop.notifications.clone()
                         .into_iter()
+                        .rev()
                         .map(|element|{
                             html!{
-                                <ToastNotification notification={element} delete_callback={delete_handler.clone()} />
+                                <ToastNotification key={element.id} notification={element.clone()} delete_callback={delete_handler.clone()} />
                             }
                         }
                     ).collect::<Html>()
