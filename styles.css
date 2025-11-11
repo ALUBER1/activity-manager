@@ -530,7 +530,7 @@ input[type="checkbox"] {
   right: 0px;
   bottom: 0px;
   width: 40%;
-  height: 70%;
+  height: calc(100% - var(--head-height));
   display: flex;
   flex-direction: column;
   justify-content: end;
@@ -546,7 +546,7 @@ input[type="checkbox"] {
   transform: translate(calc(100% + 10px));
   flex-shrink: 0;
   width: calc(100% - 10px);
-  height: 30%;
+  height: 20%;
   border-radius: 10px;
   background-color: var(--head-background-color);
   border: 1px solid var(--text-color);

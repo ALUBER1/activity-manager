@@ -2,6 +2,8 @@ use std::cell::Cell;
 
 use chrono::{Local, NaiveTime};
 
+use crate::errors::form_error::{ErrorReason, FormError};
+
 #[derive(Clone, Debug, Default)]
 pub struct ToastNotificationModel {
     pub id: usize,
@@ -11,16 +13,16 @@ pub struct ToastNotificationModel {
 }
 
 impl ToastNotificationModel {
-    pub fn incorrect_field(field: &str) -> Self {
+    pub fn incorrect_field(error: FormError) -> Self {
         let id = next_id();
         ToastNotificationModel { 
             id: id, 
-            title: format!("incorrect field {}", field), 
-            message: match field {
-                "date" => String::from(format!("date should have format dd/mm/aaaa {}", id)),
-                "time" => String::from(format!("time should have format hh:mm {}", id)),
-                "name" => String::from(format!("please fill all form fields {}", id)),
-                _ => String::from("error")
+            title: format!("incorrect field {}", error.field), 
+            message: match error.error {
+                ErrorReason::Empty => format!("please fill form field {}", error.field),
+                ErrorReason::Past => String::from("please insert a future date time"),
+                ErrorReason::Format(format) => format!("{} should have format {}", error.field, format),
+                ErrorReason::Fallback(value) => format!("problem with value: {}", value)
             },
             created_at: Local::now().time()
         }

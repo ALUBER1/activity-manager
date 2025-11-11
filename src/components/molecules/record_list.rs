@@ -3,13 +3,13 @@ use yew::{Callback, Html, Properties, function_component, html, use_state};
 
 use shared::models::record::Record;
 
-use crate::{components::{atoms::record_button::RecordButton, molecules::edit_form::EditForm}, utils::logger::log};
+use crate::{components::{atoms::record_button::RecordButton, molecules::edit_form::EditForm}, errors::form_error::FormError};
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct Props{
     pub list: Vec<Record>,
     pub delete_callback: Callback<Record>,
-    pub edit_callback: Callback<Record>
+    pub edit_callback: Callback<Result<Record, Vec<FormError>>>
 }
 
 #[function_component(RecordList)]
@@ -42,10 +42,12 @@ pub fn record_list(records: &Props) -> Html{
     let submit_handler = {
         let editing_clone = editing.clone();
         let onclick = records.edit_callback.clone();
-        Callback::from(move |mut record: Record| {
-            record.uuid = (*editing_clone).clone().unwrap().uuid;
+        Callback::from(move |mut record: Result<Record, Vec<FormError>>| {
+            if let Ok(record) = record.as_mut() {
+                record.uuid = (*editing_clone).clone().unwrap().uuid;
+                editing_clone.set(None);
+            }
             onclick.emit(record);
-            editing_clone.set(None);
         })
     };
 

@@ -1,13 +1,13 @@
 use std::ops::Deref;
 use gloo::timers::callback::Timeout;
 use yew::prelude::*;
-use crate::{components::atoms::{button::Button, edit_input::EditInput, submit_button::SubmitButton}, utils::logger::log};
+use crate::{components::atoms::{button::Button, edit_input::EditInput, submit_button::SubmitButton}, errors::form_error::{ErrorReason, FormError}};
 use shared::{models::record::Record, style::default_colors::DefaultColors};
 use chrono::{Local, NaiveDate, NaiveTime};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
-    pub on_submit: Callback<Record>,
+    pub on_submit: Callback<Result<Record, Vec<FormError>>>,
     pub cancel: Callback<bool>,
     pub record: Record
 }
@@ -50,7 +50,8 @@ pub fn form(props: &Props) -> Html{
         let time_clone = time_color.clone();
         Callback::from(move |event: SubmitEvent|{
             event.prevent_default();
-            let mut data = cloned_value.deref().clone();
+            let data = cloned_value.deref().clone();
+            let mut error_vec: Vec<FormError> = vec![];
             
             if NaiveDate::parse_from_str(&data.date, "%d/%m/%Y").is_err() || is_future_date(&data.date) == 0 {
                 date_clone.set(DefaultColors::INVALID_COLOR.to_string());
@@ -58,7 +59,21 @@ pub fn form(props: &Props) -> Html{
                 Timeout::new(timer, move || {
                     date_clone.set("".to_string());
                 }).forget();
-                data = Record{ date: String::from("!invalid!"), ..data };
+                error_vec.push(
+                    FormError { 
+                        field: "date".to_string(), 
+                        error: 
+                            if data.date.is_empty() {
+                                ErrorReason::Empty
+                            } else if NaiveDate::parse_from_str(&data.date, "%d/%m/%Y").is_err() {
+                                ErrorReason::Format("dd/mm/aaaa".to_string())
+                            } else if is_future_date(&data.date) == 0 {
+                                ErrorReason::Past
+                            } else {
+                                ErrorReason::Fallback(data.date.clone())
+                            }
+                    }
+                );
             }
             if data.name.is_empty() {
                 name_clone.set(DefaultColors::INVALID_COLOR.to_string());
@@ -66,7 +81,12 @@ pub fn form(props: &Props) -> Html{
                 Timeout::new(timer, move || {
                     name_clone.set("".to_string());
                 }).forget();
-                data = Record{ name: String::from("!invalid!"), ..data };
+                error_vec.push(
+                    FormError { 
+                        field: "name".to_string(), 
+                        error: ErrorReason::Empty
+                    }
+                );
             }
             if NaiveTime::parse_from_str(&data.time, "%H:%M").is_err() || !is_future_time(&data.time, is_future_date(&data.date)) {
                 time_clone.set(DefaultColors::INVALID_COLOR.to_string());
@@ -74,11 +94,28 @@ pub fn form(props: &Props) -> Html{
                 Timeout::new(timer, move || {
                     time_clone.set("".to_string());
                 }).forget();
-                data = Record{ time: String::from("!invalid!"), ..data };
+                error_vec.push(
+                    FormError { 
+                        field: "time".to_string(), 
+                        error: 
+                            if data.time.is_empty() {
+                                ErrorReason::Empty
+                            } else if NaiveTime::parse_from_str(&data.time, "%H:%M").is_err() {
+                                ErrorReason::Format("hh:mm".to_string())
+                            } else if !is_future_time(&data.time, is_future_date(&data.date)) {
+                                ErrorReason::Past
+                            } else {
+                                ErrorReason::Fallback(data.time.clone())
+                            }
+                    }
+                );
             }
             
-        log("ok", &[]);
-            clone_submit.emit(data);
+            if error_vec.len() == 0 {
+                clone_submit.emit(Ok(data));
+            } else {
+                clone_submit.emit(Err(error_vec))
+            }
         })
     };
 

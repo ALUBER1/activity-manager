@@ -4,7 +4,7 @@ use i18nrs::{self, yew::I18nProvider};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar, toast_notifications::ToastNotifications}, models::{setting_value::SettingValue, toast_notification_model::ToastNotificationModel}, utils::{functions::Functions, helper::*}};
+use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar, toast_notifications::ToastNotifications}, errors::form_error::FormError, models::{setting_value::SettingValue, toast_notification_model::ToastNotificationModel}, utils::{functions::Functions, helper::*}};
 use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
 #[allow(unused_imports)]
@@ -86,27 +86,15 @@ pub fn app() -> Html {
     
     let toast_notifications_clone = toast_notifications.clone();
     let clone_list = record_list.clone();
-    let on_submit = Callback::from(move |record: Record| {
-        let mut correct = true;
-        let mut vec = (*toast_notifications_clone).clone();
-        log("ok: {$0, $1, $2}", &[&record.name, &record.date, &record.time]);
+    let on_submit = Callback::from(move |record: Result<Record, Vec<FormError>>| {
         
-        if record.date.eq("!invalid!") { 
-            vec.push(ToastNotificationModel::incorrect_field("date"));
-            correct = false;
-        }
-        if record.time.eq("!invalid!") {
-            vec.push(ToastNotificationModel::incorrect_field("time"));
-            correct = false;
-        }
-        if record.name.eq("!invalid!") {
-            vec.push(ToastNotificationModel::incorrect_field("name"));
-            correct = false;
-        }
-        toast_notifications_clone.set(vec);
-
-        if correct {
-            log("ok: {$0, $1, $2}", &[&record.name, &record.date, &record.time]);
+        if let Err(errors) = record {
+            let mut vec = (*toast_notifications_clone).clone();
+            for i in errors {
+                vec.push(ToastNotificationModel::incorrect_field(i));
+            }
+            toast_notifications_clone.set(vec);
+        } else if let Ok(record) = record {
             let record = record.clone();
             let clone_list = clone_list.clone();
             spawn_local(async move{
@@ -139,25 +127,14 @@ pub fn app() -> Html {
 
     let toast_notifications_clone = toast_notifications.clone();
     let clone_list = record_list.clone();
-    let edit_handler = Callback::from(move |record: Record|{
-        let mut correct = true;
-        let mut vec = (*toast_notifications_clone).clone();
-        log("ok", &[]);
-        if record.date.eq("!invalid!") { 
-            vec.push(ToastNotificationModel::incorrect_field("date"));
-            correct = false;
-        }
-        if record.time.eq("!invalid!") {
-            vec.push(ToastNotificationModel::incorrect_field("time"));
-            correct = false;
-        }
-        if record.name.eq("!invalid!") {
-            vec.push(ToastNotificationModel::incorrect_field("name"));
-            correct = false;
-        }
-        toast_notifications_clone.set(vec);
-
-        if correct {
+    let edit_handler = Callback::from(move |record: Result<Record, Vec<FormError>>|{
+        if let Err(errors) = record {
+            let mut vec = (*toast_notifications_clone).clone();
+            for i in errors {
+                vec.push(ToastNotificationModel::incorrect_field(i));
+            }
+            toast_notifications_clone.set(vec);
+        } else if let Ok(record) = record {
             let record = record.clone();
             let clone_list = clone_list.clone();
             spawn_local(async move{
