@@ -6,6 +6,7 @@
   --head-background-color: #272727;
   --input-background-color: #313131;
   --head-height: 52.5px;
+  --invalid-color: #cc0b0b;
 }
 
 input[type= "text"],
@@ -549,12 +550,32 @@ input[type="checkbox"] {
   border: 1px solid var(--text-color);
   margin-bottom: 10px;
   margin-right: 10px;
+  overflow-x: hidden;
 }
 
 .slide-in {
   transform: translate(0%);
+
+  & > .notification-content > .notification-progress {
+    width: 100%;
+  }
 }
 
 .notification-title {
   border-bottom: 1px solid var(--text-color);
+}
+
+.notification-progress {
+  background-color: var(--invalid-color);
+  transition: width 5000ms linear;
+  height: 5px;
+  width: 0%;
+}
+
+.notification-content {
+  width: 100%;
+  height: calc(100% - 31px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }

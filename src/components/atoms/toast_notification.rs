@@ -3,7 +3,7 @@ use wasm_bindgen::JsCast;
 use web_sys::HtmlElement;
 use yew::{Callback, Html, NodeRef, Properties, function_component, html, use_effect_with, use_state};
 
-use crate::{models::toast_notification_model::ToastNotificationModel};
+use crate::{models::toast_notification_model::ToastNotificationModel, utils::logger::log};
 
 #[derive(PartialEq, Properties)]
 pub struct Props {
@@ -25,10 +25,12 @@ pub fn create_toast_notification(prop: &Props) -> Html {
         }
     });
 
+    let notification = prop.notification.clone();
     let toast_clone: NodeRef = toast.clone();
     let visible_clone = visible.clone();
-    Timeout::new(5000, move||{
+    Timeout::new(5600, move||{
         if let Some(node) = toast_clone.get() {
+            log("deleting toast: $0", &[&notification.id.to_string()]);
             let tmp = node.unchecked_into::<HtmlElement>();
             tmp.set_class_name("notification-container");
             visible_clone.set(false);
@@ -39,6 +41,7 @@ pub fn create_toast_notification(prop: &Props) -> Html {
     let delete_callback = prop.delete_callback.clone();
     use_effect_with(visible.clone(), move |visible|{
         if !**visible {
+            log("deleting: $0", &[&notification.id.to_string()]);
             Timeout::new(600, move ||{
                 delete_callback.emit(notification);
             }).forget();
@@ -48,8 +51,10 @@ pub fn create_toast_notification(prop: &Props) -> Html {
     html!{
         <div class="notification-container" ref={toast}>
             <p class="notification-title">{prop.notification.title.clone()}</p>
-            <p class="notification-message">{prop.notification.message.clone()}</p>
-            <div class="notification-progress" />
+            <div class="notification-content">
+                <p class="notification-message">{prop.notification.message.clone()}</p>
+                <div class="notification-progress" />
+            </div>
         </div>
     }
 }
