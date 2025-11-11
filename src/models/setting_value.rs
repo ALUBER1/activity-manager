@@ -5,18 +5,28 @@ pub struct SettingValue {
     pub setting: String,
     pub value: String,
     pub index: String,
-    pub from_color_picker: bool
+    pub from_color_picker: bool,
 }
 
 impl SettingValue {
     pub fn new(setting: String, value: String, picker: bool, index: String) -> Self {
-        SettingValue { setting, value, from_color_picker: picker, index }
+        SettingValue {
+            setting,
+            value,
+            from_color_picker: picker,
+            index,
+        }
     }
 
     pub fn deserialize(input: String) -> Self {
         let mut splits = input.split("#");
 
-        SettingValue { setting: splits.nth(0).unwrap().to_string(), value: splits.nth(0).unwrap().to_string(), from_color_picker: true, index: splits.nth(0).unwrap().to_string() }
+        SettingValue {
+            setting: splits.nth(0).unwrap().to_string(),
+            value: splits.nth(0).unwrap().to_string(),
+            from_color_picker: true,
+            index: splits.nth(0).unwrap().to_string(),
+        }
     }
 
     pub fn serialize(&self) -> String {
@@ -24,6 +34,11 @@ impl SettingValue {
     }
 
     pub fn from(input: StorageEntry) -> Self {
-        SettingValue { setting: input.key, value: NormalizeDelay::normalize_color(input.value), index: String::from("0"), from_color_picker: false }
+        SettingValue {
+            setting: input.key,
+            value: NormalizeDelay::normalize_color(input.value),
+            index: String::from("0"),
+            from_color_picker: false,
+        }
     }
 }

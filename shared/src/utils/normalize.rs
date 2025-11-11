@@ -4,33 +4,34 @@ pub struct NormalizeDelay;
 
 impl NormalizeDelay {
     pub fn normalize(value: String) -> i64 {
-        if value.is_empty() {return 0_i64;}
-        let vec = value.split(":")
-            .collect::<Vec<&str>>();
+        if value.is_empty() {
+            return 0_i64;
+        }
+        let vec = value.split(":").collect::<Vec<&str>>();
         if vec.len() == 1 {
             return vec[0].parse::<i64>().unwrap();
         }
 
-        vec[1].replace("\"", "")
+        vec[1]
+            .replace("\"", "")
             .replace("}", "")
             .parse::<i64>()
             .unwrap()
     }
 
     pub fn normalize_color(value: String) -> String {
-        if value.is_empty() {return String::new();}
-        let vec = value.split(":")
-            .collect::<Vec<&str>>();
+        if value.is_empty() {
+            return String::new();
+        }
+        let vec = value.split(":").collect::<Vec<&str>>();
         if vec.len() == 1 {
             return vec[0].to_string();
         }
-        vec[1].replace("\"", "")
-            .replace("}", "")
-            .replace("\\", "")
+        vec[1].replace("\"", "").replace("}", "").replace("\\", "")
     }
 
     pub fn convert_to_num(input: String) -> String {
-        if !input.chars().any(|c|{c.is_alphabetic()}) {
+        if !input.chars().any(|c| c.is_alphabetic()) {
             let mut split = input.split("/");
             if let Some(days) = split.nth(0) {
                 let days_num: u64 = days.parse::<u64>().unwrap();

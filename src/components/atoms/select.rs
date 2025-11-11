@@ -1,21 +1,24 @@
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
-use yew::{Callback, Event, Html, Properties, function_component, html};
+use yew::{function_component, html, Callback, Event, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub selections: Vec<String>,
     pub onchange: Callback<String>,
-    pub selected: String
+    pub selected: String,
 }
 
 #[function_component(Select)]
 pub fn create_select(prop: &Props) -> Html {
-
     let onchange = {
         let callback = prop.onchange.clone();
         Callback::from(move |e: Event| {
-            let value = e.target().unwrap().unchecked_into::<HtmlInputElement>().value();
+            let value = e
+                .target()
+                .unwrap()
+                .unchecked_into::<HtmlInputElement>()
+                .value();
             callback.emit(value);
         })
     };

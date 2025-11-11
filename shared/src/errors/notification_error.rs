@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NotificationError {
-    pub message: String
+    pub message: String,
 }
 
 impl fmt::Display for NotificationError {

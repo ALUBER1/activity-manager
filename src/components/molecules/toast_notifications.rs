@@ -1,12 +1,15 @@
 use chrono::{Duration, Local};
-use yew::{Callback, Html, Properties, function_component, html};
+use yew::{function_component, html, Callback, Html, Properties};
 
-use crate::{components::atoms::toast_notification::ToastNotification, models::toast_notification_model::ToastNotificationModel};
+use crate::{
+    components::atoms::toast_notification::ToastNotification,
+    models::toast_notification_model::ToastNotificationModel,
+};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub notifications: Vec<ToastNotificationModel>,
-    pub delete_callback: Callback<ToastNotificationModel>
+    pub delete_callback: Callback<ToastNotificationModel>,
 }
 
 #[function_component(ToastNotifications)]
@@ -18,7 +21,7 @@ pub fn create_toast_notifications(prop: &Props) -> Html {
         })
     };
 
-    html!{
+    html! {
         if prop.notifications.len() != 0 {
             <div class="notifications-container" >
                 {

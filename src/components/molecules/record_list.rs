@@ -1,33 +1,36 @@
 use i18nrs::yew::use_translation;
-use yew::{Callback, Html, Properties, function_component, html, use_state};
+use yew::{function_component, html, use_state, Callback, Html, Properties};
 
 use shared::models::record::Record;
 
-use crate::{components::{atoms::record_button::RecordButton, molecules::edit_form::EditForm}, errors::form_error::FormError};
+use crate::{
+    components::{atoms::record_button::RecordButton, molecules::edit_form::EditForm},
+    errors::form_error::FormError,
+};
 
 #[derive(Properties, PartialEq, Clone)]
-pub struct Props{
+pub struct Props {
     pub list: Vec<Record>,
     pub delete_callback: Callback<Record>,
-    pub edit_callback: Callback<Result<Record, Vec<FormError>>>
+    pub edit_callback: Callback<Result<Record, Vec<FormError>>>,
 }
 
 #[function_component(RecordList)]
-pub fn record_list(records: &Props) -> Html{
+pub fn record_list(records: &Props) -> Html {
     let (i18n, _set_language) = use_translation();
 
-    let editing = use_state(||None::<Record>);
+    let editing = use_state(|| None::<Record>);
 
     let delete_handler = {
         let onclick = records.delete_callback.clone();
-        Callback::from(move |a: Record|{
+        Callback::from(move |a: Record| {
             onclick.emit(a);
         })
     };
 
     let edit_handler = {
         let editing_clone = editing.clone();
-        Callback::from(move |a: Record|{
+        Callback::from(move |a: Record| {
             editing_clone.set(Some(a));
         })
     };
@@ -38,7 +41,7 @@ pub fn record_list(records: &Props) -> Html{
             editing_clone.set(None);
         })
     };
-    
+
     let submit_handler = {
         let editing_clone = editing.clone();
         let onclick = records.edit_callback.clone();
@@ -51,7 +54,7 @@ pub fn record_list(records: &Props) -> Html{
         })
     };
 
-    html!{
+    html! {
         <>
             if let Some(record) = (*editing).clone() {
                 <div class="editing-panel">
