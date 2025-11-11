@@ -5,8 +5,8 @@ pub enum Functions {
     Close,
     Minimize,
     Maximize,
-    Tray
-} 
+    Tray,
+}
 
 impl fmt::Display for Functions {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {

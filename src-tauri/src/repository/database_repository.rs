@@ -77,7 +77,6 @@ impl Database {
     }
 
     pub fn update_record(&mut self, record: Record) -> Result<(), Error> {
-        println!("uuid: {}", record.uuid);
         match self.conn.execute(
             "UPDATE events SET name=?1, date=?2, time=?3, notified_at=?5 WHERE uuid = ?4",
             [

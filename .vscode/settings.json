@@ -2,6 +2,7 @@
   "emmet.includeLanguages": {
     "rust": "html"
   },
+  "editor.formatOnSave": true,
   "C_Cpp_Runner.cCompilerPath": "clang",
   "C_Cpp_Runner.cppCompilerPath": "clang++",
   "C_Cpp_Runner.debuggerPath": "lldb",

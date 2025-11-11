@@ -1,7 +1,8 @@
 pub mod app;
 pub mod components;
-pub mod utils;
+pub mod errors;
 pub mod models;
+pub mod utils;
 
 use app::App;
 

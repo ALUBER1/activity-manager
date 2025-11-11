@@ -7,9 +7,10 @@ pub struct Props {
     pub name: String,
     pub on_change: Callback<String>,
     pub color: String,
+    pub value: String,
 }
 
-#[function_component(TextInput)]
+#[function_component(EditInput)]
 pub fn text_input(props: &Props) -> Html {
     let onchange = {
         let on_changecall = props.on_change.clone();
@@ -24,6 +25,6 @@ pub fn text_input(props: &Props) -> Html {
     };
 
     html! {
-        <input type="text" autocomplete = "off" name = {props.name.clone()} placeholder = {props.name.clone()} onchange = {onchange} style = {format!("background-color: {}", props.color.clone())} />
+        <input type="text" autocomplete = "off" name = {props.name.clone()} placeholder = {props.name.clone()} onchange = {onchange} style = {format!("background-color: {}", props.color.clone())} value={props.value.clone()} />
     }
 }

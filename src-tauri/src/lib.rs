@@ -6,7 +6,9 @@ pub mod service;
 
 use crate::repository::{database_repository::Database, storage_repository::StorageRepository};
 use rand::RngCore;
-use service::{database_service::*, notification_service::*, storage_service::*, stronghold_service::*};
+use service::{
+    database_service::*, notification_service::*, storage_service::*, stronghold_service::*,
+};
 use std::{fs, io::Write, sync::Mutex};
 use tauri::{
     menu::{Menu, MenuItem},
@@ -79,7 +81,6 @@ pub fn run() {
             store_password
         ])
         .setup(|app| {
-
             let salt_path = app
                 .path()
                 .app_data_dir()
@@ -94,7 +95,7 @@ pub fn run() {
                 let mut file = fs::File::create(&salt_path)?;
                 file.write_all(&salt)?;
             }
-            
+
             app.handle()
                 .plugin(tauri_plugin_stronghold::Builder::with_argon2(&salt_path).build())?;
 

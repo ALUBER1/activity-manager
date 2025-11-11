@@ -9,8 +9,8 @@ pub fn auto_new(input: TokenStream) -> TokenStream {
 
     if let syn::Data::Struct(strc) = &ast.data {
         if let syn::Fields::Named(field) = &strc.fields {
-            let field_names = field.named.iter().map(|f|{&f.ident});
-            let field_type = field.named.iter().map(|f|{&f.ty});
+            let field_names = field.named.iter().map(|f| &f.ident);
+            let field_type = field.named.iter().map(|f| &f.ty);
 
             let field_names_clone = field_names.clone();
 

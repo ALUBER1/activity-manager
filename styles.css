@@ -6,6 +6,7 @@
   --head-background-color: #272727;
   --input-background-color: #313131;
   --head-height: 52.5px;
+  --invalid-color: #cc0b0b;
 }
 
 input[type= "text"],
@@ -455,7 +456,7 @@ input[type="checkbox"] {
   display: flex;
   flex-direction: row;
   width: fit-content;
-  height: 100%;
+  height: 115px;
   justify-content: space-between; 
 
   & > button {
@@ -468,15 +469,15 @@ input[type="checkbox"] {
 }
 
 .editing-form-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  height: 115px;
+  height: 50%;
 
   & > form {
     display: flex;
-    flex-direction: column;
-    width: 50%;
+    flex-direction: row;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
     & > input:first-child {
       margin-top: 0px;
     }
@@ -522,4 +523,79 @@ input[type="checkbox"] {
   left: 78%;
   transition: transform 350ms ease;
   z-index: 100;
+}
+
+.notifications-container {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  width: 40%;
+  height: calc(100% - var(--head-height));
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.notification-container {
+  -webkit-transition-duration: 600ms;
+  transition-duration: 600ms;
+  transform: translate(calc(100% + 10px));
+  flex-shrink: 0;
+  width: calc(100% - 10px);
+  height: 20%;
+  border-radius: 10px;
+  background-color: var(--head-background-color);
+  border: 1px solid var(--text-color);
+  margin-bottom: 10px;
+  margin-right: 10px;
+  overflow-x: hidden;
+  pointer-events: all;
+}
+
+.slide-in {
+  transform: translate(0%);
+
+  & > .notification-content > .notification-progress {
+    width: 100%;
+  }
+}
+
+.notification-title {
+  border-bottom: 1px solid var(--text-color);
+  height: 28px;
+  font-size: 1.1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notification-progress {
+  background-color: var(--invalid-color);
+  transition: width 5000ms linear;
+  height: 5px;
+  width: 0%;
+}
+
+.notification-content {
+  width: 100%;
+  height: calc(100% - 28px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 40%;
+  height: fit-content;
+
+  & > input:first-child {
+    margin-top: 0px;
+  }
 }

@@ -1,18 +1,32 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Mutex};
 
+use crate::{
+    components::molecules::{
+        form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings,
+        title_bar::TitleBar, toast_notifications::ToastNotifications,
+    },
+    errors::{form_error::FormError, setting_error::SettingError},
+    models::{setting_value::SettingValue, toast_notification_model::ToastNotificationModel},
+    utils::{functions::Functions, helper::*},
+};
 use i18nrs::{self, yew::I18nProvider};
+use shared::{
+    models::{record::Record, storage_entry::StorageEntry},
+    utils::normalize::NormalizeDelay,
+};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use crate::{components::molecules::{form::Form, password_screen::PasswordScreen, record_list::RecordList, settings::Settings, title_bar::TitleBar}, models::setting_value::SettingValue, utils::{functions::Functions, helper::*}};
-use shared::{models::{record::Record, storage_entry::StorageEntry}, utils::normalize::NormalizeDelay};
 
-#[wasm_bindgen(module="/src/js/variable_modify.js")]
+#[allow(unused_imports)]
+use crate::utils::logger::log;
+
+#[wasm_bindgen(module = "/src/js/variable_modify.js")]
 extern "C" {
     fn change_background(input: &str);
 }
 
-#[wasm_bindgen(module="/src/js/pickr.mjs")]
+#[wasm_bindgen(module = "/src/js/pickr.mjs")]
 extern "C" {
     pub fn init_pickr(id: String, def: String);
 }
@@ -22,40 +36,88 @@ pub fn app() -> Html {
     let translations = HashMap::from([
         ("it", include_str!("./i18n/it/base.json")),
         ("en", include_str!("./i18n/en/base.json")),
-        ("fr", include_str!("./i18n/fr/base.json"))
+        ("fr", include_str!("./i18n/fr/base.json")),
     ]);
-    
-    let record_list: UseStateHandle<Vec<Record>> = use_state(||Vec::new());
-    let delay = use_state(||StorageEntry::default());
-    let temp = use_state(||StorageEntry::default());
-    let password_abilitated = use_state(||StorageEntry::default());
-    let language = use_state(||StorageEntry::default());
-    
+
+    let record_list: UseStateHandle<Vec<Record>> = use_state(|| Vec::new());
+    let delay = use_state(|| StorageEntry::default());
+    let temp = use_state(|| StorageEntry::default());
+    let password_enabled = use_state(|| StorageEntry::default());
+    let language = use_state(|| StorageEntry::default());
+    let toast_notifications: UseStateHandle<Vec<ToastNotificationModel>> = use_state(|| Vec::new());
+
     let clone_list = record_list.clone();
     let delay_clone = delay.clone();
     let temp_clone = temp.clone();
-    let password_abilitated_clone = password_abilitated.clone();
+    let password_enabled_clone = password_enabled.clone();
     let language_clone = language.clone();
-    
-    use_effect_with((), move |_|{
+
+    use_effect_with((), move |_| {
         spawn_local(async move {
             invoke_function_async("create_database", None, None).await;
-            invoke_function_async("initialize_database", None, None).await;  
+            invoke_function_async("initialize_database", None, None).await;
             invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
             invoke_function("notification_loop", None, None);
 
-            invoke_function_store("get_storage", Some(delay_clone.clone()), Some(StorageEntry::new_delay(String::new()))).await;
-            invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("text-color".to_string(), String::new()))).await;
-            invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("background-color".to_string(), String::new()))).await;
-            invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("input-background-color".to_string(), String::new()))).await;
-            invoke_function_store("get_storage", Some(temp_clone.clone()), Some(StorageEntry::new("head-background-color".to_string(), String::new()))).await;
-            invoke_function_store("get_storage", Some(password_abilitated_clone.clone()), Some(StorageEntry::new("password-abilitated".to_string(), String::new()))).await;
-            invoke_function_store("get_storage", Some(language_clone.clone()), Some(StorageEntry::new("password-abilitated".to_string(), String::new()))).await;
+            invoke_function_store(
+                "get_storage",
+                Some(delay_clone.clone()),
+                Some(StorageEntry::new_delay(String::new())),
+            )
+            .await;
+            invoke_function_store(
+                "get_storage",
+                Some(temp_clone.clone()),
+                Some(StorageEntry::new("text-color".to_string(), String::new())),
+            )
+            .await;
+            invoke_function_store(
+                "get_storage",
+                Some(temp_clone.clone()),
+                Some(StorageEntry::new(
+                    "background-color".to_string(),
+                    String::new(),
+                )),
+            )
+            .await;
+            invoke_function_store(
+                "get_storage",
+                Some(temp_clone.clone()),
+                Some(StorageEntry::new(
+                    "input-background-color".to_string(),
+                    String::new(),
+                )),
+            )
+            .await;
+            invoke_function_store(
+                "get_storage",
+                Some(temp_clone.clone()),
+                Some(StorageEntry::new(
+                    "head-background-color".to_string(),
+                    String::new(),
+                )),
+            )
+            .await;
+            invoke_function_store(
+                "get_storage",
+                Some(password_enabled_clone.clone()),
+                Some(StorageEntry::new(
+                    "password-enabled".to_string(),
+                    String::new(),
+                )),
+            )
+            .await;
+            invoke_function_store(
+                "get_storage",
+                Some(language_clone.clone()),
+                Some(StorageEntry::new("language".to_string(), String::new())),
+            )
+            .await;
         });
-        
-        ||{}
+
+        || {}
     });
-    
+
     use_effect_with((*temp).clone(), move |temp| {
         if !(*temp).value.is_empty() {
             let tmp = SettingValue::from((*temp).clone()).serialize();
@@ -71,28 +133,55 @@ pub fn app() -> Html {
 
     use_effect_with((language).clone(), move |language| {
         if (*language).value.is_empty() {
-            language.set(StorageEntry::new(String::from("language"), "en".to_string()));
+            language.set(StorageEntry::new(
+                String::from("language"),
+                "en".to_string(),
+            ));
         }
     });
 
-    let password_abilitated_clone = password_abilitated.clone();
-    use_effect_with((*password_abilitated).clone(), move |password_abilitated| {
-        password_abilitated_clone.set(StorageEntry::new(password_abilitated.key.clone(), NormalizeDelay::normalize_color((*password_abilitated).clone().value)));
+    let password_enabled_clone = password_enabled.clone();
+    use_effect_with((*password_enabled).clone(), move |password_enabled| {
+        password_enabled_clone.set(StorageEntry::new(
+            password_enabled.key.clone(),
+            NormalizeDelay::normalize_color((*password_enabled).clone().value),
+        ));
     });
-    
+
+    let toast_notifications_clone = toast_notifications.clone();
     let clone_list = record_list.clone();
-    let on_submit = Callback::from(move |record: Record| {
-        let record = record.clone();
-        let clone_list = clone_list.clone();
-        spawn_local(async move{
-            invoke_function_async("add_record", None, Some(Record { uuid: "".to_string(), ..record})).await;
-            invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
-            ()
-        });
+    let language_clone = language.clone();
+    let on_submit = Callback::from(move |record: Result<Record, Vec<FormError>>| {
+        if let Err(errors) = record {
+            let mut vec = (*toast_notifications_clone).clone();
+            for i in errors {
+                vec.push(ToastNotificationModel::incorrect_field(
+                    i,
+                    &(*language_clone).value,
+                ));
+            }
+            toast_notifications_clone.set(vec);
+        } else if let Ok(record) = record {
+            let record = record.clone();
+            let clone_list = clone_list.clone();
+            spawn_local(async move {
+                invoke_function_async(
+                    "add_record",
+                    None,
+                    Some(Record {
+                        uuid: "".to_string(),
+                        ..record
+                    }),
+                )
+                .await;
+                invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
+                ()
+            });
+        }
     });
 
     let clone_list = record_list.clone();
-    let delete_handler = Callback::from(move |record: Record|{
+    let delete_handler = Callback::from(move |record: Record| {
         let record = record.clone();
         let clone_list = clone_list.clone();
         spawn_local(async move {
@@ -102,55 +191,131 @@ pub fn app() -> Html {
         });
     });
 
-    let title_handler = Callback::from(move |function: Functions| {
-        match function {
-            Functions::Close => invoke_function("close_app", None, None),
-            Functions::Minimize => invoke_function("minimize_app", None, None),
-            Functions::Maximize => invoke_function("maximize_app", None, None),
-            Functions::Tray => invoke_function("tray_app", None, None),
+    let title_handler = Callback::from(move |function: Functions| match function {
+        Functions::Close => invoke_function("close_app", None, None),
+        Functions::Minimize => invoke_function("minimize_app", None, None),
+        Functions::Maximize => invoke_function("maximize_app", None, None),
+        Functions::Tray => invoke_function("tray_app", None, None),
+    });
+
+    let toast_notifications_clone = toast_notifications.clone();
+    let clone_list = record_list.clone();
+    let language_clone = language.clone();
+    let edit_handler = Callback::from(move |record: Result<Record, Vec<FormError>>| {
+        if let Err(errors) = record {
+            let mut vec = (*toast_notifications_clone).clone();
+            for i in errors {
+                vec.push(ToastNotificationModel::incorrect_field(
+                    i,
+                    &(*language_clone).value,
+                ));
+            }
+            toast_notifications_clone.set(vec);
+        } else if let Ok(record) = record {
+            let record = record.clone();
+            let clone_list = clone_list.clone();
+            spawn_local(async move {
+                invoke_function_async("update_record", None, Some(record)).await;
+                invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
+                ()
+            });
         }
     });
 
-    let clone_list = record_list.clone();
-    let edit_handler = Callback::from(move |record: Record|{
-        let record = record.clone();
-        let clone_list = clone_list.clone();
-        spawn_local(async move {
-            invoke_function_async("update_record", None, Some(record)).await;
-            invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
-            ()
-        });
-    });
-    
+    let toast_notifications_clone = toast_notifications.clone();
     let delay_clone = delay.clone();
-    let settings_handler = Callback::from(move |input: SettingValue|{
-        let delay_clone = delay_clone.clone();
-        let input = input.clone();
-        spawn_local(async move {
-            if input.from_color_picker {
-                change_background(&input.serialize());
-                invoke_function_store("store_storage", None, Some(StorageEntry::new_color(input.value.clone(), input.setting))).await;
-            } else {
-                match &*(input.setting) {
-                    "delay" => {
-                        invoke_function_store("store_storage", None, Some(StorageEntry::new_delay(input.value.clone()))).await;
-                        delay_clone.set(StorageEntry::new_delay(NormalizeDelay::convert_to_string(input.value)));
-                    },
-                    "password" => {
-                        invoke_function_store("store_password", None, Some(StorageEntry::new(input.setting.clone(), input.value.clone()))).await;
-                    },
-                    "password-abilitated" |
-                    "language" => {
-                        invoke_function_store("store_storage", None, Some(StorageEntry::new(input.setting.clone(), input.value.clone()))).await;
-                    },
-                    _ => ()
+    let language_clone = language.clone();
+    let settings_handler = Callback::from(move |input: Result<SettingValue, SettingError>| {
+        if let Ok(input) = input {
+            let delay_clone = delay_clone.clone();
+            let input = input.clone();
+            let language_clone = language_clone.clone();
+            spawn_local(async move {
+                if input.from_color_picker {
+                    change_background(&input.serialize());
+                    invoke_function_store(
+                        "store_storage",
+                        None,
+                        Some(StorageEntry::new_color(input.value.clone(), input.setting)),
+                    )
+                    .await;
+                } else {
+                    match &*(input.setting) {
+                        "delay" => {
+                            invoke_function_store(
+                                "store_storage",
+                                None,
+                                Some(StorageEntry::new_delay(input.value.clone())),
+                            )
+                            .await;
+                            delay_clone.set(StorageEntry::new_delay(
+                                NormalizeDelay::convert_to_string(input.value),
+                            ));
+                        }
+                        "password" => {
+                            invoke_function_store(
+                                "store_password",
+                                None,
+                                Some(StorageEntry::new(
+                                    input.setting.clone(),
+                                    input.value.clone(),
+                                )),
+                            )
+                            .await;
+                        }
+                        "password-enabled" => {
+                            invoke_function_store(
+                                "store_storage",
+                                None,
+                                Some(StorageEntry::new(
+                                    input.setting.clone(),
+                                    input.value.clone(),
+                                )),
+                            )
+                            .await;
+                        }
+                        "language" => {
+                            invoke_function_store(
+                                "store_storage",
+                                None,
+                                Some(StorageEntry::new(
+                                    input.setting.clone(),
+                                    input.value.clone(),
+                                )),
+                            )
+                            .await;
+                            language_clone.set(StorageEntry::new(input.setting, input.value));
+                        }
+                        _ => (),
+                    }
                 }
-            }
-        });
+            });
+        } else if let Err(error) = input {
+            let mut vec = (*toast_notifications_clone).clone();
+            vec.push(ToastNotificationModel::incorrect_setting(
+                error,
+                &(*language_clone).value,
+            ));
+            toast_notifications_clone.set(vec);
+        }
     });
 
+    let toast_delete_callback = {
+        let toast_notifications_mutex = Mutex::new((*toast_notifications).clone());
+        let toast_notifications_clone = toast_notifications.clone();
+
+        Callback::from(move |notification: ToastNotificationModel| {
+            let vec = toast_notifications_mutex.lock();
+            if let Ok(mut vec) = vec {
+                vec.retain(|element| element.id != notification.id);
+
+                toast_notifications_clone.set((*vec).clone());
+            }
+        })
+    };
+
     html! {
-        <I18nProvider 
+        <I18nProvider
             translations={translations}
             default_language={(*language).value.clone()}
         >
@@ -164,10 +329,11 @@ pub fn app() -> Html {
                 <div id="non-fixed">
                     <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler} />
                 </div>
-                <Settings callback={settings_handler} delay={(*delay).clone()} password_abilitated={(*password_abilitated).value.eq("true")}/>
-                if (*password_abilitated).value.eq("true") {
+                <Settings callback={settings_handler} delay={(*delay).clone()} password_enabled={(*password_enabled).value.eq("true")}/>
+                if (*password_enabled).value.eq("true") {
                     <PasswordScreen />
                 }
+                <ToastNotifications notifications={(*toast_notifications).clone()} delete_callback={toast_delete_callback}/>
             </div>
         </I18nProvider>
     }

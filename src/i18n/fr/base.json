@@ -1,13 +1,25 @@
 {
     "name": "nom",
-    "date": "date (gg/mm/aaaa)",
-    "date2": "date",
-    "time": "heures",
+    "date2": "date (jj/mm/aaaa)",
+    "date": "date",
+    "time": "heure",
+
     "background": "couleur de fond",
     "input": "couleur d'entrée",
     "text": "couleur du texte",
     "header": "couleur d'en-tête",
-    "delay": "heure de notification",
-    "abilitated": "mot de passe activé",
-    "language": "changer de langue"
+
+    "delay": "délai de notification",
+    "enabled": "mot de passe activé",
+    "language": "changer de langue",
+
+    "form_incorrect_field": "champ du formulaire incorrect",
+    "empty_form_field": "veuillez remplir ce champ du formulaire",
+    "past_datetime": "Veuillez entrer une date et une heure ultérieures",
+    "incorrect_format": "doit être au format",
+    "form_fallback": "problème avec la valeur",
+
+    "setting_incorrect_field": "champ de paramètre incorrect",
+    "empty_setting_field": "veuillez remplir ce champ de paramètre",
+    "invalid_setting": "Veuillez saisir une entrée valide"
 }
