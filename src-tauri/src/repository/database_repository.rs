@@ -1,110 +1,51 @@
-use rusqlite::{params, Connection, Error};
-use shared::models::record::Record;
-use tauri::{AppHandle, Manager};
-use uuid::Uuid;
+use std::fs::{self, File};
 
-#[derive(Debug)]
+use diesel::{result::Error, Connection, *};
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+use crate::{models::record::Record, schema::schema::events::{self, dsl::*}};
+use tauri::{AppHandle, Manager};
+
 pub struct Database {
-    conn: Connection,
+    conn: SqliteConnection,
 }
 
+const MIGRATIONS: EmbeddedMigrations = embed_migrations!("../migrations/create_table");
+
 impl Database {
-    pub fn new(app: AppHandle) -> Result<Database, Error> {
+    pub fn new(app: AppHandle) -> Result<Database, ConnectionError> {
         let mut path = app.path().app_data_dir().unwrap();
         path.push("database");
-        std::fs::create_dir_all(&path).expect("Failed to create app data dir");
+        fs::create_dir_all(&path).expect("Failed to create app data dir");
         path.push("database.db");
-        let connection = Connection::open(path)?;
+        if !fs::exists(&path).unwrap() {
+            File::create(&path).unwrap();
+        }
+        let mut connection = SqliteConnection::establish(path.to_str().unwrap())?;
+        connection.run_pending_migrations(MIGRATIONS).unwrap();
         Ok(Database { conn: connection })
     }
 
-    pub fn initialize(&mut self) -> Result<(), Error> {
-        match self.conn.execute(
-            "CREATE TABLE IF NOT EXISTS events(
-            uuid TEXT PRIMARY KEY,
-            name TEXT,
-            date TEXT,
-            time TEXT,
-            notified_at TEXT
-        ) WITHOUT ROWID;",
-            [],
-        ) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
-    }
-
     pub fn add_record(&mut self, record: Record) -> Result<Record, Error> {
-        match self.conn.execute(
-            "INSERT INTO events(uuid, name, date, time, notified_at) VALUES (?1, ?2, ?3, ?4, ?5)",
-            params![
-                Uuid::new_v4().to_string(),
-                record.name,
-                record.date,
-                record.time,
-                record.notified_at
-            ],
-        ) {
-            Ok(_) => Ok(record),
-            Err(e) => Err(e),
-        }
-    }
-
-    pub fn get_record(&mut self, record: String) -> Result<Record, Error> {
-        let mut comm = self
-            .conn
-            .prepare("SELECT name, date, time, notified_at FROM events WHERE uuid = ?1")?;
-        let ret = comm.query_row([record], |row| {
-            Ok(Record::new(
-                row.get(0)?,
-                row.get(1)?,
-                row.get(2)?,
-                row.get(3)?,
-                row.get(4)?,
-            ))
-        })?;
-        Ok(ret)
+        diesel::insert_into(events::table)
+            .values(&record)
+            .returning(Record::as_returning())
+            .get_result(&mut self.conn)
     }
 
     pub fn delete_record(&mut self, record: Record) -> Result<Record, Error> {
-        match self
-            .conn
-            .execute("DELETE FROM events WHERE uuid = ?1", [record.uuid.clone()])
-        {
-            Ok(_) => Ok(record),
-            Err(e) => Err(e),
-        }
+        diesel::delete(events::table.filter(uuid.eq(record.uuid.clone())))
+            .execute(&mut self.conn)?;
+        Ok(record)
     }
 
     pub fn update_record(&mut self, record: Record) -> Result<(), Error> {
-        match self.conn.execute(
-            "UPDATE events SET name=?1, date=?2, time=?3, notified_at=?5 WHERE uuid = ?4",
-            [
-                record.name.clone(),
-                record.date.clone(),
-                record.time.clone(),
-                record.uuid.clone(),
-                record.notified_at.clone(),
-            ],
-        ) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
+        diesel::update(events::table.filter(uuid.eq(record.uuid.clone())))
+            .set(record)
+            .execute(&mut self.conn)?;
+        Ok(())
     }
 
     pub fn get_all_records(&mut self) -> Result<Vec<Record>, Error> {
-        let mut comm = self.conn.prepare("SELECT * FROM events")?;
-        let mut cols = comm.query([])?;
-        let mut vec = Vec::new();
-        while let Some(row) = cols.next()? {
-            vec.push(Record::new(
-                row.get(0)?,
-                row.get(1)?,
-                row.get(2)?,
-                row.get(3)?,
-                row.get(4)?,
-            ));
-        }
-        Ok(vec)
+        events.select(Record::as_select()).load(&mut self.conn)
     }
 }

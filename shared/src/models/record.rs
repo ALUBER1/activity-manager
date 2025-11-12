@@ -5,7 +5,16 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use yew::Properties;
 
-#[derive(Properties, PartialEq, Clone, Deserialize, Default, Serialize, Debug, AutoNew)]
+#[derive(
+    Properties,
+    PartialEq,
+    Clone,
+    Default,
+    Debug,
+    AutoNew,
+    Deserialize,
+    Serialize
+)]
 pub struct Record {
     pub uuid: String,
     pub name: String,

@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::{from_value, to_value};
-use shared::models::{record::Record, storage_entry::StorageEntry};
+use shared::models::{dto::record_dto::RecordDto, record::Record, storage_entry::StorageEntry};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
@@ -15,7 +15,7 @@ extern "C" {
 
 #[derive(Serialize, Deserialize)]
 pub struct Args {
-    pub record: Record,
+    pub record: RecordDto,
 }
 
 #[allow(non_snake_case)]
@@ -42,7 +42,7 @@ pub async fn invoke_function_async<'a>(
         let buffer = invoke(
             function,
             to_value(&Args {
-                record: args.unwrap(),
+                record: RecordDto::from(args.unwrap()),
             })
             .unwrap(),
         )
@@ -76,7 +76,7 @@ pub fn invoke_function<'a>(
             let buffer = invoke(
                 function,
                 to_value(&Args {
-                    record: args.unwrap(),
+                    record: RecordDto::from(args.unwrap()),
                 })
                 .unwrap(),
             )
@@ -108,7 +108,7 @@ pub async fn invoke_function_vec<'a>(
         let buffer = invoke(
             function,
             to_value(&Args {
-                record: Record::from(args.unwrap()),
+                record: RecordDto::from(args.unwrap()),
             })
             .unwrap(),
         )

@@ -1,5 +1,7 @@
 pub mod gateway;
 pub mod repository;
+pub mod schema;
+pub mod models;
 
 #[macro_use]
 pub mod service;
@@ -67,8 +69,6 @@ pub fn run() {
             minimize_app,
             close_app,
             create_database,
-            initialize_database,
-            get_record,
             add_record,
             get_all_records,
             delete_record,
