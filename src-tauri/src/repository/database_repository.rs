@@ -1,15 +1,19 @@
 use std::fs::{self, File};
 
+use crate::{
+    models::record::Record,
+    schema::schema::events::{self, dsl::*},
+};
+use ::uuid::Uuid;
 use diesel::{result::Error, Connection, *};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use crate::{models::record::Record, schema::schema::events::{self, dsl::*}};
 use tauri::{AppHandle, Manager};
 
 pub struct Database {
     conn: SqliteConnection,
 }
 
-const MIGRATIONS: EmbeddedMigrations = embed_migrations!("../migrations/create_table");
+const MIGRATIONS: EmbeddedMigrations = embed_migrations!("../migrations");
 
 impl Database {
     pub fn new(app: AppHandle) -> Result<Database, ConnectionError> {
@@ -17,15 +21,17 @@ impl Database {
         path.push("database");
         fs::create_dir_all(&path).expect("Failed to create app data dir");
         path.push("database.db");
-        if !fs::exists(&path).unwrap() {
-            File::create(&path).unwrap();
-        }
+
         let mut connection = SqliteConnection::establish(path.to_str().unwrap())?;
-        connection.run_pending_migrations(MIGRATIONS).unwrap();
+        match connection.run_pending_migrations(MIGRATIONS) {
+            Ok(_) => println!("all ok"),
+            Err(e) => println!("problem applying migration: {}", e),
+        }
         Ok(Database { conn: connection })
     }
 
-    pub fn add_record(&mut self, record: Record) -> Result<Record, Error> {
+    pub fn add_record(&mut self, mut record: Record) -> Result<Record, Error> {
+        record.uuid = Uuid::new_v4().to_string();
         diesel::insert_into(events::table)
             .values(&record)
             .returning(Record::as_returning())
@@ -46,6 +52,9 @@ impl Database {
     }
 
     pub fn get_all_records(&mut self) -> Result<Vec<Record>, Error> {
-        events.select(Record::as_select()).load(&mut self.conn)
+        events
+            .select(Record::as_select())
+            .order_by((date.desc(), time.desc()))
+            .load(&mut self.conn)
     }
 }
