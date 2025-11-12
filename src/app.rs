@@ -55,7 +55,6 @@ pub fn app() -> Html {
     use_effect_with((), move |_| {
         spawn_local(async move {
             invoke_function_async("create_database", None, None).await;
-            invoke_function_async("initialize_database", None, None).await;
             invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;
             invoke_function("notification_loop", None, None);
 

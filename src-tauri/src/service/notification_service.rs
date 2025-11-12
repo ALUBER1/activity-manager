@@ -1,13 +1,12 @@
 use std::{sync::Mutex, thread, time};
 
 use crate::{
-    gateway::notifications_gateway::NotificationGateway,
-    repository::{database_repository::Database, storage_repository::StorageRepository},
+    gateway::notifications_gateway::NotificationGateway, models::record::Record, repository::{database_repository::Database, storage_repository::StorageRepository}
 };
 use chrono::{Local, NaiveDate, NaiveDateTime, NaiveTime};
 use shared::{
     errors::notification_error::NotificationError,
-    models::{notification::Notification, record::Record},
+    models::notification::Notification,
     utils::normalize::NormalizeDelay,
 };
 use tauri::{AppHandle, Manager, State};

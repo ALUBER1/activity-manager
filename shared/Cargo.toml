@@ -8,5 +8,6 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 yew = "0.21.0"
-macros ={ path = "../macros"}
+macros = { path = "../macros" }
 uuid = { version = "1.18.1", features = ["v4", "js"] }
+
