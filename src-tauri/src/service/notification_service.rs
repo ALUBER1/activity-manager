@@ -3,7 +3,7 @@ use std::{sync::Mutex, thread, time};
 use crate::{
     gateway::notifications_gateway::NotificationGateway, models::record::Record, repository::{database_repository::Database, storage_repository::StorageRepository}
 };
-use chrono::{Local, NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{Local, NaiveDateTime};
 use shared::{
     errors::notification_error::NotificationError,
     models::notification::Notification,
@@ -58,8 +58,8 @@ pub fn notification_loop(app: AppHandle) {
         };
 
         for mut record in records {
-            let date = NaiveDate::parse_from_str(&record.date, "%d/%m/%Y").unwrap();
-            let time = NaiveTime::parse_from_str(&record.time, "%H:%M").unwrap();
+            let date = record.date;
+            let time = record.time;
             let date_time = NaiveDateTime::new(date, time);
             let now = Local::now().naive_local();
             let diff = (date_time - now).num_seconds();

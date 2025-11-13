@@ -22,14 +22,19 @@ tauri = { version = "2.0.0", features = ["tray-icon"] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-shared = { path = "../shared"}
+shared = { path = "../shared" }
 uuid = { version = "1.18.1", features = ["v4"] }
 tauri-plugin-notifications = "0.2.5"
-chrono = "0.4.41"
+chrono = {version = "0.4.41", features = ["serde"] }
 tauri-plugin-store = "2"
 tauri-plugin-stronghold = "2"
 rand = "0.9.2"
 argon2 = "0.5.3"
-diesel = { version = "*", features = ["sqlite", "returning_clauses_for_sqlite_3_35"] }
+diesel = { version = "*", features = [
+    "sqlite",
+    "returning_clauses_for_sqlite_3_35",
+    "chrono",
+    "uuid",
+] }
 diesel_migrations = { version = "2.3.0", features = ["sqlite"] }
 libsqlite3-sys = { version = "0.27", features = ["bundled"] }

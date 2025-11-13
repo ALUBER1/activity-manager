@@ -2,11 +2,12 @@ use crate::{
     components::atoms::{button::Button, edit_input::EditInput, submit_button::SubmitButton},
     errors::form_error::{FormError, FormErrorReason},
 };
-use chrono::{Local, NaiveDate, NaiveTime};
+use chrono::{Local, NaiveDate, NaiveDateTime, NaiveTime};
 use gloo::timers::callback::Timeout;
 use i18nrs::yew::use_translation;
 use shared::{models::record::Record, style::default_colors::DefaultColors};
 use std::ops::Deref;
+use uuid::Uuid;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -16,42 +17,67 @@ pub struct Props {
     pub record: Record,
 }
 
+#[derive(Clone)]
+struct Data {
+    pub name: String,
+    pub date: String,
+    pub time: String,
+}
+
+impl Data {
+    pub fn into_record(&self) -> Record {
+        Record {
+            uuid: Uuid::nil(),
+            name: self.name.clone(),
+            date: NaiveDate::parse_from_str(&self.date, "%d/%m/%Y").unwrap(),
+            time: NaiveTime::parse_from_str(&self.time, "%M:%H").unwrap(),
+            notified_at: NaiveDateTime::default(),
+        }
+    }
+}
+
 #[function_component(EditForm)]
 pub fn form(props: &Props) -> Html {
     let timer = 3000;
     let (i18n, _set_language) = use_translation();
 
-    let value_state = use_state(|| props.record.clone());
+    let value_state = use_state(|| Data {
+        name: props.record.name.clone(),
+        date: props.record.get_date(),
+        time: props.record.get_time(),
+    });
     let name_color = use_state(|| String::new());
     let date_color = use_state(|| String::new());
     let time_color = use_state(|| String::new());
 
     let on_changename = {
         let cloned_value = value_state.clone();
-        Callback::from(move |name| {
-            cloned_value.set(Record {
+        Callback::from(move |name: String| {
+            cloned_value.set(Data {
                 name,
-                ..cloned_value.deref().clone()
+                ..((*cloned_value).clone())
             });
         })
     };
 
     let on_changedate = {
         let cloned_value = value_state.clone();
-        Callback::from(move |date| {
-            cloned_value.set(Record {
-                date,
-                ..cloned_value.deref().clone()
+        Callback::from(move |date: String| {
+            let date = date.trim();
+            cloned_value.set(Data {
+                date: String::from(date),
+                ..((*cloned_value).clone())
             });
         })
     };
 
     let on_changetime = {
         let cloned_value = value_state.clone();
-        Callback::from(move |time| {
-            cloned_value.set(Record {
-                time,
-                ..cloned_value.deref().clone()
+        Callback::from(move |time: String| {
+            let time = time.trim();
+            cloned_value.set(Data {
+                time: String::from(time),
+                ..((*cloned_value).clone())
             });
         })
     };
@@ -125,7 +151,7 @@ pub fn form(props: &Props) -> Html {
             }
 
             if error_vec.len() == 0 {
-                clone_submit.emit(Ok(data));
+                clone_submit.emit(Ok(data.into_record()));
             } else {
                 clone_submit.emit(Err(error_vec))
             }

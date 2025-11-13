@@ -75,11 +75,11 @@ pub fn record_list(records: &Props) -> Html {
                                         {", "}
                                         {i18n.t("date")}
                                         {": "}
-                                        {element.date.clone()}
+                                        {element.get_date().clone()}
                                         {", "}
                                         {i18n.t("time")}
                                         {": "}
-                                        {element.time.clone()}
+                                        {element.get_time().clone()}
                                     </p>
                                     <div class="record-button">
                                         <RecordButton id = {element.clone()}  onclick = {delete_handler.clone()} ty={"delete"}/>
