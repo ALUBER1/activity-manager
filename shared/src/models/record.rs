@@ -32,7 +32,7 @@ impl Record {
     }
 
     pub fn get_time(&self) -> String {
-        self.time.format("%M:%H").to_string()
+        self.time.format("%H:%M").to_string()
     }
 
     pub fn get_notified(&self) -> String {
@@ -57,7 +57,7 @@ impl Record {
                 name: record.name,
                 date: record.date,
                 time: record.time,
-                notified_at: NaiveDateTime::parse_from_str(&record.notified_at, "%d/%m/%Y,%H:%M").unwrap(),
+                notified_at: NaiveDateTime::default(),
             });
         }
         vec

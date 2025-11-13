@@ -30,7 +30,7 @@ impl Data {
             uuid: Uuid::nil(),
             name: self.name.clone(),
             date: NaiveDate::parse_from_str(&self.date, "%d/%m/%Y").unwrap(),
-            time: NaiveTime::parse_from_str(&self.time, "%M:%H").unwrap(),
+            time: NaiveTime::parse_from_str(&self.time, "%H:%M").unwrap(),
             notified_at: NaiveDateTime::default(),
         }
     }

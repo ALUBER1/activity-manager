@@ -19,18 +19,28 @@ pub struct Record {
 
 impl Record {
     pub fn from(record: RecordDto) -> Self {
-        println!("recieved: {}", record.notified_at);
         Record {
             uuid: record.uuid.to_string(),
             name: record.name,
             date: record.date,
             time: record.time,
-            notified_at: if record.notified_at.eq(&NaiveDateTime::default().to_string()) {
+            notified_at: if record.notified_at.eq(&NaiveDateTime::default()
+                .format("%d/%m/%Y,%H:%M")
+                .to_string())
+            {
                 String::new()
             } else {
                 record.notified_at
             },
         }
+    }
+
+    pub fn get_date(&self) -> String {
+        self.date.format("%d/%m/%Y").to_string()
+    }
+
+    pub fn get_time(&self) -> String {
+        self.time.format("%H:%M").to_string()
     }
 }
 

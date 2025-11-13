@@ -1,12 +1,13 @@
 use std::{sync::Mutex, thread, time};
 
 use crate::{
-    gateway::notifications_gateway::NotificationGateway, models::record::Record, repository::{database_repository::Database, storage_repository::StorageRepository}
+    gateway::notifications_gateway::NotificationGateway,
+    models::record::Record,
+    repository::{database_repository::Database, storage_repository::StorageRepository},
 };
 use chrono::{Local, NaiveDateTime};
 use shared::{
-    errors::notification_error::NotificationError,
-    models::notification::Notification,
+    errors::notification_error::NotificationError, models::notification::Notification,
     utils::normalize::NormalizeDelay,
 };
 use tauri::{AppHandle, Manager, State};
@@ -57,6 +58,19 @@ pub fn notification_loop(app: AppHandle) {
             }
         };
 
+        let clone = app.clone();
+        let language = {
+            let mut guard = storage_repository.lock().unwrap();
+            if let Some(ref mut storage) = *guard {
+                match storage.get(clone, "language".to_string()) {
+                    Ok(value) => &NormalizeDelay::normalize_color(value),
+                    Err(_) => "en",
+                }
+            } else {
+                "en"
+            }
+        };
+
         for mut record in records {
             let date = record.date;
             let time = record.time;
@@ -68,7 +82,7 @@ pub fn notification_loop(app: AppHandle) {
                     app.clone(),
                     Notification {
                         title: record.name.clone(),
-                        body: format_notification_body(&record),
+                        body: format_notification_body(&record, language),
                     },
                 );
                 record.notified_at = Local::now().format("%d/%m/%Y,%H:%M").to_string();
@@ -90,9 +104,28 @@ pub fn notification_loop(app: AppHandle) {
     ()
 }
 
-fn format_notification_body(record: &Record) -> String {
-    format!(
-        "you have {} due at {} the day {}",
-        record.name, record.time, record.date
-    )
+fn format_notification_body(record: &Record, language: &str) -> String {
+    match language {
+        "en" => format!(
+            "you have {} due at {} the day {}",
+            record.name,
+            record.get_time(),
+            record.get_date()
+        ),
+
+        "it" => format!(
+            "hai {} alle {} il giorno {}",
+            record.name,
+            record.get_time(),
+            record.get_date()
+        ),
+
+        "fr" => format!(
+            "Vous avez {} à {} le {}",
+            record.name,
+            record.get_time(),
+            record.get_date()
+        ),
+        _ => String::from("unknown language selected"),
+    }
 }
