@@ -34,9 +34,10 @@ pub async fn invoke_function_async<'a>(
     if args.is_none() {
         let buffer = invoke(function, JsValue::null()).await;
         if !result.is_none() {
+            let value = from_value::<RecordDto>(buffer).expect("wasn't able to extract value");
             result
                 .unwrap()
-                .set(from_value(buffer).expect("wasn't able to extract value"));
+                .set(Record::from(value));
         }
     } else {
         let buffer = invoke(
@@ -48,9 +49,10 @@ pub async fn invoke_function_async<'a>(
         )
         .await;
         if !result.is_none() {
+            let value = from_value::<RecordDto>(buffer).expect("wasn't able to extract value");
             result
                 .unwrap()
-                .set(from_value(buffer).expect("wasn't able to extract value"));
+                .set(Record::from(value));
         }
     }
 }
@@ -66,9 +68,10 @@ pub fn invoke_function<'a>(
         spawn_local(async {
             let buffer = invoke(function, JsValue::null()).await;
             if !result.is_none() {
+                let value = from_value::<RecordDto>(buffer).expect("wasn't able to extract value");
                 result
                     .unwrap()
-                    .set(from_value(buffer).expect("wasn't able to extract value"));
+                    .set(Record::from(value));
             }
         });
     } else {
@@ -82,9 +85,10 @@ pub fn invoke_function<'a>(
             )
             .await;
             if !result.is_none() {
+                let value = from_value::<RecordDto>(buffer).expect("wasn't able to extract value");
                 result
                     .unwrap()
-                    .set(from_value(buffer).expect("wasn't able to extract value"));
+                    .set(Record::from(value));
             }
         })
     }
@@ -100,9 +104,10 @@ pub async fn invoke_function_vec<'a>(
     if args.is_none() {
         let buffer = invoke(function, JsValue::null()).await;
         if !result.is_none() {
+            let value = from_value::<Vec<RecordDto>>(buffer).expect("wasn't able to extract value");
             result
                 .unwrap()
-                .set(from_value(buffer).expect("wasn't able to extract value"));
+                .set(Record::from_vec(value));
         }
     } else {
         let buffer = invoke(
@@ -114,9 +119,10 @@ pub async fn invoke_function_vec<'a>(
         )
         .await;
         if !result.is_none() {
+            let value = from_value::<Vec<RecordDto>>(buffer).expect("wasn't able to extract value");
             result
                 .unwrap()
-                .set(from_value(buffer).expect("wasn't able to extract value"));
+                .set(Record::from_vec(value));
         }
     }
 }

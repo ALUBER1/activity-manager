@@ -167,10 +167,7 @@ pub fn app() -> Html {
                 invoke_function_async(
                     "add_record",
                     None,
-                    Some(Record {
-                        uuid: "".to_string(),
-                        ..record
-                    }),
+                    Some(record),
                 )
                 .await;
                 invoke_function_vec("get_all_records", Some(clone_list.clone()), None).await;

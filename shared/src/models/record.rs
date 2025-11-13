@@ -1,37 +1,66 @@
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
+use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use macros::AutoNew;
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use yew::Properties;
 
-#[derive(
-    Properties,
-    PartialEq,
-    Clone,
-    Default,
-    Debug,
-    AutoNew,
-    Deserialize,
-    Serialize
-)]
+use crate::models::dto::record_dto::RecordDto;
+
+#[derive(Properties, PartialEq, Clone, Default, Debug, AutoNew)]
 pub struct Record {
-    pub uuid: String,
+    pub uuid: Uuid,
     pub name: String,
-    pub date: String,
-    pub time: String,
-    pub notified_at: String,
+    pub date: NaiveDate,
+    pub time: NaiveTime,
+    pub notified_at: NaiveDateTime,
 }
 
 impl Record {
     pub fn record_by_name(name: String) -> Record {
         Record {
-            uuid: Uuid::nil().to_string(),
+            uuid: Uuid::nil(),
             name,
-            date: "".to_string(),
-            time: "".to_string(),
-            notified_at: "".to_string(),
+            date: NaiveDate::default(),
+            time: NaiveTime::default(),
+            notified_at: NaiveDateTime::default(),
         }
+    }
+
+    pub fn get_date(&self) -> String {
+        self.date.format("%d/%m/%Y").to_string()
+    }
+
+    pub fn get_time(&self) -> String {
+        self.time.format("%H:%M").to_string()
+    }
+
+    pub fn get_notified(&self) -> String {
+        self.notified_at.format("%d/%m/%Y,%H:%M").to_string()
+    }
+
+    pub fn from(record: RecordDto) -> Self {
+        Record {
+            uuid: Uuid::from_str(&record.uuid).unwrap(),
+            name: record.name,
+            date: record.date,
+            time: record.time,
+            notified_at: NaiveDateTime::parse_from_str(&record.notified_at, "%d/%m/%Y,%H:%M").unwrap(),
+        }
+    }
+
+    pub fn from_vec(records: Vec<RecordDto>) -> Vec<Self> {
+        let mut vec = Vec::<Record>::new();
+        for record in records {
+            vec.push(Record {
+                uuid: Uuid::from_str(&record.uuid).unwrap(),
+                name: record.name,
+                date: record.date,
+                time: record.time,
+                notified_at: NaiveDateTime::default(),
+            });
+        }
+        vec
     }
 }
 

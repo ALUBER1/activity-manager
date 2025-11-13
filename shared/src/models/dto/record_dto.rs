@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+use chrono::{NaiveDate, NaiveTime};
 use macros::AutoNew;
 use serde::{Deserialize, Serialize};
 
@@ -9,19 +10,19 @@ use crate::models::record::Record;
 pub struct RecordDto {
     pub uuid: String,
     pub name: String,
-    pub date: String,
-    pub time: String,
+    pub date: NaiveDate,
+    pub time: NaiveTime,
     pub notified_at: String,
 }
 
 impl RecordDto {
     pub fn from(record: Record) -> Self {
         RecordDto {
-            uuid: record.uuid,
-            name: record.name,
+            uuid: record.uuid.to_string(),
+            name: record.name.clone(),
             date: record.date,
             time: record.time,
-            notified_at: record.notified_at,
+            notified_at: record.get_notified(),
         }
     }
 }
