@@ -1,17 +1,17 @@
 use yew::prelude::*;
 
-use crate::classes::submit::submit;
+use crate::classes::password_submit_button::password_submit_button;
 
 #[derive(PartialEq, Properties)]
 pub struct Props {
     pub children: Children,
 }
 
-#[function_component(SubmitButton)]
+#[function_component(PasswordSubmitButton)]
 pub fn button(label: &Props) -> Html {
     html! {
         <button 
-            classes = {submit()}
+            classes = {password_submit_button()}
         >{label.children.clone()}</button>
     }
 }

@@ -19,6 +19,17 @@ pub fn button(label: &Props) -> Html {
         })
     };
     html! {
-        <button onclick = {handler}><span class="material-symbols-outlined">{label.ty.clone()}</span> </button>
+        <button 
+            onclick = {handler}
+            classes = {
+                if label.ty.eq("delete") {
+                    classes!("pr-[13px]", "border-r-3", "border-r-solid", "border-r-(--text-color)")
+                } else {
+                    classes!("pl-[10px]")
+                }
+            }
+        >
+            <span class="material-symbols-outlined">{label.ty.clone()}</span>
+        </button>
     }
 }

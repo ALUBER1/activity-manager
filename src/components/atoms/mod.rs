@@ -10,3 +10,4 @@ pub mod submit_button;
 pub mod text_input;
 pub mod title_bar_btn;
 pub mod toast_notification;
+pub mod password_submit_button;

@@ -1,5 +1,5 @@
 use crate::{
-    classes::{editing_button_container::editing_button_container, form_fields::form_fields}, components::atoms::{button::Button, edit_input::EditInput, submit_button::SubmitButton}, errors::form_error::{FormError, FormErrorReason}
+    classes::{cancel::cancel, edit_form::edit_form, editing_button_container::editing_button_container, form_fields::form_fields}, components::atoms::{button::Button, edit_input::EditInput, submit_button::SubmitButton}, errors::form_error::{FormError, FormErrorReason}
 };
 use chrono::{Local, NaiveDate, NaiveDateTime, NaiveTime};
 use gloo::timers::callback::Timeout;
@@ -158,15 +158,15 @@ pub fn form(props: &Props) -> Html {
     };
 
     html! {
-        <form onsubmit={on_submit} class="edit-form">
+        <form onsubmit={on_submit} classes = {edit_form()}>
             <div class={form_fields()}>
                 <EditInput name={i18n.t("name")} on_change={on_changename} color={(*name_color).clone()} value={(*value_state).name.clone()} />
                 <EditInput name={i18n.t("date2")} on_change={on_changedate} color={(*date_color).clone()} value={(*value_state).date.clone()} />
                 <EditInput name={i18n.t("time")} on_change={on_changetime} color={(*time_color).clone()} value={(*value_state).time.clone()} />
             </div>
             <div class={editing_button_container()}>
-                <SubmitButton id="submit"><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
-                <Button onclick={props.cancel.clone()} id="cancel"><span class="material-symbols-outlined">{"cancel"}</span></Button>
+                <SubmitButton><span class="material-symbols-outlined">{"send"}</span></SubmitButton>
+                <Button onclick={props.cancel.clone()} classes = {cancel()}><span class="material-symbols-outlined">{"cancel"}</span></Button>
             </div>
         </form>
     }

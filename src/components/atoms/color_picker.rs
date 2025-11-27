@@ -5,7 +5,7 @@ use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 use crate::{
-    app::init_pickr, classes::color_picker_container::color_picker_container, components::atoms::button::Button, models::setting_value::SettingValue
+    app::init_pickr, classes::{color_picker_container::color_picker_container}, components::atoms::button::Button, models::setting_value::SettingValue
 };
 
 #[derive(Properties, PartialEq)]
@@ -58,7 +58,10 @@ pub fn color_picker(prop: &Props) -> Html {
     html! {
         <div class={color_picker_container()}>
             <button id={prop.item.clone()} class="pickr" onfocusout={onclick} style={"background-color: ".to_string() + &DefaultColors::get(&prop.item)} />
-            <Button onclick={default_onclick.clone()} id="default" >{"DEFAULT"}</Button>
+            <Button 
+                onclick={default_onclick.clone()} 
+                classes = {classes!("pl-[7px]")} 
+            >{"DEFAULT"}</Button>
         </div>
     }
 }

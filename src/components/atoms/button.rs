@@ -3,8 +3,8 @@ use yew::prelude::*;
 #[derive(PartialEq, Properties)]
 pub struct Props {
     pub children: Children,
-    pub id: String,
     pub onclick: Callback<bool>,
+    pub classes: Classes
 }
 
 #[function_component(Button)]
@@ -14,6 +14,10 @@ pub fn button(label: &Props) -> Html {
         onclick.emit(true);
     });
     html! {
-        <button id={label.id.clone()} onclick={handler} type="button">{label.children.clone()}</button>
+        <button 
+            onclick={handler} 
+            type="button"
+            classes = {label.classes.clone()}
+        >{label.children.clone()}</button>
     }
 }

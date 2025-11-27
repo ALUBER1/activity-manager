@@ -1,11 +1,10 @@
 use i18nrs::yew::use_translation;
-use yew::{function_component, html, use_state, Callback, Html, Properties};
+use yew::{Callback, Html, Properties, classes, function_component, html, use_state};
 
 use shared::models::record::Record;
 
 use crate::{
-    components::{atoms::record_button::RecordButton, molecules::edit_form::EditForm},
-    errors::form_error::FormError,
+    classes::{editing_panel::editing_panel, record_button::record_button, record_list, record_list_style::record_list_style}, components::{atoms::record_button::RecordButton, molecules::edit_form::EditForm}, errors::form_error::FormError
 };
 
 #[derive(Properties, PartialEq, Clone)]
@@ -57,18 +56,22 @@ pub fn record_list(records: &Props) -> Html {
     html! {
         <>
             if let Some(record) = (*editing).clone() {
-                <div class="editing-panel">
-                    <div class="editing-form-container">
-                        <EditForm on_submit={submit_handler} record={record} cancel={cancel_handle} />
+                <div classes = {editing_panel()}>
+                    <div style = {"height: 50%"}>
+                        <EditForm 
+                            on_submit={submit_handler} 
+                            record={record} 
+                            cancel={cancel_handle} 
+                        />
                     </div>
                 </div>
             } else {
-                <div id="record-list">
+                <div classes = {record_list::record_list()}>
                     {
                         records.list.clone().into_iter().map(|element|{
                             html!{
-                                <div class="record-list-style">
-                                    <p class="record-label">
+                                <div classes = {record_list_style()}>
+                                    <p classes = {classes!("w-8/10", "h-fit")}>
                                         {i18n.t("name")}
                                         {": "}
                                         {element.name.clone()}
@@ -81,7 +84,7 @@ pub fn record_list(records: &Props) -> Html {
                                         {": "}
                                         {element.get_time().clone()}
                                     </p>
-                                    <div class="record-button">
+                                    <div classes = {record_button()}>
                                         <RecordButton id = {element.clone()}  onclick = {delete_handler.clone()} ty={"delete"}/>
                                         <RecordButton id = {element}  onclick = {edit_handler.clone()} ty={"edit"}/>
                                     </div>

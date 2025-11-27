@@ -1,6 +1,5 @@
 use crate::{
-    components::atoms::{password_input::PasswordInput, submit_button::SubmitButton},
-    utils::helper::invoke_function_store,
+    classes::{password_screen, screen_blocker::screen_blocker, show::show}, components::atoms::{password_input::PasswordInput, password_submit_button::PasswordSubmitButton}, utils::helper::invoke_function_store
 };
 use gloo::timers::callback::Timeout;
 use shared::{models::storage_entry::StorageEntry, style::default_colors::DefaultColors};
@@ -10,7 +9,7 @@ use yew::{function_component, html, use_effect_with, use_state, Callback, Html, 
 #[function_component(PasswordScreen)]
 pub fn password_screen() -> Html {
     let password = use_state(|| String::new());
-    let show = use_state(|| false);
+    let showing = use_state(|| false);
     let correct = use_state(|| StorageEntry::default());
     let color = use_state(|| DefaultColors::INPUT_BACKGROUND_COLOR);
 
@@ -22,7 +21,7 @@ pub fn password_screen() -> Html {
     };
 
     let password_button_onclick = {
-        let show_clone = show.clone();
+        let show_clone = showing.clone();
         Callback::from(move |_| {
             show_clone.set(!*show_clone);
         })
@@ -64,20 +63,20 @@ pub fn password_screen() -> Html {
 
     html! {
         if !(*correct).value.eq("true") {
-            <div id="password-screen" >
-                <div id="screen-blocker" />
+            <div classes = {password_screen::password_screen()} >
+                <div classes = {screen_blocker()} />
                 <form id="password-form" onsubmit={submit_handler}>
-                    <PasswordInput callback={handler} show={*show} color={*color}/>
-                    <button id="show" type="button" onclick={password_button_onclick} >
+                    <PasswordInput callback={handler} show={*showing} color={*color}/>
+                    <button classes = {show()} type="button" onclick={password_button_onclick} >
                         <span class="material-symbols-outlined">{
-                            if *show {
+                            if *showing {
                                 "visibility_off"
                             } else {
                                 "visibility"
                             }
                         }</span>
                     </button>
-                    <SubmitButton id="password-submit-button">{"login"}</SubmitButton>
+                    <PasswordSubmitButton>{"login"}</PasswordSubmitButton>
                 </form>
             </div>
         }
