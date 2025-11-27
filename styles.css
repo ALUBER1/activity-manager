@@ -163,10 +163,10 @@ html, body {
 }
 
 p {
-  padding: none;
+  padding: none !important;
   padding-left: 2%;
   color: var(--text-color);
-  margin: none;
+  margin: none !important;
   font-size: 20px;
 }
 
@@ -272,18 +272,6 @@ div:has( > .color-picker-container) {
   width: 100%;
 }
 
-.color-picker-container {
-  display: inline-block;
-  width: 100px;
-  height: fit-content;
-  position: relative;
-  margin-left: auto;
-  margin-right: 10px;
-  outline: none;
-  cursor: pointer;
-  border-radius: 10px;
-}
-
 .pickr {
   height: 23px;
   width: 23px;
@@ -362,7 +350,6 @@ div:has( > .color-picker-container) {
 .record-label {
   width: 80%;
   height: fit-content;
-  line-height: calc(2.5em - 50%);
 }
 
 .setting > input {

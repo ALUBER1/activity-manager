@@ -2,6 +2,8 @@ use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
+use crate::classes::edit_input::edit_input;
+
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub name: String,
@@ -25,6 +27,15 @@ pub fn text_input(props: &Props) -> Html {
     };
 
     html! {
-        <input type="text" autocomplete = "off" name = {props.name.clone()} placeholder = {props.name.clone()} onchange = {onchange} style = {format!("background-color: {}", props.color.clone())} value={props.value.clone()} />
+        <input 
+            type="text" 
+            autocomplete = "off" 
+            name = {props.name.clone()} 
+            placeholder = {props.name.clone()} 
+            onchange = {onchange} 
+            style = {format!("background-color: {}", props.color.clone())} 
+            value={props.value.clone()} 
+            classes = {edit_input()}
+        />
     }
 }

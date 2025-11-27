@@ -3,6 +3,7 @@ pub mod components;
 pub mod errors;
 pub mod models;
 pub mod utils;
+pub mod classes;
 
 use app::App;
 
