@@ -315,14 +315,14 @@ pub fn app() -> Html {
             translations={translations}
             default_language={(*language).value.clone()}
         >
-            <div id="main">
-                <div id="fixed">
+            <div classes = {classes!("absolute", "h-full", "w-full")}>
+                <div classes = {classes!("fixed", "h-fit", "w-full", "z-100")}>
                     <TitleBar on_click={title_handler}></TitleBar>
-                    <div id="form">
+                    <div classes = {classes!("bg-(--background-color)", "pl-[60px]")}>
                         <Form on_submit = {on_submit} />
                     </div>
                 </div>
-                <div id="non-fixed">
+                <div classes = {classes!("z-1", "h-[calc(100vh_-_130px)]", "w-[calc(100%_-_60px)]", "mt-[130px]", "ml-[60px]")}>
                     <RecordList list = {(*record_list).clone()} delete_callback = {delete_handler} edit_callback = {edit_handler} />
                 </div>
                 <Settings callback={settings_handler} delay={(*delay).clone()} password_enabled={(*password_enabled).value.eq("true")}/>

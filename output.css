@@ -63,6 +63,9 @@
 .isolate {
   isolation: isolate;
 }
+.z-1 {
+  z-index: 1;
+}
 .z-100 {
   z-index: 100;
 }
@@ -87,6 +90,9 @@
 .mt-\[20px\] {
   margin-top: 20px;
 }
+.mt-\[130px\] {
+  margin-top: 130px;
+}
 .mr-\[10px\] {
   margin-right: 10px;
 }
@@ -104,6 +110,9 @@
 }
 .ml-\[15px\] {
   margin-left: 15px;
+}
+.ml-\[60px\] {
+  margin-left: 60px;
 }
 .ml-auto {
   margin-left: auto;
@@ -159,6 +168,9 @@
 .h-\[calc\(100\%_-_var\(--head-height\)\)\] {
   height: calc(100% - var(--head-height));
 }
+.h-\[calc\(100vh_-_130px\)\] {
+  height: calc(100vh - 130px);
+}
 .h-fit {
   height: fit-content;
 }
@@ -209,6 +221,9 @@
 }
 .w-\[calc\(100\%_\+_10px\)\] {
   width: calc(100% + 10px);
+}
+.w-\[calc\(100\%_-_60px\)\] {
+  width: calc(100% - 60px);
 }
 .w-fit {
   width: fit-content;
@@ -368,6 +383,9 @@
 }
 .pl-\[10px\] {
   padding-left: 10px;
+}
+.pl-\[60px\] {
+  padding-left: 60px;
 }
 .text-left {
   text-align: left;

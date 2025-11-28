@@ -9,6 +9,7 @@ pub fn submit() -> Classes {
         "items-center",
         "w-[30px]",
         "rounded-[5px]",
-        "ml-[10px]"
+        "ml-[10px]",
+        "bg-(--input-background-color)"
     )
 }
