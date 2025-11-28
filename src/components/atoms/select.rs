@@ -1,6 +1,8 @@
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
-use yew::{function_component, html, Callback, Event, Html, Properties};
+use yew::{Callback, Event, Html, Properties, classes, function_component, html};
+
+use crate::classes::select_classes::*;
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
@@ -24,19 +26,19 @@ pub fn create_select(prop: &Props) -> Html {
     };
 
     html! {
-        <div class="select-container">
-            <select class="select-comp" onchange={onchange} >
+        <div classes = {select_container()}>
+            <select classes= { select_comp() } onchange={onchange} >
                 {
                     prop.selections.clone().into_iter().map(|element| {
                         html!{
-                            <option value={element.clone()} class="select-option-comp" selected={
+                            <option value={element.clone()} classes = {select_option_comp()} selected={
                                 element.eq(&prop.selected)
                             }>{element}</option>
                         }
                     }).collect::<Html>()
                 }
             </select>
-            <span class={"material-symbols-outlined select-arrow"}>{"keyboard_arrow_down"}</span>
+            <span classes={classes!("material-symbols-outlined", select_arrow())}>{"keyboard_arrow_down"}</span>
         </div>
     }
 }

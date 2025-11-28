@@ -4,7 +4,7 @@ use yew::{Callback, Html, Properties, classes, function_component, html, use_sta
 use shared::models::record::Record;
 
 use crate::{
-    classes::{editing_panel::editing_panel, record_button::record_button, record_list, record_list_style::record_list_style}, components::{atoms::record_button::RecordButton, molecules::edit_form::EditForm}, errors::form_error::FormError
+    classes::{edit_classes::editing_panel, record_classes::*}, components::{atoms::record_button::RecordButton, molecules::edit_form::EditForm}, errors::form_error::FormError
 };
 
 #[derive(Properties, PartialEq, Clone)]
@@ -15,7 +15,7 @@ pub struct Props {
 }
 
 #[function_component(RecordList)]
-pub fn record_list(records: &Props) -> Html {
+pub fn create_record_list(records: &Props) -> Html {
     let (i18n, _set_language) = use_translation();
 
     let editing = use_state(|| None::<Record>);
@@ -66,7 +66,7 @@ pub fn record_list(records: &Props) -> Html {
                     </div>
                 </div>
             } else {
-                <div classes = {record_list::record_list()}>
+                <div classes = {record_list()}>
                     {
                         records.list.clone().into_iter().map(|element|{
                             html!{

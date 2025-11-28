@@ -6,7 +6,7 @@ use yew::{
     function_component, html, use_effect_with, use_state, Callback, Html, NodeRef, Properties,
 };
 
-use crate::models::toast_notification_model::ToastNotificationModel;
+use crate::{classes::notification_classes::{notification_container, notification_content, notification_progress, notification_title}, models::toast_notification_model::ToastNotificationModel};
 
 #[derive(PartialEq, Properties)]
 pub struct Props {
@@ -55,11 +55,11 @@ pub fn create_toast_notification(prop: &Props) -> Html {
     });
 
     html! {
-        <div class="notification-container" ref={toast}>
-            <p class="notification-title">{prop.notification.title.clone()}</p>
-            <div class="notification-content">
-                <p class="notification-message">{prop.notification.message.clone()}</p>
-                <div class="notification-progress" />
+        <div classes = {notification_container()} ref={toast}>
+            <p classes = {notification_title()}>{prop.notification.title.clone()}</p>
+            <div classes = {notification_content()}>
+                <p>{prop.notification.message.clone()}</p>
+                <div classes = {notification_progress()} />
             </div>
         </div>
     }

@@ -2,8 +2,7 @@ use chrono::{Duration, Local};
 use yew::{function_component, html, Callback, Html, Properties};
 
 use crate::{
-    components::atoms::toast_notification::ToastNotification,
-    models::toast_notification_model::ToastNotificationModel,
+    classes::notification_classes::notifications_container, components::atoms::toast_notification::ToastNotification, models::toast_notification_model::ToastNotificationModel
 };
 
 #[derive(Properties, PartialEq)]
@@ -23,7 +22,7 @@ pub fn create_toast_notifications(prop: &Props) -> Html {
 
     html! {
         if prop.notifications.len() != 0 {
-            <div class="notifications-container" >
+            <div classes = {notifications_container()} >
                 {
                     prop.notifications.clone()
                         .into_iter()

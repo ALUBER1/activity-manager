@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-use crate::classes::password_submit_button::password_submit_button;
+use crate::classes::password_classes::password_submit_button;
 
 #[derive(PartialEq, Properties)]
 pub struct Props {

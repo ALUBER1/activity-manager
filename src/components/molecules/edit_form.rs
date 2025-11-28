@@ -1,5 +1,5 @@
 use crate::{
-    classes::{cancel::cancel, edit_form::edit_form, editing_button_container::editing_button_container, form_fields::form_fields}, components::atoms::{button::Button, edit_input::EditInput, submit_button::SubmitButton}, errors::form_error::{FormError, FormErrorReason}
+    classes::edit_classes::*, components::atoms::{button::Button, edit_input::EditInput, submit_button::SubmitButton}, errors::form_error::{FormError, FormErrorReason}
 };
 use chrono::{Local, NaiveDate, NaiveDateTime, NaiveTime};
 use gloo::timers::callback::Timeout;

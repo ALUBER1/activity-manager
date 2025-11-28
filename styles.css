@@ -512,21 +512,6 @@ input[type="checkbox"] {
   z-index: 100;
 }
 
-.notifications-container {
-  position: absolute;
-  right: 0px;
-  bottom: 0px;
-  width: 40%;
-  height: calc(100% - var(--head-height));
-  display: flex;
-  flex-direction: column;
-  justify-content: end;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  z-index: 1000;
-  pointer-events: none;
-}
-
 .notification-container {
   -webkit-transition-duration: 600ms;
   transition-duration: 600ms;

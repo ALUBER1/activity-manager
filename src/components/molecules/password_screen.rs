@@ -1,5 +1,5 @@
 use crate::{
-    classes::{password_screen, screen_blocker::screen_blocker, show::show}, components::atoms::{password_input::PasswordInput, password_submit_button::PasswordSubmitButton}, utils::helper::invoke_function_store
+    classes::password_classes::*, components::atoms::{password_input::PasswordInput, password_submit_button::PasswordSubmitButton}, utils::helper::invoke_function_store
 };
 use gloo::timers::callback::Timeout;
 use shared::{models::storage_entry::StorageEntry, style::default_colors::DefaultColors};
@@ -7,7 +7,7 @@ use wasm_bindgen_futures::spawn_local;
 use yew::{function_component, html, use_effect_with, use_state, Callback, Html, SubmitEvent};
 
 #[function_component(PasswordScreen)]
-pub fn password_screen() -> Html {
+pub fn create_password_screen() -> Html {
     let password = use_state(|| String::new());
     let showing = use_state(|| false);
     let correct = use_state(|| StorageEntry::default());
@@ -63,7 +63,7 @@ pub fn password_screen() -> Html {
 
     html! {
         if !(*correct).value.eq("true") {
-            <div classes = {password_screen::password_screen()} >
+            <div classes = {password_screen()} >
                 <div classes = {screen_blocker()} />
                 <form id="password-form" onsubmit={submit_handler}>
                     <PasswordInput callback={handler} show={*showing} color={*color}/>

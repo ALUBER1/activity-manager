@@ -6,16 +6,14 @@ use shared::{
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::{
-    function_component, html, use_effect_with, use_state, Callback, Html, MouseEvent, Properties,
+    Callback, Html, MouseEvent, Properties, classes, function_component, html, use_effect_with, use_state
 };
 
 use crate::{
-    components::atoms::{
+    classes::settings_classes::*, components::atoms::{
         button::Button, color_picker::ColorPicker, notification_input::NotificationInput,
         select::Select, setting::Setting, text_input::TextInput,
-    },
-    errors::setting_error::{SettingError, SettingErrorReason},
-    models::setting_value::SettingValue,
+    }, errors::setting_error::{SettingError, SettingErrorReason}, models::setting_value::SettingValue
 };
 
 #[derive(Properties, PartialEq)]
@@ -134,12 +132,12 @@ pub fn create_setting(prop: &Props) -> Html {
     };
 
     html! {
-        <div id="settings-container">
-            <div id="settings-panel" class={
+        <div classes = {settings_container()}>
+            <div id="settings-panel" classes={
                 if *show {
-                    "show-panel"
+                    classes!("w-[300px]", "border-t", "border-t-solid", "border-(--background-color)")
                 } else {
-                    "hide-panel"
+                    classes!("invisible", "w-[60px]")
                 }
             }>
                 <Setting label={i18n.t("background")}><ColorPicker item="background-color" call_back={get_input_values.clone()} index=0 /></Setting>
@@ -156,19 +154,36 @@ pub fn create_setting(prop: &Props) -> Html {
                         format!("{}/{}", days, minutes)
                     }
                 } /></Setting>
-                <Setting label={i18n.t("enabled")}><input type="checkbox" onclick={password_enabled_handle} checked={*password_enabled} /></Setting>
+                <Setting label={i18n.t("enabled")}>
+                    <input 
+                        type="checkbox" 
+                        onclick={password_enabled_handle} 
+                        checked={*password_enabled} 
+                        classes = {classes!("w-fit", "mr-[18%]")}
+                    />
+                </Setting>
                 if *password_enabled {
-                    <Setting label={"password"}><TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()} /></Setting>
+                    <Setting label={"password"}>
+                        <TextInput name="password" on_change={password_handle} color={DefaultColors::INPUT_BACKGROUND_COLOR.to_string()} />
+                    </Setting>
                 }
                 <Setting label={i18n.t("language")}>
                     <Select selections={valid_languages} onchange={language_handle} selected={i18n.get_current_language().to_string()}/>
                 </Setting>
             </div>
-            <Button onclick={listener.clone()} id="settings"><span class={format!("material-symbols-outlined {}", if *show {
-                "spin"
-            } else {
-                ""
-            })}>{"settings"}</span></Button>
+            <Button onclick={listener.clone()} classes = {settings()}>
+                <span classes = {
+                    format!("material-symbols-outlined {}", 
+                        if *show {
+                            "spin"
+                        } else {
+                            ""
+                        }
+                    )
+                }>
+                    {"settings"}
+                </span>
+            </Button>
         </div>
     }
 }

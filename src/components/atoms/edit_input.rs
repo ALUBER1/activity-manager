@@ -2,7 +2,7 @@ use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
-use crate::classes::edit_input::edit_input;
+use crate::classes::edit_classes::edit_input;
 
 #[derive(Properties, PartialEq)]
 pub struct Props {

@@ -1,5 +1,7 @@
 use yew::{function_component, html, Children, Html, Properties};
 
+use crate::classes::settings_classes::*;
+
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub label: String,
@@ -7,14 +9,14 @@ pub struct Props {
 }
 
 #[function_component(Setting)]
-pub fn setting(prop: &Props) -> Html {
+pub fn create_setting(prop: &Props) -> Html {
     html! {
         <>
-            <div class="setting">
-                <p class="setting-label">{prop.label.clone()}</p>
+            <div classes = {setting()}>
+                <p classes = {setting_label()}>{prop.label.clone()}</p>
                 {prop.children.clone()}
             </div>
-            <hr class="settings-divisor"/>
+            <hr classes = {settings_divisor()}/>
         </>
     }
 }
