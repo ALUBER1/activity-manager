@@ -2,7 +2,8 @@
 
 This is an application that lets you store appointments using a name, a date and a time and then reminds you 60 minutes before by default. It is fully customizable from the color of the inputs to the notification delay, it even lets you save a password to protect your privacy.\
 This app comes in three languages that you can select from the settings: italian, english and french.\
-The arrow button in the top right is used to put the app in the tray.
+The arrow button in the top right is used to put the app in the tray.\
+The app saves all data at this path: C:\Users\<username>\AppData\Roaming\com.activity-manager
 
 \
 **landing page:**
